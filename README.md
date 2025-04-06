@@ -26,13 +26,13 @@ The project is powered by the [Beaver Foundation](https://beaver.foundation), su
 
 ## Screenshots
 
-![Main Game Viewer](/public/screenshots/game-viewer.png)
+![Main Game Viewer](/Examples/3_game_preview.jpg)
 *The main game viewer interface showing an interactive Go board with move history and navigation controls*
 
-![Game Library](/public/screenshots/game-library.png)
+![Game Library](/Examples/2_game_lib.jpg)
 *Browse thousands of professional games organized by tournaments, players, and categories*
 
-![SGF File Upload](/public/screenshots/file-upload.png)
+![SGF File Upload](/Examples/1_game_upload.jpg)
 *Upload your own SGF files or paste Japanese kifu format for instant visualization*
 
 ## Game Library
