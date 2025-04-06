@@ -370,7 +370,7 @@ PW[White Player]PB[Black Player]
                     <a href="https://homepages.cwi.nl/~aeb/go/games/games/" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>SGF Game Collection</a>
                   </li>
                   <li style={{ marginBottom: '5px' }}>
-                    <a href="https://github.com/AI-Kifu" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>GitHub Repository</a>
+                    <a href="https://github.com/shiofreecss/AI-Kifu" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>GitHub Repository</a>
                   </li>
                 </ul>
               </div>
