@@ -24,6 +24,17 @@ The project is powered by the [Beaver Foundation](https://beaver.foundation), su
 - 📱 Responsive design for desktop and mobile
 - ⚡ Optimized performance with caching and React memoization
 
+## Screenshots
+
+![Main Game Viewer](/public/screenshots/game-viewer.png)
+*The main game viewer interface showing an interactive Go board with move history and navigation controls*
+
+![Game Library](/public/screenshots/game-library.png)
+*Browse thousands of professional games organized by tournaments, players, and categories*
+
+![SGF File Upload](/public/screenshots/file-upload.png)
+*Upload your own SGF files or paste Japanese kifu format for instant visualization*
+
 ## Game Library
 
 The AI-Kifu game library includes thousands of professional Go games, organized into categories:
@@ -66,7 +77,7 @@ AI-Kifu includes several performance optimizations to ensure smooth and responsi
 
 1. Clone the repository:
    ```
-   git clone https://github.com/AI-Kifu/ai-kifu.git
+   git clone https://github.com/shiofreecss/AI-Kifu.git
    cd ai-kifu
    ```
 
