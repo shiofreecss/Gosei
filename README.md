@@ -2,6 +2,10 @@
 
 AI-Kifu is an open-source web application dedicated to the Go community for reading, visualizing, and analyzing Go game records (kifu) in both SGF (Smart Game Format) and traditional Japanese kifu format.
 
+## Live Demo
+
+Check out the live deployment of AI-Kifu at [https://kifu.netlify.app/](https://kifu.netlify.app/)
+
 ## About the Project
 
 AI-Kifu is built as a contribution to the Go community, providing free access to both game visualization tools and an extensive library of historical games. The application features thousands of professional games sourced from the [comprehensive SGF collection](https://homepages.cwi.nl/~aeb/go/games/games/) maintained by Andries E. Brouwer.
