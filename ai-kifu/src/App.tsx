@@ -70,7 +70,7 @@ PW[White Player]PB[Black Player]
         color: 'white',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
       }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+        <div style={{ maxWidth: '1250px', margin: '0 auto', padding: '0 20px' }}>
           <h1 style={{ 
             margin: 0, 
             fontSize: '32px',
@@ -150,7 +150,7 @@ PW[White Player]PB[Black Player]
       </header>
       
       <main style={{ 
-        maxWidth: '1200px', 
+        maxWidth: '1250px', 
         margin: '0 auto', 
         padding: '30px 20px',
         flex: '1 0 auto'
@@ -170,7 +170,8 @@ PW[White Player]PB[Black Player]
             padding: '25px', 
             borderRadius: '8px',
             marginBottom: '30px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+            width: '100%'
           }}>
             <h2 style={{ 
               color: '#333',
@@ -280,7 +281,8 @@ PW[White Player]PB[Black Player]
             padding: '25px', 
             borderRadius: '8px',
             marginBottom: '30px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+            width: '100%'
           }}>
             <GameLibrary onSelectGame={handleGameSelected} />
           </div>
@@ -292,7 +294,8 @@ PW[White Player]PB[Black Player]
           padding: '25px', 
           borderRadius: '8px',
           marginBottom: '30px',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+          width: '100%'
         }}>
           <h2 style={{ 
             color: '#333',
@@ -313,7 +316,8 @@ PW[White Player]PB[Black Player]
             padding: '25px', 
             borderRadius: '8px',
             marginBottom: '30px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+            width: '100%'
           }}>
             <h2 style={{ 
               color: '#333',
@@ -345,7 +349,7 @@ PW[White Player]PB[Black Player]
         boxShadow: '0 -4px 6px rgba(0, 0, 0, 0.05)',
         flexShrink: 0
       }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px' }}>
           <div style={{ 
             display: 'flex', 
             flexDirection: 'column',

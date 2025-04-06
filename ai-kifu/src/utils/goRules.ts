@@ -249,10 +249,10 @@ export const getHandicapPositions = (boardSize: number, handicap: number): Posit
       { x: 15, y: 3 },  // bottom right
       { x: 3, y: 15 },  // top left
       { x: 9, y: 9 },   // center
-      { x: 9, y: 3 },   // bottom center
-      { x: 15, y: 9 },  // right center
-      { x: 9, y: 15 },  // top center
-      { x: 3, y: 9 }    // left center
+      { x: 3, y: 9 },   // left middle
+      { x: 15, y: 9 },  // right middle
+      { x: 9, y: 3 },   // bottom middle
+      { x: 9, y: 15 }   // top middle
     ];
   } else if (boardSize === 13) {
     starPoints = [
@@ -261,10 +261,10 @@ export const getHandicapPositions = (boardSize: number, handicap: number): Posit
       { x: 9, y: 3 },   // bottom right
       { x: 3, y: 9 },   // top left
       { x: 6, y: 6 },   // center
-      { x: 6, y: 3 },   // bottom center
-      { x: 9, y: 6 },   // right center
-      { x: 6, y: 9 },   // top center
-      { x: 3, y: 6 }    // left center
+      { x: 3, y: 6 },   // left middle
+      { x: 9, y: 6 },   // right middle
+      { x: 6, y: 3 },   // bottom middle
+      { x: 6, y: 9 }    // top middle
     ];
   } else if (boardSize === 9) {
     starPoints = [
@@ -273,13 +273,108 @@ export const getHandicapPositions = (boardSize: number, handicap: number): Posit
       { x: 6, y: 2 },   // bottom right
       { x: 2, y: 6 },   // top left
       { x: 4, y: 4 },   // center
-      { x: 4, y: 2 },   // bottom center
-      { x: 6, y: 4 },   // right center
-      { x: 4, y: 6 },   // top center
-      { x: 2, y: 4 }    // left center
+      { x: 2, y: 4 },   // left middle
+      { x: 6, y: 4 },   // right middle
+      { x: 4, y: 2 },   // bottom middle
+      { x: 4, y: 6 }    // top middle
     ];
   }
   
-  // Return the appropriate number of handicap positions
+  // Return only the required number of handicap stones
   return starPoints.slice(0, handicap);
+};
+
+/**
+ * Calculates territory and scoring for the current board state
+ * Note: This is a simplified implementation and may not handle all edge cases
+ */
+export const calculateTerritory = (
+  board: ('black' | 'white' | null)[][],
+): {
+  blackTerritory: number,
+  whiteTerritory: number,
+  blackCaptures: number,
+  whiteCaptures: number
+} => {
+  const boardSize = board.length;
+  
+  // Create a copy of the board to mark territory
+  const territoryBoard = board.map(row => [...row]);
+  
+  // Initialize territory counts
+  let blackTerritory = 0;
+  let whiteTerritory = 0;
+  
+  // Function to flood fill and determine territory ownership
+  const floodFillTerritory = (startX: number, startY: number) => {
+    if (territoryBoard[startY][startX] !== null) return null;
+    
+    const queue: Position[] = [{ x: startX, y: startY }];
+    const territory: Position[] = [];
+    let isBlackBordered = false;
+    let isWhiteBordered = false;
+    
+    const visited: boolean[][] = Array(boardSize)
+      .fill(false)
+      .map(() => Array(boardSize).fill(false));
+    
+    while (queue.length > 0) {
+      const pos = queue.shift()!;
+      
+      if (visited[pos.y][pos.x]) continue;
+      
+      visited[pos.y][pos.x] = true;
+      
+      if (territoryBoard[pos.y][pos.x] === null) {
+        territory.push(pos);
+        
+        const adjacentPositions = getAdjacentPositions(pos, boardSize);
+        
+        for (const adjPos of adjacentPositions) {
+          const adjCell = territoryBoard[adjPos.y][adjPos.x];
+          
+          if (adjCell === null) {
+            queue.push(adjPos);
+          } else if (adjCell === 'black') {
+            isBlackBordered = true;
+          } else if (adjCell === 'white') {
+            isWhiteBordered = true;
+          }
+        }
+      }
+    }
+    
+    // Determine ownership of territory
+    let owner = null;
+    if (isBlackBordered && !isWhiteBordered) {
+      owner = 'black';
+      blackTerritory += territory.length;
+    } else if (isWhiteBordered && !isBlackBordered) {
+      owner = 'white';
+      whiteTerritory += territory.length;
+    }
+    
+    // Mark territory on board to avoid recounting
+    territory.forEach(pos => {
+      territoryBoard[pos.y][pos.x] = 'marked' as any;
+    });
+    
+    return { territory, owner };
+  };
+  
+  // Scan the board for empty spaces and determine territory
+  for (let y = 0; y < boardSize; y++) {
+    for (let x = 0; x < boardSize; x++) {
+      if (territoryBoard[y][x] === null) {
+        floodFillTerritory(x, y);
+      }
+    }
+  }
+  
+  return {
+    blackTerritory,
+    whiteTerritory,
+    blackCaptures: 0, // These would be tracked separately during game play
+    whiteCaptures: 0
+  };
 }; 

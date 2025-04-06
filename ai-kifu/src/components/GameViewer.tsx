@@ -24,8 +24,8 @@ const GameViewer: React.FC<GameViewerProps> = ({ sgfContent, onClose }) => {
       <div style={{ 
         backgroundColor: 'white',
         borderRadius: '8px',
-        maxWidth: '1000px',
-        width: '100%',
+        maxWidth: '1250px',
+        width: '90%',
         maxHeight: '90vh',
         overflow: 'auto',
         position: 'relative',

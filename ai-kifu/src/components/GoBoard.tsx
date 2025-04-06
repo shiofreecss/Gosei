@@ -30,7 +30,8 @@ const GoBoard: React.FC<GoBoardProps> = ({
   capturedStones = [],
   onClick 
 }) => {
-  const cellSize = 30;
+  // Adjust cell size for better balance in side-by-side layout
+  const cellSize = 32; // Decreased from 40 to 32
   const boardSize = (size - 1) * cellSize;
   const boardPadding = cellSize / 2;
   
@@ -59,16 +60,24 @@ const GoBoard: React.FC<GoBoardProps> = ({
     return map;
   }, [capturedStones]);
   
+  // Determine if a stone at given coordinates is captured
+  const isStoneVisible = useCallback((x: number, y: number) => {
+    const key = `${x},${y}`;
+    if (!capturedStonesMap.has(key)) return true;
+    
+    // If stone is in the captured map, it's not visible
+    return false;
+  }, [capturedStonesMap]);
+  
   const renderStones = useCallback(() => {
     const visibleStones = stones.slice(0, currentMove >= 0 ? currentMove + 1 : stones.length);
     
     return visibleStones.map((stone, index) => {
-      const isLatestMove = index === (currentMove >= 0 ? currentMove : stones.length - 1);
+      const isLatestMove = index === (currentMove >= 0 ? currentMove : visibleStones.length - 1);
       const moveNumber = index + 1;
-      const isCaptured = capturedStonesMap.has(`${stone.x},${stone.y}`);
       
       // Skip rendering if the stone is captured
-      if (isCaptured) return null;
+      if (!isStoneVisible(stone.x, stone.y)) return null;
       
       return (
         <g key={`${stone.x}-${stone.y}`}>
@@ -87,8 +96,8 @@ const GoBoard: React.FC<GoBoardProps> = ({
             cy={stone.y * cellSize}
             r={cellSize * 0.45}
             fill={stone.color}
-            stroke={stone.color === 'black' ? '#222' : '#ddd'}
-            strokeWidth={0.5}
+            stroke={stone.color === 'black' ? '#222' : '#888'} // Improved contrast for white stones
+            strokeWidth={0.8} // Slightly thicker border
             style={{ 
               filter: stone.color === 'black' 
                 ? 'brightness(1.1) drop-shadow(0 1px 1px rgba(0,0,0,0.4))' 
@@ -101,7 +110,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
             <circle
               cx={stone.x * cellSize}
               cy={stone.y * cellSize}
-              r={cellSize * 0.15}
+              r={cellSize * 0.18} // Larger indicator
               fill={stone.color === 'black' ? 'white' : 'black'}
               opacity={0.8}
             />
@@ -113,7 +122,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
               x={stone.x * cellSize}
               y={stone.y * cellSize + 5}
               textAnchor="middle"
-              fontSize={cellSize * 0.4}
+              fontSize={cellSize * 0.4} // Larger font for better readability
               fontFamily="sans-serif"
               fontWeight="bold"
               fill={stone.color === 'black' ? 'white' : 'black'}
@@ -125,9 +134,9 @@ const GoBoard: React.FC<GoBoardProps> = ({
         </g>
       );
     });
-  }, [stones, currentMove, showMoveNumbers, capturedStonesMap, cellSize]);
+  }, [stones, currentMove, showMoveNumbers, isStoneVisible, cellSize]);
   
-  // Render any captured stones with a special style (ghosted appearance)
+  // Render any captured stones with a special style
   const renderCapturedStones = useCallback(() => {
     if (!capturedStones || capturedStones.length === 0) return null;
     
@@ -136,21 +145,50 @@ const GoBoard: React.FC<GoBoardProps> = ({
       stone => stone.moveNumber <= (currentMove >= 0 ? currentMove + 1 : stones.length)
     );
     
-    return visibleCaptures.map((stone, index) => (
-      <g key={`captured-${stone.x}-${stone.y}-${index}`}>
-        <circle
-          cx={stone.x * cellSize}
-          cy={stone.y * cellSize}
-          r={cellSize * 0.45}
-          fill={stone.color}
-          opacity={0.2}
-          stroke={stone.color === 'black' ? '#222' : '#ddd'}
-          strokeWidth={0.5}
-          strokeDasharray="4,2"
-        />
-      </g>
-    ));
-  }, [capturedStones, currentMove, stones, cellSize]);
+    // Create an animation effect for recent captures (stones captured in the last move)
+    const lastMoveNumber = currentMove >= 0 ? currentMove + 1 : stones.length;
+    
+    return visibleCaptures.map((stone, index) => {
+      const isRecentCapture = stone.moveNumber === lastMoveNumber;
+      
+      return (
+        <g key={`captured-${stone.x}-${stone.y}-${index}`}>
+          {/* Show a more visible "X" mark where the stone was captured */}
+          <line
+            x1={(stone.x * cellSize) - (cellSize * 0.3)}
+            y1={(stone.y * cellSize) - (cellSize * 0.3)}
+            x2={(stone.x * cellSize) + (cellSize * 0.3)}
+            y2={(stone.y * cellSize) + (cellSize * 0.3)}
+            stroke={stone.color === 'black' ? '#333' : '#888'} // Better contrast
+            strokeWidth={1.5} // Thicker line for better visibility
+            opacity={0.6} // Higher opacity for better visibility
+            strokeDasharray={isRecentCapture ? "0" : "3,2"}
+          />
+          <line
+            x1={(stone.x * cellSize) + (cellSize * 0.3)}
+            y1={(stone.y * cellSize) - (cellSize * 0.3)}
+            x2={(stone.x * cellSize) - (cellSize * 0.3)}
+            y2={(stone.y * cellSize) + (cellSize * 0.3)}
+            stroke={stone.color === 'black' ? '#333' : '#888'} // Better contrast
+            strokeWidth={1.5} // Thicker line for better visibility
+            opacity={0.6} // Higher opacity for better visibility
+            strokeDasharray={isRecentCapture ? "0" : "3,2"}
+          />
+          
+          {/* Add a more visible ghost of the stone for recent captures */}
+          {isRecentCapture && (
+            <circle
+              cx={stone.x * cellSize}
+              cy={stone.y * cellSize}
+              r={cellSize * 0.25} // Larger ghost
+              fill={stone.color}
+              opacity={0.15} // Slightly more visible
+            />
+          )}
+        </g>
+      );
+    });
+  }, [capturedStones, currentMove, stones.length, cellSize]);
   
   const renderGrid = useCallback(() => {
     const lines = [];
@@ -164,7 +202,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
           y1={i * cellSize}
           x2={boardSize}
           y2={i * cellSize}
-          stroke="#444"
+          stroke="#333" // Darker lines for better contrast
           strokeWidth={i === 0 || i === size - 1 ? 2 : 1}
         />
       );
@@ -179,7 +217,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
           y1={0}
           x2={i * cellSize}
           y2={boardSize}
-          stroke="#444"
+          stroke="#333" // Darker lines for better contrast
           strokeWidth={i === 0 || i === size - 1 ? 2 : 1}
         />
       );
@@ -200,8 +238,9 @@ const GoBoard: React.FC<GoBoardProps> = ({
           x={i * cellSize}
           y={boardSize + boardPadding * 2}
           textAnchor="middle"
-          fill="#555"
-          fontSize={cellSize * 0.4}
+          fill="#333" // Darker text for better contrast
+          fontSize={cellSize * 0.45} // Larger font for coordinates
+          fontWeight="500" // Slightly bolder
           fontFamily="sans-serif"
         >
           {letters[i]}
@@ -217,8 +256,9 @@ const GoBoard: React.FC<GoBoardProps> = ({
           x={-boardPadding * 1.5}
           y={i * cellSize + cellSize * 0.15}
           textAnchor="middle"
-          fill="#555"
-          fontSize={cellSize * 0.4}
+          fill="#333" // Darker text for better contrast
+          fontSize={cellSize * 0.45} // Larger font for coordinates
+          fontWeight="500" // Slightly bolder
           fontFamily="sans-serif"
         >
           {size - i}
@@ -239,8 +279,8 @@ const GoBoard: React.FC<GoBoardProps> = ({
             key={`hoshi-${x}-${y}`}
             cx={x * cellSize}
             cy={y * cellSize}
-            r={3.5}
-            fill="#444"
+            r={4} // Larger star points
+            fill="#333" // Darker for better contrast
           />
         );
       }
@@ -249,103 +289,74 @@ const GoBoard: React.FC<GoBoardProps> = ({
     return points;
   }, [hoshiPoints, cellSize]);
   
-  const renderClickableAreas = useCallback(() => {
-    const areas = [];
+  const renderCellOverlays = useCallback(() => {
+    if (!onClick) return null;
+    
+    const overlays = [];
     
     for (let x = 0; x < size; x++) {
       for (let y = 0; y < size; y++) {
-        areas.push(
-          <rect
-            key={`click-${x}-${y}`}
-            x={(x * cellSize) - (cellSize / 2)}
-            y={(y * cellSize) - (cellSize / 2)}
-            width={cellSize}
-            height={cellSize}
-            fill="transparent"
-            onClick={() => handleCellClick(x, y)}
-            style={{ cursor: 'pointer' }}
-          />
+        // Skip if there's already a stone at this position
+        const hasStone = stones.some(stone => 
+          stone.x === x && stone.y === y &&
+          isStoneVisible(stone.x, stone.y)
         );
+        
+        if (!hasStone) {
+          overlays.push(
+            <rect
+              key={`overlay-${x}-${y}`}
+              x={(x * cellSize) - (cellSize / 2)}
+              y={(y * cellSize) - (cellSize / 2)}
+              width={cellSize}
+              height={cellSize}
+              fill="transparent"
+              onClick={() => handleCellClick(x, y)}
+              style={{ cursor: 'pointer' }}
+            />
+          );
+        }
       }
     }
     
-    return areas;
-  }, [size, cellSize, handleCellClick]);
-
-  // Memoize the SVG filter definitions
-  const filterDefinitions = useMemo(() => (
-    <defs>
-      <filter id="wood-texture" x="0" y="0" width="100%" height="100%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="5" />
-        <feColorMatrix type="saturate" values="0.1" />
-        <feBlend mode="multiply" in="SourceGraphic" />
-      </filter>
-      
-      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-        <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="#000" floodOpacity="0.3" />
-      </filter>
-    </defs>
-  ), []);
-  
-  // Memoize the board background rectangle
-  const boardBackground = useMemo(() => (
-    <rect
-      x={-boardPadding}
-      y={-boardPadding}
-      width={boardSize + boardPadding * 2}
-      height={boardSize + boardPadding * 2}
-      fill="#e9bb7b"
-      rx={4}
-      ry={4}
-      style={{ 
-        filter: 'url(#wood-texture)',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-      }}
-    />
-  ), [boardSize, boardPadding]);
+    return overlays;
+  }, [size, cellSize, stones, isStoneVisible, onClick, handleCellClick]);
   
   return (
-    <div 
-      className="go-board-container" 
-      style={{ 
-        margin: '10px 0',
-        position: 'relative',
-        display: 'inline-block'
-      }}
-    >
+    <div style={{ 
+      position: 'relative',
+      padding: `${boardPadding * 3.5}px ${boardPadding * 3}px`,
+      maxWidth: '100%',
+      overflow: 'auto', // Allow scrolling if the board is too big for small screens
+    }}>
       <svg
-        width={boardSize + cellSize + boardPadding * 2}
-        height={boardSize + cellSize + boardPadding * 2}
-        viewBox={`-${boardPadding * 2} -${boardPadding} ${boardSize + cellSize + boardPadding * 3} ${boardSize + cellSize + boardPadding * 3}`}
-      >
-        {/* Board background with wooden texture */}
-        {boardBackground}
-        
-        {/* Create a subtle wood grain texture */}
-        {filterDefinitions}
-        
-        {renderCoordinates()}
-        {renderGrid()}
-        {renderHoshiPoints()}
-        {renderCapturedStones()}
-        {renderStones()}
-        {renderClickableAreas()}
-      </svg>
-      
-      {/* Shadow effect for the board */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: -1,
-          borderRadius: '4px',
-          boxShadow: '0 6px 15px rgba(0, 0, 0, 0.15)',
-          transform: 'translateY(4px)'
+        width={boardSize + boardPadding * 3}
+        height={boardSize + boardPadding * 4}
+        viewBox={`${-boardPadding * 2} ${-boardPadding} ${boardSize + boardPadding * 3} ${boardSize + boardPadding * 4}`}
+        style={{ 
+          backgroundColor: '#e6c588', // Warm wood color for the board
+          borderRadius: '8px', // Slightly more rounded corners
+          boxShadow: '0 3px 8px rgba(0,0,0,0.2), inset 0 -3px 6px rgba(0,0,0,0.1)', // Enhanced shadow for depth
         }}
-      />
+      >
+        {/* Board grid */}
+        <g>{renderGrid()}</g>
+        
+        {/* Star points */}
+        <g>{renderHoshiPoints()}</g>
+        
+        {/* Captured stones' marks */}
+        <g>{renderCapturedStones()}</g>
+        
+        {/* Active stones */}
+        <g>{renderStones()}</g>
+        
+        {/* Coordinates */}
+        <g>{renderCoordinates()}</g>
+        
+        {/* Interactive overlays */}
+        {onClick && <g>{renderCellOverlays()}</g>}
+      </svg>
     </div>
   );
 };

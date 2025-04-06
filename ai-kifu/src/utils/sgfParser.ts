@@ -63,6 +63,9 @@ export const parseSGF = (sgfContent: string): ParsedGame => {
   // This will store AB property values which are typically handicap stones
   const handicapPositions: { x: number, y: number }[] = [];
 
+  // Check for captured stones in SGF (AW for adding white, AB for adding black)
+  let captureData: { [moveNumber: number]: { x: number, y: number }[] } = {};
+
   while ((match = propertyRegex.exec(cleanSgf)) !== null) {
     const [_, propertyName, propertyValueWithBrackets] = match;
     
@@ -103,6 +106,10 @@ export const parseSGF = (sgfContent: string): ParsedGame => {
           }
         });
         break;
+      case 'AW':
+        // Add White - in some variations of SGF, used for setup
+        // Not directly related to captures, but keeping for completeness
+        break;
       case 'C':
         lastComment = propertyValues[0];
         break;
@@ -116,6 +123,7 @@ export const parseSGF = (sgfContent: string): ParsedGame => {
             y: sgfToCoordinate(coords[1]),
             moveNumber,
             comment: lastComment || undefined,
+            captures: captureData[moveNumber] || []
           });
           lastComment = '';
           currentColor = 'white';
@@ -131,6 +139,7 @@ export const parseSGF = (sgfContent: string): ParsedGame => {
             y: sgfToCoordinate(coords[1]),
             moveNumber,
             comment: lastComment || undefined,
+            captures: captureData[moveNumber] || []
           });
           lastComment = '';
           currentColor = 'black';
@@ -146,6 +155,12 @@ export const parseSGF = (sgfContent: string): ParsedGame => {
     if (game.info.handicap === 0) {
       game.info.handicap = handicapPositions.length;
     }
+  }
+
+  // Process Japanese kifu format if SGF parsing failed or has no moves
+  if (game.moves.length === 0 && sgfContent.includes('黒') && sgfContent.includes('白')) {
+    const kifuLines = sgfContent.split('\n');
+    parseJapaneseKifu(kifuLines, game);
   }
 
   return game;
@@ -164,6 +179,58 @@ export const japaneseCoordinateToSGF = (japaneseCoord: string): [number, number]
   const row = rows.indexOf(japaneseCoord[1].toLowerCase());
   
   return [col, row];
+};
+
+// Parse traditional Japanese kifu format
+const parseJapaneseKifu = (lines: string[], game: ParsedGame) => {
+  let moveNumber = 0;
+  
+  for (const line of lines) {
+    // Skip comments and empty lines
+    if (line.startsWith('#') || line.trim() === '') continue;
+    
+    // Look for move patterns like "1. 黒: Q16" (Black: Q16)
+    const moveMatch = line.match(/^(\d+)[\.\s:]+([黒白])[\s:]+([A-T][1-9][0-9]?)/i);
+    if (moveMatch) {
+      moveNumber++;
+      const color = moveMatch[2] === '黒' ? 'black' : 'white';
+      const coord = moveMatch[3].toUpperCase();
+      
+      // Convert traditional board coordinates (A1, Q16, etc) to SGF coordinates
+      const x = coord.charCodeAt(0) - 'A'.charCodeAt(0);
+      const y = game.info.size - parseInt(coord.substring(1), 10);
+      
+      game.moves.push({
+        color,
+        x,
+        y,
+        moveNumber,
+        comment: '',
+        captures: []
+      });
+    }
+    
+    // Look for game info like "黒：Player Black"
+    const blackPlayerMatch = line.match(/^#\s*黒[:：]\s*(.+)/);
+    if (blackPlayerMatch) {
+      game.info.playerBlack = blackPlayerMatch[1].trim();
+    }
+    
+    const whitePlayerMatch = line.match(/^#\s*白[:：]\s*(.+)/);
+    if (whitePlayerMatch) {
+      game.info.playerWhite = whitePlayerMatch[1].trim();
+    }
+    
+    const resultMatch = line.match(/^#\s*結果[:：]\s*(.+)/);
+    if (resultMatch) {
+      game.info.result = resultMatch[1].trim();
+    }
+    
+    const dateMatch = line.match(/^#\s*日付[:：]\s*(.+)/);
+    if (dateMatch) {
+      game.info.date = dateMatch[1].trim();
+    }
+  }
 };
 
 // Convert moves to stones for rendering
