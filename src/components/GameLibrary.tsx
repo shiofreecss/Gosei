@@ -482,176 +482,612 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
   
   return (
     <div className="game-library" style={{ 
-      backgroundColor: 'white',
+      display: 'flex', 
+      flexDirection: 'column',
+      height: '100%',
+      overflow: 'hidden', 
+      backgroundColor: '#fafafa',
       borderRadius: '8px',
-      padding: '25px',
-      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+      padding: '20px'
     }}>
       <h2 style={{ 
-        fontSize: '24px', 
-        marginTop: 0, 
-        marginBottom: '20px',
-        fontWeight: '600',
-        color: '#333'
+        margin: '0 0 20px 0',
+        color: '#333',
+        borderBottom: '1px solid #eaeaea',
+        paddingBottom: '10px'
       }}>
         Game Library
       </h2>
       
+      <div style={{ display: 'flex', height: 'calc(100% - 60px)' }}>
+        {/* Left sidebar: Categories and Tournaments */}
+        <div style={{ 
+          width: '280px', 
+          borderRight: '1px solid #eaeaea',
+          paddingRight: '20px',
+          overflow: 'auto',
+          height: '100%'
+        }}>
+          {/* Category Selection at the top */}
+          <div style={{ marginBottom: '15px' }}>
+            <h3 style={{ 
+              fontSize: '16px', 
+              marginBottom: '10px',
+              color: '#555'
+            }}>
+              View
+            </h3>
+            <div style={{ 
+              display: 'flex', 
+              flexWrap: 'wrap',
+              gap: '8px'
+            }}>
+              <button
+                onClick={() => setSelectedCategory('all')}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: selectedCategory === 'all' ? '#4CAF50' : '#f0f0f0',
+                  color: selectedCategory === 'all' ? 'white' : '#333',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                All Tournaments
+              </button>
+              {mainCategories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  style={{
+                    padding: '8px 12px',
+                    backgroundColor: selectedCategory === category.id ? '#4CAF50' : '#f0f0f0',
+                    color: selectedCategory === category.id ? 'white' : '#333',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          {/* Tournament list with expandable categories */}
+          <div style={{ marginBottom: '15px' }}>
+            <h3 style={{ 
+              fontSize: '16px', 
+              marginBottom: '10px',
+              color: '#555',
+              display: 'flex',
+              justifyContent: 'space-between'
+            }}>
+              <span>Tournaments</span>
+              {loading && (
+                <span style={{ fontSize: '12px', color: '#777' }}>
+                  Loading...
+                </span>
+              )}
+            </h3>
+            
+            {selectedCategory === 'all' ? (
+              // Display tournaments organized by categories
+              mainCategories.map(category => (
+                <div key={category.id} style={{ marginBottom: '10px' }}>
+                  <div 
+                    onClick={() => toggleCategoryExpansion(category.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '8px 10px',
+                      backgroundColor: '#f0f0f0',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      marginBottom: '5px'
+                    }}
+                  >
+                    <span style={{ fontWeight: '500' }}>{category.name}</span>
+                    <span style={{ transform: expandedCategories[category.id] ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>
+                      ▶
+                    </span>
+                  </div>
+                  
+                  {expandedCategories[category.id] && (
+                    <div style={{ 
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      paddingLeft: '10px'
+                    }}>
+                      {/* Display category description */}
+                      {category.description && (
+                        <div style={{ 
+                          fontSize: '12px', 
+                          color: '#666', 
+                          margin: '0 0 8px 0',
+                          padding: '0 4px'
+                        }}>
+                          {category.description}
+                        </div>
+                      )}
+                      
+                      {/* Display subcategories */}
+                      {category.subcategories && category.subcategories.map(subcategory => (
+                        <div key={subcategory.id} style={{ marginBottom: '8px' }}>
+                          <div 
+                            onClick={() => toggleSubcategoryExpansion(`${category.id}_${subcategory.id}`)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '6px 10px',
+                              backgroundColor: '#f5f5f5',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              marginBottom: '4px',
+                              fontSize: '14px'
+                            }}
+                          >
+                            <span>{subcategory.name}</span>
+                            <span style={{ 
+                              transform: expandedSubcategories[`${category.id}_${subcategory.id}`] ? 'rotate(90deg)' : 'none', 
+                              transition: 'transform 0.2s',
+                              fontSize: '10px'
+                            }}>
+                              ▶
+                            </span>
+                          </div>
+                          
+                          {expandedSubcategories[`${category.id}_${subcategory.id}`] && (
+                            <div style={{ 
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '2px',
+                              paddingLeft: '15px'
+                            }}>
+                              {subcategoryTournaments[`${category.id}_${subcategory.id}`]?.map(tournament => (
+                                <div
+                                  key={tournament.id}
+                                  onClick={() => handleTournamentSelect(tournament)}
+                                  style={{
+                                    padding: '5px 10px',
+                                    backgroundColor: selectedTournament?.id === tournament.id ? '#e3f2fd' : 'transparent',
+                                    borderLeft: selectedTournament?.id === tournament.id ? '3px solid #2196F3' : '3px solid transparent',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '13px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    transition: 'background-color 0.15s'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    if (selectedTournament?.id !== tournament.id) {
+                                      e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                    }
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    if (selectedTournament?.id !== tournament.id) {
+                                      e.currentTarget.style.backgroundColor = 'transparent';
+                                    }
+                                  }}
+                                >
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#777" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                                  </svg>
+                                  {tournament.name}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          <div 
+                            onClick={() => handleSubcategorySelect(category.id, subcategory.id)}
+                            style={{
+                              padding: '4px 15px',
+                              color: `${category.id}_${subcategory.id}` === `${selectedCategory}_${selectedSubcategory}` ? '#2196F3' : '#777',
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                              display: 'inline-block',
+                              marginTop: '2px',
+                              borderRadius: '4px',
+                              backgroundColor: `${category.id}_${subcategory.id}` === `${selectedCategory}_${selectedSubcategory}` ? '#e3f2fd' : 'transparent'
+                            }}
+                          >
+                            View All {subcategory.name}
+                          </div>
+                        </div>
+                      ))}
+                      
+                      <div 
+                        onClick={() => handleCategorySelect(category.id)}
+                        style={{
+                          padding: '6px 10px',
+                          color: selectedCategory === category.id && !selectedSubcategory ? '#2196F3' : '#555',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          display: 'inline-block',
+                          marginTop: '5px',
+                          borderRadius: '4px',
+                          backgroundColor: selectedCategory === category.id && !selectedSubcategory ? '#e3f2fd' : 'transparent',
+                          fontWeight: '500'
+                        }}
+                      >
+                        View All {category.name}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : selectedSubcategory ? (
+              // Display only the selected subcategory's tournaments
+              <div style={{ 
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px'
+              }}>
+                {/* Back button */}
+                <div
+                  onClick={() => setSelectedSubcategory(null)}
+                  style={{
+                    padding: '8px 10px',
+                    backgroundColor: '#f0f0f0',
+                    color: '#555',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '10px'
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                  </svg>
+                  Back to Category
+                </div>
+                
+                {/* Display current location */}
+                <div style={{
+                  padding: '6px 10px',
+                  backgroundColor: '#e3f2fd',
+                  color: '#0d47a1',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  marginBottom: '10px'
+                }}>
+                  <strong>
+                    {mainCategories.find(cat => cat.id === selectedCategory)?.name} / 
+                    {mainCategories.find(cat => cat.id === selectedCategory)?.subcategories?.find(sub => sub.id === selectedSubcategory)?.name}
+                  </strong>
+                </div>
+                
+                {/* Display selected subcategory description */}
+                {mainCategories.find(cat => cat.id === selectedCategory)?.subcategories?.find(sub => sub.id === selectedSubcategory)?.description && (
+                  <div style={{ 
+                    fontSize: '13px', 
+                    color: '#666', 
+                    margin: '0 0 12px 0',
+                    padding: '8px 10px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '4px',
+                    lineHeight: '1.4'
+                  }}>
+                    {mainCategories.find(cat => cat.id === selectedCategory)?.subcategories?.find(sub => sub.id === selectedSubcategory)?.description}
+                  </div>
+                )}
+                
+                {filteredTournaments.map(tournament => (
+                  <div
+                    key={tournament.id}
+                    onClick={() => handleTournamentSelect(tournament)}
+                    style={{
+                      padding: '8px 10px',
+                      backgroundColor: selectedTournament?.id === tournament.id ? '#e3f2fd' : 'white',
+                      borderLeft: selectedTournament?.id === tournament.id ? '3px solid #2196F3' : '3px solid transparent',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      transition: 'background-color 0.15s',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (selectedTournament?.id !== tournament.id) {
+                        e.currentTarget.style.backgroundColor = '#f5f5f5';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedTournament?.id !== tournament.id) {
+                        e.currentTarget.style.backgroundColor = 'white';
+                      }
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    {tournament.name}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              // Display only the selected category's subcategories
+              <div style={{ 
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px'
+              }}>
+                {/* Back button */}
+                <div
+                  onClick={() => setSelectedCategory('all')}
+                  style={{
+                    padding: '8px 10px',
+                    backgroundColor: '#f0f0f0',
+                    color: '#555',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '10px'
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                  </svg>
+                  Back to All Categories
+                </div>
+                
+                {/* Display selected category description */}
+                {mainCategories.find(cat => cat.id === selectedCategory)?.description && (
+                  <div style={{ 
+                    fontSize: '13px', 
+                    color: '#666', 
+                    margin: '0 0 12px 0',
+                    padding: '8px 10px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '4px',
+                    lineHeight: '1.4'
+                  }}>
+                    {mainCategories.find(cat => cat.id === selectedCategory)?.description}
+                  </div>
+                )}
+                
+                {/* Display subcategories as cards */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                  gap: '10px',
+                  marginBottom: '15px'
+                }}>
+                  {mainCategories.find(cat => cat.id === selectedCategory)?.subcategories?.map(subcategory => (
+                    <div
+                      key={subcategory.id}
+                      onClick={() => handleSubcategorySelect(selectedCategory, subcategory.id)}
+                      style={{
+                        padding: '12px 15px',
+                        backgroundColor: 'white',
+                        borderRadius: '6px',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '5px',
+                        transition: 'transform 0.15s, box-shadow 0.15s',
+                        border: '1px solid #e0e0e0'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                      }}
+                    >
+                      <div style={{ fontWeight: '500', color: '#333' }}>{subcategory.name}</div>
+                      <div style={{ fontSize: '12px', color: '#666' }}>
+                        {subcategoryTournaments[`${selectedCategory}_${subcategory.id}`]?.length || 0} tournaments
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Show all tournaments in this category */}
+                <div style={{ marginTop: '10px', borderTop: '1px solid #eaeaea', paddingTop: '15px' }}>
+                  <h4 style={{ fontSize: '14px', margin: '0 0 10px 0', color: '#555' }}>All Tournaments in this Category</h4>
+                  <div style={{ 
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px'
+                  }}>
+                    {filteredTournaments.map(tournament => (
+                      <div
+                        key={tournament.id}
+                        onClick={() => handleTournamentSelect(tournament)}
+                        style={{
+                          padding: '8px 10px',
+                          backgroundColor: selectedTournament?.id === tournament.id ? '#e3f2fd' : 'transparent',
+                          borderLeft: selectedTournament?.id === tournament.id ? '3px solid #2196F3' : '3px solid transparent',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          transition: 'background-color 0.15s'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (selectedTournament?.id !== tournament.id) {
+                            e.currentTarget.style.backgroundColor = '#f5f5f5';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (selectedTournament?.id !== tournament.id) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        {tournament.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Right panel: Games list */}
+        <div style={{ 
+          flex: 1,
+          paddingLeft: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          height: '100%'
+        }}>
+          {selectedTournament ? (
+            <>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                marginBottom: '15px'
+              }}>
+                <h3 style={{ 
+                  fontSize: '16px', 
+                  margin: 0,
+                  color: '#555'
+                }}>
+                  Games - {selectedTournament.name}
+                </h3>
+                
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  backgroundColor: 'white',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  border: '1px solid #e0e0e0',
+                  width: '250px'
+                }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#777" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="Search games..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{
+                      border: 'none',
+                      outline: 'none',
+                      padding: '0 10px',
+                      width: '100%',
+                      backgroundColor: 'transparent',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+              </div>
+              
+              <div style={{ 
+                backgroundColor: 'white',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                {renderGameList()}
+              </div>
+              
+              {/* Note for users */}
+              <div style={{ 
+                marginTop: '15px', 
+                padding: '10px', 
+                backgroundColor: '#e8f4fd', 
+                borderRadius: '6px',
+                fontSize: '14px',
+                color: '#0277bd',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0277bd" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                Click on any game to view it in a separate game board viewer
+              </div>
+            </>
+          ) : (
+            <div style={{ 
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%',
+              color: '#777',
+              padding: '20px',
+              textAlign: 'center',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              border: '1px dashed #ddd'
+            }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <h3 style={{ 
+                fontSize: '18px', 
+                margin: '15px 0 10px',
+                color: '#555'
+              }}>
+                Select a tournament
+              </h3>
+              <p style={{ margin: 0 }}>
+                Choose a tournament from the left panel to view available games
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+      
       {error && (
         <div style={{ 
-          color: '#e74c3c', 
           padding: '12px 15px', 
           backgroundColor: '#fdedeb', 
-          borderRadius: '6px', 
+          color: '#e74c3c',
+          borderRadius: '6px',
           fontSize: '14px',
-          marginBottom: '15px',
+          marginTop: '20px',
           display: 'flex',
           alignItems: 'center',
           gap: '10px'
         }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 8V12M12 16V16.01M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#e74c3c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
           </svg>
           {error}
         </div>
       )}
-      
-      <div className="game-library-container" style={{ 
-        display: 'flex', 
-        gap: '25px',
-        flexDirection: 'row'
-      }}>
-        {/* LEFT COLUMN - Categories and Tournaments */}
-        <div className="category-list" style={{ 
-          width: '30%', 
-          borderRight: '1px solid #eee',
-          paddingRight: '20px',
-          overflowY: 'auto',
-          maxHeight: '75vh'
-        }}>
-          <h3 style={{ 
-            fontSize: '18px', 
-            marginTop: 0, 
-            fontWeight: '500',
-            marginBottom: '15px',
-            color: '#444'
-          }}>
-            Tournament Categories
-          </h3>
-          
-          <ul style={{ 
-            listStyle: 'none', 
-            padding: 0, 
-            margin: 0 
-          }}>
-            <li style={{ marginBottom: '15px' }}>
-              <button
-                onClick={() => handleCategorySelect('all')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  backgroundColor: selectedCategory === 'all' ? '#f0f8ff' : 'transparent',
-                  border: 'none',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  width: '100%',
-                  textAlign: 'left',
-                  fontWeight: selectedCategory === 'all' ? '600' : '400',
-                  color: selectedCategory === 'all' ? '#3498db' : '#444',
-                  fontSize: '16px'
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 6H20M4 12H20M4 18H20" stroke={selectedCategory === 'all' ? '#3498db' : '#666'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                All Tournaments
-              </button>
-            </li>
-            
-            {/* ... existing category rendering code ... */}
-          </ul>
-        </div>
-        
-        {/* RIGHT COLUMN - Game List */}
-        <div className="game-list" style={{ 
-          width: '70%',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          {/* Game List Header and Search */}
-          <div className="game-browser-filters" style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '15px',
-            gap: '15px'
-          }}>
-            <h3 style={{ 
-              fontSize: '18px', 
-              margin: 0, 
-              fontWeight: '500',
-              color: '#444',
-              flex: '1'
-            }}>
-              {selectedTournament ? selectedTournament.name : 'All Games'}
-              {filteredGames.length > 0 && 
-                <span style={{ 
-                  fontSize: '14px', 
-                  color: '#888', 
-                  fontWeight: 'normal',
-                  marginLeft: '8px'
-                }}>
-                  ({filteredGames.length} games)
-                </span>
-              }
-            </h3>
-            
-            <div className="search-input" style={{ 
-              position: 'relative',
-              width: '250px'
-            }}>
-              <svg 
-                width="16" 
-                height="16" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                xmlns="http://www.w3.org/2000/svg"
-                style={{
-                  position: 'absolute',
-                  left: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#888'
-                }}
-              >
-                <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              
-              <input
-                type="text"
-                placeholder="Search games..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 10px 8px 35px',
-                  border: '1px solid #ccc',
-                  borderRadius: '6px',
-                  fontSize: '14px'
-                }}
-              />
-            </div>
-          </div>
-          
-          {/* Games Table */}
-          {renderGameList()}
-          
-          {/* Pagination Controls */}
-          {filteredGames.length > gamesPerPage && renderPagination()}
-        </div>
-      </div>
     </div>
   );
 };

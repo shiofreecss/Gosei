@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './App.css';
-import './responsive.css';
 import KifuReader from './components/KifuReader';
 import SGFUploader from './components/SGFUploader';
 import GameLibrary from './components/GameLibrary';
@@ -89,7 +88,7 @@ PW[White Player]PB[Black Player]
               border: '2px solid #fff',
             }}></span>
             AI-Kifu
-            <span className="app-subtitle" style={{ 
+            <span style={{ 
               fontSize: '18px', 
               fontWeight: 'normal', 
               opacity: 0.8, 
@@ -98,7 +97,7 @@ PW[White Player]PB[Black Player]
               Go Game Analysis Tool
             </span>
           </h1>
-          <div className="header-buttons" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', gap: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', gap: '10px' }}>
             <button 
               onClick={() => setShowLibrary(!showLibrary)}
               style={{ 
@@ -150,7 +149,7 @@ PW[White Player]PB[Black Player]
         </div>
       </header>
       
-      <main className="main-container" style={{ 
+      <main style={{ 
         maxWidth: '1250px', 
         margin: '0 auto', 
         padding: '30px 20px',
@@ -398,9 +397,6 @@ PW[White Player]PB[Black Player]
           </div>
         </div>
       </footer>
-
-      {/* Add responsive meta tag */}
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     </div>
   );
 }

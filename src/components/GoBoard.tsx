@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState, useEffect } from 'react';
+import React, { useMemo, useCallback } from 'react';
 
 interface Stone {
   x: number;
@@ -30,35 +30,8 @@ const GoBoard: React.FC<GoBoardProps> = ({
   capturedStones = [],
   onClick 
 }) => {
-  // Use state to track container size for responsive SVG sizing
-  const [containerWidth, setContainerWidth] = useState(0);
-  const [cellSize, setCellSize] = useState(32);
-  
-  // Ref for the container
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  
-  // Update cell size based on container width
-  useEffect(() => {
-    const updateSize = () => {
-      if (containerRef.current) {
-        const width = containerRef.current.clientWidth;
-        setContainerWidth(width);
-        // Calculate cell size based on container width
-        const newCellSize = Math.max(Math.floor((width - 20) / (size - 1)), 12);
-        setCellSize(newCellSize);
-      }
-    };
-    
-    // Initial size
-    updateSize();
-    
-    // Add resize listener
-    window.addEventListener('resize', updateSize);
-    
-    // Cleanup
-    return () => window.removeEventListener('resize', updateSize);
-  }, [size]);
-  
+  // Adjust cell size for better balance in side-by-side layout
+  const cellSize = 32; // Decreased from 40 to 32
   const boardSize = (size - 1) * cellSize;
   const boardPadding = cellSize / 2;
   
@@ -350,55 +323,39 @@ const GoBoard: React.FC<GoBoardProps> = ({
   }, [size, cellSize, stones, isStoneVisible, onClick, handleCellClick]);
   
   return (
-    <div 
-      ref={containerRef} 
-      style={{ 
-        width: '100%', 
-        maxWidth: '100%',
-        margin: '0 auto',
-        overflow: 'hidden'
-      }}
-    >
+    <div style={{ 
+      position: 'relative',
+      padding: `${boardPadding * 3.5}px ${boardPadding * 3}px`,
+      maxWidth: '100%',
+      overflow: 'auto', // Allow scrolling if the board is too big for small screens
+    }}>
       <svg
-        width={boardSize + boardPadding * 2}
-        height={boardSize + boardPadding * 2}
-        viewBox={`0 0 ${boardSize + boardPadding * 2} ${boardSize + boardPadding * 2}`}
+        width={boardSize + boardPadding * 3}
+        height={boardSize + boardPadding * 4}
+        viewBox={`${-boardPadding * 2} ${-boardPadding} ${boardSize + boardPadding * 3} ${boardSize + boardPadding * 4}`}
         style={{ 
-          maxWidth: '100%', 
-          height: 'auto',
-          display: 'block'
+          backgroundColor: '#e6c588', // Warm wood color for the board
+          borderRadius: '8px', // Slightly more rounded corners
+          boxShadow: '0 3px 8px rgba(0,0,0,0.2), inset 0 -3px 6px rgba(0,0,0,0.1)', // Enhanced shadow for depth
         }}
       >
-        <g transform={`translate(${boardPadding}, ${boardPadding})`}>
-          {/* Board background */}
-          <rect
-            x={-boardPadding}
-            y={-boardPadding}
-            width={boardSize + boardPadding * 2}
-            height={boardSize + boardPadding * 2}
-            fill="#E7C391" // Wooden board color
-            rx="5"
-            ry="5"
-          />
-          
-          {/* Board grid */}
-          <g>{renderGrid()}</g>
-          
-          {/* Star points */}
-          <g>{renderHoshiPoints()}</g>
-          
-          {/* Captured stones' marks */}
-          <g>{renderCapturedStones()}</g>
-          
-          {/* Active stones */}
-          <g>{renderStones()}</g>
-          
-          {/* Coordinates */}
-          <g>{renderCoordinates()}</g>
-          
-          {/* Interactive overlays */}
-          {onClick && <g>{renderCellOverlays()}</g>}
-        </g>
+        {/* Board grid */}
+        <g>{renderGrid()}</g>
+        
+        {/* Star points */}
+        <g>{renderHoshiPoints()}</g>
+        
+        {/* Captured stones' marks */}
+        <g>{renderCapturedStones()}</g>
+        
+        {/* Active stones */}
+        <g>{renderStones()}</g>
+        
+        {/* Coordinates */}
+        <g>{renderCoordinates()}</g>
+        
+        {/* Interactive overlays */}
+        {onClick && <g>{renderCellOverlays()}</g>}
       </svg>
     </div>
   );
