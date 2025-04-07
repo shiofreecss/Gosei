@@ -11,3 +11,54 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Responsive styles */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Media Queries */
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 24px !important;
+  }
+  
+  h2 {
+    font-size: 20px !important;
+  }
+  
+  p, div, button {
+    font-size: 14px !important;
+  }
+  
+  pre {
+    font-size: 12px !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  h1 {
+    font-size: 20px !important;
+  }
+  
+  .app-subtitle {
+    display: none !important;
+  }
+  
+  button {
+    padding: 6px 10px !important;
+  }
+  
+  .header-buttons {
+    flex-direction: column !important;
+  }
+}

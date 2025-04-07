@@ -1,0 +1,125 @@
+/* Responsive styles for AI-Kifu components */
+
+/* General layout adjustments */
+@media screen and (max-width: 768px) {
+  .main-container {
+    padding: 20px 15px !important;
+  }
+  
+  .two-column-layout {
+    flex-direction: column !important;
+  }
+}
+
+/* Game board responsive styles */
+@media screen and (max-width: 768px) {
+  .goban-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 15px !important;
+  }
+  
+  .board-settings-container {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  
+  .board-controls {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 5px !important;
+  }
+  
+  .move-info-container {
+    margin-top: 15px !important;
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+}
+
+/* Game Library responsive styles */
+@media screen and (max-width: 768px) {
+  .game-library-container {
+    flex-direction: column !important;
+  }
+  
+  .category-list {
+    width: 100% !important;
+    margin-bottom: 15px !important;
+    max-height: 300px !important;
+    border-right: none !important;
+    border-bottom: 1px solid #eee !important;
+    padding-bottom: 15px !important;
+  }
+  
+  .game-list {
+    width: 100% !important;
+  }
+  
+  .game-browser-filters {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  
+  .search-input {
+    width: 100% !important;
+    margin-bottom: 10px !important;
+  }
+  
+  .pagination-controls {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 5px !important;
+  }
+}
+
+/* SGF Uploader responsive styles */
+@media screen and (max-width: 768px) {
+  .upload-container {
+    flex-direction: column !important;
+  }
+  
+  .drop-area {
+    width: 100% !important;
+    margin-bottom: 15px !important;
+    height: 120px !important;
+  }
+  
+  .text-input-area {
+    width: 100% !important;
+  }
+  
+  .input-textarea {
+    min-height: 120px !important;
+  }
+}
+
+/* Mobile specific adjustments */
+@media screen and (max-width: 480px) {
+  .game-info-container {
+    padding: 10px !important;
+  }
+  
+  .board-nav-buttons button {
+    min-width: auto !important;
+    padding: 8px !important;
+  }
+  
+  .board-size-label {
+    display: none !important;
+  }
+  
+  .drop-area-text {
+    font-size: 12px !important;
+  }
+  
+  /* Hide game table headers on very small screens */
+  .game-table th:not(:first-child):not(:last-child) {
+    display: none !important;
+  }
+  
+  .game-table td:not(:first-child):not(:last-child) {
+    display: none !important;
+  }
+} 

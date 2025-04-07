@@ -276,7 +276,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
       
       {game && (
         <>
-          <div className="kifu-content" style={{ 
+          <div className="kifu-content two-column-layout" style={{ 
             display: 'flex', 
             flexDirection: 'row',
             gap: '20px',
@@ -284,7 +284,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             maxWidth: '100%'
           }}>
             {/* LEFT SIDE - Go Board */}
-            <div className="board-container" style={{ 
+            <div className="board-container goban-container" style={{ 
               width: '60%',
               minWidth: '480px', 
               backgroundColor: 'rgba(249, 249, 249, 0.5)',
@@ -305,7 +305,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             </div>
             
             {/* RIGHT SIDE - Game Info and Controls */}
-            <div className="controls-container" style={{ 
+            <div className="controls-container move-info-container" style={{ 
               width: '35%',
               minWidth: '330px',
               display: 'flex', 
@@ -323,7 +323,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               />
               
               {/* Game Information */}
-              <div className="game-info" style={{
+              <div className="game-info game-info-container" style={{
                 padding: '20px',
                 backgroundColor: 'white',
                 borderRadius: '8px',
@@ -457,172 +457,132 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               </div>
               
               {/* Navigation Controls */}
-              <div className="navigation-container" style={{ 
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                padding: '20px',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+              <div className="navigation-controls" style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '10px'
+                gap: '15px',
+                backgroundColor: 'white',
+                padding: '20px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
               }}>
-                <div className="move-slider" style={{ 
-                  width: '100%',
+                <div className="board-settings-container" style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '15px',
-                  marginBottom: '15px'
+                  gap: '10px',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span className="board-size-label" style={{ fontSize: '14px', color: '#666' }}>Board size:</span>
+                    <span style={{ fontSize: '14px', fontWeight: 'bold' }}>{game.info.size}×{game.info.size}</span>
+                  </div>
+                  
+                  <div style={{ flex: 1 }}></div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <span style={{ fontSize: '14px', color: '#666' }}>Move:</span>
+                    <span style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                      {currentMove >= 0 ? currentMove + 1 : 0} / {game.moves.length}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Control Buttons */}
+                <div className="board-controls board-nav-buttons" style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  gap: '10px'
                 }}>
                   <button
                     onClick={handleFirstMove}
                     style={{
-                      padding: '12px',
+                      backgroundColor: '#f2f2f2',
                       border: 'none',
-                      backgroundColor: '#f0f0f0',
-                      borderRadius: '6px',
+                      borderRadius: '4px',
+                      padding: '8px 16px',
                       cursor: 'pointer',
+                      minWidth: '40px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                      justifyContent: 'center'
                     }}
-                    aria-label="Go to first move"
                   >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M19 20H17V4H19V20ZM15 12L5 4V20L15 12Z" fill="#333"/>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M19 20L9 12L19 4V20Z" fill="#555"/>
+                      <path d="M5 19V5" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </button>
-                  
                   <button
                     onClick={handlePrevMove}
                     style={{
-                      padding: '12px',
+                      backgroundColor: '#f2f2f2',
                       border: 'none',
-                      backgroundColor: '#f0f0f0',
-                      borderRadius: '6px',
+                      borderRadius: '4px',
+                      padding: '8px 16px',
                       cursor: 'pointer',
+                      minWidth: '40px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                      justifyContent: 'center'
                     }}
-                    aria-label="Previous move"
                   >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M15 6L9 12L15 18V6Z" fill="#333"/>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M15 6L9 12L15 18V6Z" fill="#555"/>
                     </svg>
                   </button>
-                  
                   <button
                     onClick={toggleAutoplay}
                     style={{
-                      padding: '12px 16px',
+                      backgroundColor: '#f2f2f2',
                       border: 'none',
-                      backgroundColor: autoplayActive ? '#4CAF50' : '#f0f0f0',
-                      color: autoplayActive ? 'white' : '#333',
-                      borderRadius: '6px',
+                      borderRadius: '4px',
+                      padding: '8px 16px',
                       cursor: 'pointer',
+                      minWidth: '40px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                      fontWeight: '500',
-                      fontSize: '16px'
+                      justifyContent: 'center'
                     }}
-                    aria-label={autoplayActive ? "Pause autoplay" : "Start autoplay"}
                   >
-                    {autoplayActive ? (
-                      <>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z" fill="currentColor"/>
-                        </svg>
-                        Pause
-                      </>
-                    ) : (
-                      <>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M8 5V19L19 12L8 5Z" fill="currentColor"/>
-                        </svg>
-                        Play
-                      </>
-                    )}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z" fill="#555"/>
+                    </svg>
                   </button>
-                  
                   <button
                     onClick={handleNextMove}
                     style={{
-                      padding: '12px',
+                      backgroundColor: '#f2f2f2',
                       border: 'none',
-                      backgroundColor: '#f0f0f0',
-                      borderRadius: '6px',
+                      borderRadius: '4px',
+                      padding: '8px 16px',
                       cursor: 'pointer',
+                      minWidth: '40px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                      justifyContent: 'center'
                     }}
-                    aria-label="Next move"
                   >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9 18L15 12L9 6V18Z" fill="#333"/>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 18L15 12L9 6V18Z" fill="#555"/>
                     </svg>
                   </button>
-                  
                   <button
                     onClick={handleLastMove}
                     style={{
-                      padding: '12px',
+                      backgroundColor: '#f2f2f2',
                       border: 'none',
-                      backgroundColor: '#f0f0f0',
-                      borderRadius: '6px',
+                      borderRadius: '4px',
+                      padding: '8px 16px',
                       cursor: 'pointer',
+                      minWidth: '40px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                      justifyContent: 'center'
                     }}
-                    aria-label="Go to last move"
                   >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5 20L15 12L5 4V20ZM19 4V20H17V4H19Z" fill="#333"/>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 20L15 12L5 4V20ZM19 4V20H17V4H19Z" fill="#555"/>
                     </svg>
                   </button>
-                </div>
-              
-                <div style={{
-                  flex: 1,
-                  position: 'relative',
-                  marginBottom: '20px'
-                }}>
-                  <input
-                    type="range"
-                    min="-1"
-                    max={game.moves.length - 1}
-                    value={currentMove}
-                    onChange={(e) => handleMoveChange(parseInt(e.target.value, 10))}
-                    style={{
-                      width: '100%',
-                      height: '12px',
-                      appearance: 'none',
-                      backgroundColor: '#e0e0e0',
-                      borderRadius: '6px',
-                      outline: 'none',
-                      cursor: 'pointer'
-                    }}
-                    aria-label="Move slider"
-                  />
-                  <div style={{
-                    marginTop: '10px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    fontSize: '16px',
-                    color: '#333',
-                    fontWeight: '500'
-                  }}>
-                    <span>Start</span>
-                    <span>Move {currentMove + 1} / {game.moves.length}</span>
-                  </div>
                 </div>
               </div>
             </div>
