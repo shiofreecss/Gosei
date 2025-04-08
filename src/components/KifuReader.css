@@ -115,6 +115,7 @@
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 15px;
   margin-bottom: 15px;
 }
@@ -165,10 +166,11 @@
 .move-range-info {
   margin-top: 10px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   font-size: 16px;
   color: #333;
   font-weight: 500;
+  gap: 25px;
 }
 
 /* Responsive styles */
@@ -217,6 +219,7 @@
 
   .move-slider {
     gap: 10px;
+    justify-content: center;
   }
 
   .move-button, .autoplay-button {
@@ -255,5 +258,7 @@
 
   .move-range-info {
     font-size: 14px;
+    justify-content: center;
+    gap: 20px;
   }
 } 
