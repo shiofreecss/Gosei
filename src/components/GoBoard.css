@@ -25,29 +25,29 @@
 
   /* Adjust cell size for smaller screens */
   .go-board {
-    --cell-size: 28px;
+    --cell-size: 22px;
   }
 }
 
 @media (max-width: 480px) {
   .go-board-container {
-    padding: 8px;
+    padding: 5px;
   }
 
   /* Further reduce cell size for mobile */
   .go-board {
-    --cell-size: 24px;
+    --cell-size: 17px;
   }
 }
 
 /* Extra small mobile devices */
 @media (max-width: 360px) {
   .go-board-container {
-    padding: 5px;
+    padding: 3px;
   }
 
   /* Even smaller cell size for very small devices */
   .go-board {
-    --cell-size: 20px;
+    --cell-size: 14px;
   }
 } 

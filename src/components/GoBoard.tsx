@@ -39,9 +39,9 @@ const GoBoard: React.FC<GoBoardProps> = ({
     const handleResize = () => {
       const width = window.innerWidth;
       if (width <= 360) {
-        setCellSize(16); // Very small screens
+        setCellSize(14); // Very small screens
       } else if (width <= 480) {
-        setCellSize(18); // Small mobile
+        setCellSize(17); // Small mobile
       } else if (width <= 768) {
         setCellSize(22); // Tablets
       } else if (width <= 1024) {
@@ -306,7 +306,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
             key={`hoshi-${x}-${y}`}
             cx={x * cellSize}
             cy={y * cellSize}
-            r={4} // Larger star points
+            r={Math.max(3, cellSize * 0.12)} // Responsive star point size
             fill="#333" // Darker for better contrast
           />
         );
