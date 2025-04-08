@@ -25,7 +25,7 @@
 
   /* Adjust cell size for smaller screens */
   .go-board {
-    --cell-size: 22px;
+    --cell-size: 20px;
   }
 }
 
@@ -36,7 +36,7 @@
 
   /* Further reduce cell size for mobile */
   .go-board {
-    --cell-size: 17px;
+    --cell-size: 15px;
   }
 }
 
@@ -48,6 +48,6 @@
 
   /* Even smaller cell size for very small devices */
   .go-board {
-    --cell-size: 14px;
+    --cell-size: 13px;
   }
 } 

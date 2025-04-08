@@ -39,11 +39,11 @@ const GoBoard: React.FC<GoBoardProps> = ({
     const handleResize = () => {
       const width = window.innerWidth;
       if (width <= 360) {
-        setCellSize(14); // Very small screens
+        setCellSize(13); // Very small screens
       } else if (width <= 480) {
-        setCellSize(17); // Small mobile
+        setCellSize(15); // Small mobile
       } else if (width <= 768) {
-        setCellSize(22); // Tablets
+        setCellSize(20); // Tablets
       } else if (width <= 1024) {
         setCellSize(28); // Small laptops
       } else {
@@ -106,13 +106,16 @@ const GoBoard: React.FC<GoBoardProps> = ({
       // Skip rendering if the stone is captured
       if (!isStoneVisible(stone.x, stone.y)) return null;
       
+      // Adjust stone size for better visibility on small screens
+      const stoneRadius = cellSize <= 15 ? cellSize * 0.48 : cellSize * 0.45;
+      
       return (
         <g key={`${stone.x}-${stone.y}`}>
           {/* Stone shadow */}
           <circle
             cx={stone.x * cellSize}
             cy={stone.y * cellSize + 1.5}
-            r={cellSize * 0.45}
+            r={stoneRadius}
             fill="rgba(0,0,0,0.15)"
             style={{ filter: 'blur(1px)' }}
           />
@@ -121,7 +124,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
           <circle
             cx={stone.x * cellSize}
             cy={stone.y * cellSize}
-            r={cellSize * 0.45}
+            r={stoneRadius}
             fill={stone.color}
             stroke={stone.color === 'black' ? '#222' : '#888'} // Improved contrast for white stones
             strokeWidth={0.8} // Slightly thicker border
@@ -369,8 +372,8 @@ const GoBoard: React.FC<GoBoardProps> = ({
         {/* Active stones */}
         <g>{renderStones()}</g>
         
-        {/* Coordinates */}
-        <g>{renderCoordinates()}</g>
+        {/* Coordinates - hide on very small screens */}
+        {cellSize > 14 && <g>{renderCoordinates()}</g>}
         
         {/* Interactive overlays */}
         {onClick && <g>{renderCellOverlays()}</g>}
