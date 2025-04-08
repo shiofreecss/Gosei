@@ -47,6 +47,13 @@ The AI-Kifu game library includes thousands of professional Go games, organized 
 
 All game data is sourced from the [SGF collection](https://homepages.cwi.nl/~aeb/go/games/games/) maintained by Andries E. Brouwer at CWI.
 
+## Technology Stack
+
+- **Frontend**: React 19, TypeScript
+- **Styling**: CSS
+- **Deployment**: Netlify
+- **Testing**: Jest, React Testing Library
+
 ## Performance Optimizations
 
 AI-Kifu includes several performance optimizations to ensure smooth and responsive user experience:
@@ -70,15 +77,15 @@ AI-Kifu includes several performance optimizations to ensure smooth and responsi
 
 ### Prerequisites
 
-- Node.js (v14 or later)
+- Node.js (v16 or later recommended)
 - npm (v6 or later)
 
 ### Installation
 
 1. Clone the repository:
    ```
-   git clone https://github.com/shiofreecss/AI-Kifu.git
-   cd ai-kifu
+   git clone https://github.com/yourusername/AI-Kifu.git
+   cd AI-Kifu
    ```
 
 2. Install dependencies:
@@ -86,12 +93,32 @@ AI-Kifu includes several performance optimizations to ensure smooth and responsi
    npm install
    ```
 
-3. Start the development server:
+3. Set up game data:
+   ```
+   npm run setup
+   ```
+
+4. Start the development server:
    ```
    npm start
    ```
+   
+   Or to run setup and start in one command:
+   ```
+   npm run start-with-copy
+   ```
 
-4. Open your browser and navigate to `http://localhost:3000`
+5. Open your browser and navigate to `http://localhost:3000`
+
+## Building for Production
+
+To build the application for production:
+
+```
+npm run build-with-copy
+```
+
+The build artifacts will be stored in the `build/` directory.
 
 ## Usage
 
