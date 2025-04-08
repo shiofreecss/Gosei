@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import './GoBoard.css';
 
 interface Stone {
@@ -31,8 +31,34 @@ const GoBoard: React.FC<GoBoardProps> = ({
   capturedStones = [],
   onClick 
 }) => {
-  // Adjust cell size for better balance in side-by-side layout
-  const cellSize = 32; // Decreased from 40 to 32
+  // Make cellSize responsive based on screen width
+  const [cellSize, setCellSize] = useState(32);
+  
+  // Add effect to adjust cell size based on screen width
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width <= 360) {
+        setCellSize(16); // Very small screens
+      } else if (width <= 480) {
+        setCellSize(18); // Small mobile
+      } else if (width <= 768) {
+        setCellSize(22); // Tablets
+      } else if (width <= 1024) {
+        setCellSize(28); // Small laptops
+      } else {
+        setCellSize(32); // Default size
+      }
+    };
+    
+    // Initial size
+    handleResize();
+    
+    // Add resize listener
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
   const boardSize = (size - 1) * cellSize;
   const boardPadding = cellSize / 2;
   
