@@ -3,6 +3,7 @@ import GoBoard from './GoBoard';
 import KifuSettings from './KifuSettings';
 import { ParsedGame, parseSGF, movesToStones } from '../utils/sgfParser';
 import { applyMove, createBoardFromStones, getHandicapPositions, findCapturedStones, Position } from '../utils/goRules';
+import './KifuReader.css';
 
 interface KifuReaderProps {
   sgfContent: string;
@@ -254,381 +255,101 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   );
 
   return (
-    <div className="kifu-reader" style={{ fontFamily: 'inherit' }}>
+    <div className="kifu-reader">
       {error && (
-        <div className="error" style={{ 
-          color: '#e74c3c', 
-          padding: '12px 15px', 
-          backgroundColor: '#fdedeb', 
-          borderRadius: '6px', 
-          fontSize: '14px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          marginBottom: '20px'
-        }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 8V12M12 16V16.01M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#e74c3c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+        <div className="error">
+          <span>⚠️</span>
           {error}
         </div>
       )}
-      
-      {game && (
-        <>
-          <div className="kifu-content" style={{ 
-            display: 'flex', 
-            flexDirection: 'row',
-            gap: '20px',
-            alignItems: 'flex-start', 
-            maxWidth: '100%'
-          }}>
-            {/* LEFT SIDE - Go Board */}
-            <div className="board-container" style={{ 
-              width: '60%',
-              minWidth: '480px', 
-              backgroundColor: 'rgba(249, 249, 249, 0.5)',
-              padding: '25px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}>
-              <GoBoard 
-                size={game.info.size} 
-                stones={movesToStones(
-                  currentMove >= 0 ? game.moves.slice(0, currentMove + 1) : [],
-                  game.handicapStones
-                )} 
-                currentMove={currentMove}
-                showMoveNumbers={showMoveNumbers}
-                capturedStones={visibleCapturedStones}
-              />
+      <div className="kifu-content">
+        <div className="board-container">
+          <GoBoard
+            size={game?.info.size || 19}
+            stones={game ? movesToStones(
+              currentMove >= 0 ? game.moves.slice(0, currentMove + 1) : [],
+              game.handicapStones
+            ) : []}
+            currentMove={currentMove}
+            showMoveNumbers={showMoveNumbers}
+            capturedStones={visibleCapturedStones}
+          />
+        </div>
+        <div className="controls-container">
+          <div className="game-info">
+            <div className="game-info-header">
+              <div className="game-info-player">
+                <div className="game-info-player-name">
+                  <span>Black: {game?.info.playerBlack || 'Unknown'}</span>
+                  <span className="game-info-player-captures">
+                    Captures: {capturedBlack}
+                  </span>
+                </div>
+              </div>
+              <div className="game-info-player">
+                <div className="game-info-player-name">
+                  <span>White: {game?.info.playerWhite || 'Unknown'}</span>
+                  <span className="game-info-player-captures">
+                    Captures: {capturedWhite}
+                  </span>
+                </div>
+              </div>
             </div>
-            
-            {/* RIGHT SIDE - Game Info and Controls */}
-            <div className="controls-container" style={{ 
-              width: '35%',
-              minWidth: '330px',
-              display: 'flex', 
-              flexDirection: 'column',
-              gap: '15px'
-            }}>
-              {/* Settings Panel - Moved to top */}
-              <KifuSettings
-                autoplaySpeed={autoplaySpeed}
-                onAutoplaySpeedChange={handleAutoplaySpeedChange}
-                showMoveNumbers={showMoveNumbers}
-                onToggleMoveNumbers={handleToggleMoveNumbers}
-                enableSound={enableSound}
-                onToggleSound={handleToggleSound}
-              />
-              
-              {/* Game Information */}
-              <div className="game-info" style={{
-                padding: '20px',
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-              }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  borderBottom: '1px solid #eee',
-                  paddingBottom: '15px',
-                  marginBottom: '15px',
-                }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ 
-                      fontWeight: 'bold', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '10px', 
-                      fontSize: '18px',
-                      marginBottom: '8px'
-                    }}>
-                      <span style={{ 
-                        display: 'inline-block', 
-                        width: '18px', 
-                        height: '18px', 
-                        borderRadius: '50%', 
-                        backgroundColor: 'black' 
-                      }}></span>
-                      {game.info.playerBlack}
-                    </div>
-                    <div style={{ 
-                      fontSize: '16px',
-                      color: '#444',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '5px'
-                    }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 5L5 19M19 19L5 5" stroke="#444" strokeWidth="2" strokeLinecap="round"/>
-                      </svg>
-                      Captures: <strong>{capturedWhite}</strong>
-                    </div>
-                  </div>
-                  <div style={{ flex: 1, textAlign: 'right' }}>
-                    <div style={{ 
-                      fontWeight: 'bold', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '10px', 
-                      justifyContent: 'flex-end',
-                      fontSize: '18px',
-                      marginBottom: '8px'
-                    }}>
-                      {game.info.playerWhite}
-                      <span style={{ 
-                        display: 'inline-block', 
-                        width: '18px', 
-                        height: '18px', 
-                        borderRadius: '50%', 
-                        backgroundColor: 'white',
-                        border: '1px solid #888'
-                      }}></span>
-                    </div>
-                    <div style={{ 
-                      fontSize: '16px',
-                      color: '#444',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                      gap: '5px'
-                    }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 5L5 19M19 19L5 5" stroke="#444" strokeWidth="2" strokeLinecap="round"/>
-                      </svg>
-                      Captures: <strong>{capturedBlack}</strong>
-                    </div>
-                  </div>
-                </div>
-                
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  fontSize: '16px',
-                  color: '#333',
-                  flexWrap: 'wrap',
-                  gap: '10px'
-                }}>
-                  <div style={{ 
-                    backgroundColor: '#f9f9f9', 
-                    padding: '8px 12px', 
-                    borderRadius: '6px',
-                    fontWeight: '500'
-                  }}>
-                    Komi: {game.info.komi}
-                  </div>
-                  <div style={{ 
-                    backgroundColor: '#f9f9f9', 
-                    padding: '8px 12px', 
-                    borderRadius: '6px',
-                    fontWeight: '500'
-                  }}>
-                    Size: {game.info.size}×{game.info.size}
-                  </div>
-                  {game.info.handicap > 1 && (
-                    <div style={{ 
-                      backgroundColor: '#f9f9f9', 
-                      padding: '8px 12px', 
-                      borderRadius: '6px',
-                      fontWeight: '500'
-                    }}>
-                      Handicap: {game.info.handicap}
-                    </div>
-                  )}
-                </div>
-                
-                {/* Current move comment */}
-                {currentMoveInfo?.comment && (
-                  <div style={{
-                    marginTop: '15px',
-                    padding: '15px',
-                    backgroundColor: '#f5f9ff',
-                    borderRadius: '6px',
-                    fontSize: '16px',
-                    lineHeight: '1.5',
-                    border: '1px solid #e0e8f5'
-                  }}>
-                    <div style={{ fontWeight: 'bold', marginBottom: '5px', color: '#444' }}>Comment:</div>
-                    {currentMoveInfo.comment}
-                  </div>
-                )}
+            <div className="game-info-details">
+              <span className="game-info-detail">Komi: {game?.info.komi || 6.5}</span>
+              <span className="game-info-detail">Size: {game?.info.size || 19}×{game?.info.size || 19}</span>
+              {game?.info.handicap && game.info.handicap > 1 && (
+                <span className="game-info-detail">Handicap: {game.info.handicap}</span>
+              )}
+            </div>
+            {currentMoveInfo?.comment && (
+              <div className="game-info-comment">
+                <div className="game-info-comment-title">Comment:</div>
+                {currentMoveInfo.comment}
               </div>
-              
-              {/* Navigation Controls */}
-              <div className="navigation-container" style={{ 
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                padding: '20px',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px'
-              }}>
-                <div className="move-slider" style={{ 
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '15px',
-                  marginBottom: '15px'
-                }}>
-                  <button
-                    onClick={handleFirstMove}
-                    style={{
-                      padding: '12px',
-                      border: 'none',
-                      backgroundColor: '#f0f0f0',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                    }}
-                    aria-label="Go to first move"
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M19 20H17V4H19V20ZM15 12L5 4V20L15 12Z" fill="#333"/>
-                    </svg>
-                  </button>
-                  
-                  <button
-                    onClick={handlePrevMove}
-                    style={{
-                      padding: '12px',
-                      border: 'none',
-                      backgroundColor: '#f0f0f0',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                    }}
-                    aria-label="Previous move"
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M15 6L9 12L15 18V6Z" fill="#333"/>
-                    </svg>
-                  </button>
-                  
-                  <button
-                    onClick={toggleAutoplay}
-                    style={{
-                      padding: '12px 16px',
-                      border: 'none',
-                      backgroundColor: autoplayActive ? '#4CAF50' : '#f0f0f0',
-                      color: autoplayActive ? 'white' : '#333',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                      fontWeight: '500',
-                      fontSize: '16px'
-                    }}
-                    aria-label={autoplayActive ? "Pause autoplay" : "Start autoplay"}
-                  >
-                    {autoplayActive ? (
-                      <>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z" fill="currentColor"/>
-                        </svg>
-                        Pause
-                      </>
-                    ) : (
-                      <>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M8 5V19L19 12L8 5Z" fill="currentColor"/>
-                        </svg>
-                        Play
-                      </>
-                    )}
-                  </button>
-                  
-                  <button
-                    onClick={handleNextMove}
-                    style={{
-                      padding: '12px',
-                      border: 'none',
-                      backgroundColor: '#f0f0f0',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                    }}
-                    aria-label="Next move"
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9 18L15 12L9 6V18Z" fill="#333"/>
-                    </svg>
-                  </button>
-                  
-                  <button
-                    onClick={handleLastMove}
-                    style={{
-                      padding: '12px',
-                      border: 'none',
-                      backgroundColor: '#f0f0f0',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                    }}
-                    aria-label="Go to last move"
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5 20L15 12L5 4V20ZM19 4V20H17V4H19Z" fill="#333"/>
-                    </svg>
-                  </button>
-                </div>
-              
-                <div style={{
-                  flex: 1,
-                  position: 'relative',
-                  marginBottom: '20px'
-                }}>
-                  <input
-                    type="range"
-                    min="-1"
-                    max={game.moves.length - 1}
-                    value={currentMove}
-                    onChange={(e) => handleMoveChange(parseInt(e.target.value, 10))}
-                    style={{
-                      width: '100%',
-                      height: '12px',
-                      appearance: 'none',
-                      backgroundColor: '#e0e0e0',
-                      borderRadius: '6px',
-                      outline: 'none',
-                      cursor: 'pointer'
-                    }}
-                    aria-label="Move slider"
-                  />
-                  <div style={{
-                    marginTop: '10px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    fontSize: '16px',
-                    color: '#333',
-                    fontWeight: '500'
-                  }}>
-                    <span>Start</span>
-                    <span>Move {currentMove + 1} / {game.moves.length}</span>
-                  </div>
-                </div>
-              </div>
+            )}
+          </div>
+          <div className="navigation-container">
+            <div className="move-slider">
+              <button className="move-button" onClick={handleFirstMove} title="First move">
+                ⏮️
+              </button>
+              <button className="move-button" onClick={handlePrevMove} title="Previous move">
+                ⏪
+              </button>
+              <button className="autoplay-button" onClick={toggleAutoplay}>
+                {autoplayActive ? '⏸️ Stop' : '▶️ Play'}
+              </button>
+              <button className="move-button" onClick={handleNextMove} title="Next move">
+                ⏩
+              </button>
+              <button className="move-button" onClick={handleLastMove} title="Last move">
+                ⏭️
+              </button>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max={game?.moves.length || 0}
+              value={currentMove}
+              onChange={(e) => handleMoveChange(parseInt(e.target.value, 10))}
+              className="move-range"
+            />
+            <div className="move-range-info">
+              <span>Move: {currentMove + 1}</span>
+              <span>Total: {game?.moves.length || 0}</span>
             </div>
           </div>
-        </>
-      )}
+          <KifuSettings
+            showMoveNumbers={showMoveNumbers}
+            onToggleMoveNumbers={handleToggleMoveNumbers}
+            enableSound={enableSound}
+            onToggleSound={handleToggleSound}
+            autoplaySpeed={autoplaySpeed}
+            onAutoplaySpeedChange={handleAutoplaySpeedChange}
+          />
+        </div>
+      </div>
     </div>
   );
 };

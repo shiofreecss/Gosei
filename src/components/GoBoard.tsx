@@ -1,4 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
+import './GoBoard.css';
 
 interface Stone {
   x: number;
@@ -323,21 +324,12 @@ const GoBoard: React.FC<GoBoardProps> = ({
   }, [size, cellSize, stones, isStoneVisible, onClick, handleCellClick]);
   
   return (
-    <div style={{ 
-      position: 'relative',
-      padding: `${boardPadding * 3.5}px ${boardPadding * 3}px`,
-      maxWidth: '100%',
-      overflow: 'auto', // Allow scrolling if the board is too big for small screens
-    }}>
+    <div className="go-board-container">
       <svg
+        className="go-board"
         width={boardSize + boardPadding * 3}
         height={boardSize + boardPadding * 4}
         viewBox={`${-boardPadding * 2} ${-boardPadding} ${boardSize + boardPadding * 3} ${boardSize + boardPadding * 4}`}
-        style={{ 
-          backgroundColor: '#e6c588', // Warm wood color for the board
-          borderRadius: '8px', // Slightly more rounded corners
-          boxShadow: '0 3px 8px rgba(0,0,0,0.2), inset 0 -3px 6px rgba(0,0,0,0.1)', // Enhanced shadow for depth
-        }}
       >
         {/* Board grid */}
         <g>{renderGrid()}</g>

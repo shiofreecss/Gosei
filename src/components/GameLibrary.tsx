@@ -13,6 +13,7 @@ import {
   getTournamentsBySubcategory,
   getAllSubcategories
 } from '../utils/gameLibrary';
+import './GameLibrary.css';
 
 interface GameLibraryProps {
   onSelectGame: (sgfContent: string) => void;
@@ -271,7 +272,7 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
     if (totalPages <= 1) return null;
     
     return (
-      <div style={{
+      <div className="pagination" style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -377,137 +378,102 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
     }
     
     return (
-      <div>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr',
-          gap: '10px',
-          marginBottom: '20px'
-        }}>
-          {currentGames.map(game => (
-            <div 
-              key={game.id}
-              style={{
-                backgroundColor: 'white',
-                borderRadius: '4px',
-                padding: '15px',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s',
-                border: '1px solid #e0e0e0'
-              }}
-              onClick={() => handleGameSelect(game)}
-            >
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between',
-                alignItems: 'center', 
-                marginBottom: '8px' 
+      <div className="game-list">
+        {currentGames.map(game => (
+          <div 
+            key={game.id}
+            className="game-item"
+            onClick={() => handleGameSelect(game)}
+          >
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              alignItems: 'center', 
+              marginBottom: '8px' 
+            }}>
+              <h3 style={{ 
+                margin: 0, 
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
               }}>
-                <h3 style={{ 
-                  margin: 0, 
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  color: '#333'
-                }}>
-                  {game.title}
-                </h3>
-                <span style={{ 
-                  fontSize: '14px',
-                  color: '#777',
-                  fontWeight: '500'
-                }}>
-                  {game.date}
-                </span>
-              </div>
-              
+                {game.title}
+              </h3>
+              <span style={{ 
+                fontSize: '14px',
+                color: '#777',
+                fontWeight: '500'
+              }}>
+                {game.date}
+              </span>
+            </div>
+            
+            <div className="player-info" style={{ 
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '5px',
+              fontSize: '14px'
+            }}>
               <div style={{ 
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
-                marginBottom: '5px',
-                fontSize: '14px'
+                gap: '5px'
               }}>
-                <div style={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px'
-                }}>
-                  <span style={{ 
-                    width: '12px',
-                    height: '12px',
-                    backgroundColor: 'black',
-                    borderRadius: '50%',
-                    display: 'inline-block'
-                  }}></span>
-                  <span>{game.players[0] || 'Unknown'}</span>
-                </div>
-                <span style={{ color: '#999' }}>vs</span>
-                <div style={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px'
-                }}>
-                  <span style={{ 
-                    width: '12px',
-                    height: '12px',
-                    backgroundColor: 'white',
-                    borderRadius: '50%',
-                    border: '1px solid #ddd',
-                    display: 'inline-block'
-                  }}></span>
-                  <span>{game.players[1] || 'Unknown'}</span>
-                </div>
+                <span style={{ 
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: 'black',
+                  borderRadius: '50%',
+                  display: 'inline-block'
+                }}></span>
+                <span>{game.players[0] || 'Unknown'}</span>
               </div>
-              
-              {game.result && (
-                <div style={{ 
-                  color: '#555',
-                  fontSize: '13px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}>
-                  <span style={{ fontWeight: '500' }}>Result:</span>
-                  <span>{game.result}</span>
-                </div>
-              )}
+              <span style={{ color: '#999' }}>vs</span>
+              <div style={{ 
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}>
+                <span style={{ 
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: 'white',
+                  borderRadius: '50%',
+                  border: '1px solid #ddd',
+                  display: 'inline-block'
+                }}></span>
+                <span>{game.players[1] || 'Unknown'}</span>
+              </div>
             </div>
-          ))}
-        </div>
-        {renderPagination()}
+            
+            {game.result && (
+              <div style={{ 
+                color: '#555',
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                <span style={{ fontWeight: '500' }}>Result:</span>
+                <span>{game.result}</span>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     );
   };
   
   return (
-    <div className="game-library" style={{ 
-      display: 'flex', 
-      flexDirection: 'column',
-      height: '100%',
-      overflow: 'hidden', 
-      backgroundColor: '#fafafa',
-      borderRadius: '8px',
-      padding: '20px'
-    }}>
-      <h2 style={{ 
-        margin: '0 0 20px 0',
-        color: '#333',
-        borderBottom: '1px solid #eaeaea',
-        paddingBottom: '10px'
-      }}>
+    <div className="game-library">
+      <h2 className="game-library-header">
         Game Library
       </h2>
       
-      <div style={{ display: 'flex', height: 'calc(100% - 60px)' }}>
+      <div className="game-library-container">
         {/* Left sidebar: Categories and Tournaments */}
-        <div style={{ 
-          width: '280px', 
-          borderRight: '1px solid #eaeaea',
-          paddingRight: '20px',
-          overflow: 'auto',
-          height: '100%'
-        }}>
+        <div className="game-library-sidebar">
           {/* Category Selection at the top */}
           <div style={{ marginBottom: '15px' }}>
             <h3 style={{ 
@@ -517,7 +483,7 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
             }}>
               View
             </h3>
-            <div style={{ 
+            <div className="category-buttons" style={{ 
               display: 'flex', 
               flexWrap: 'wrap',
               gap: '8px'
@@ -557,7 +523,7 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
           </div>
           
           {/* Tournament list with expandable categories */}
-          <div style={{ marginBottom: '15px' }}>
+          <div className="tournament-list" style={{ marginBottom: '15px' }}>
             <h3 style={{ 
               fontSize: '16px', 
               marginBottom: '10px',
@@ -950,21 +916,15 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
         </div>
         
         {/* Right panel: Games list */}
-        <div style={{ 
-          flex: 1,
-          paddingLeft: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          height: '100%'
-        }}>
+        <div className="game-library-content">
           {selectedTournament ? (
             <>
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between', 
                 alignItems: 'center',
-                marginBottom: '15px'
+                marginBottom: '15px',
+                flexWrap: 'wrap'
               }}>
                 <h3 style={{ 
                   fontSize: '16px', 
@@ -974,7 +934,7 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
                   Games - {selectedTournament.name}
                 </h3>
                 
-                <div style={{ 
+                <div className="search-container" style={{ 
                   display: 'flex', 
                   alignItems: 'center',
                   backgroundColor: 'white',
@@ -1013,7 +973,13 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
                 display: 'flex',
                 flexDirection: 'column'
               }}>
-                {renderGameList()}
+                <div className="game-list">
+                  {renderGameList()}
+                </div>
+                
+                <div className="pagination">
+                  {renderPagination()}
+                </div>
               </div>
               
               {/* Note for users */}

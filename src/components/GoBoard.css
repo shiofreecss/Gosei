@@ -1,0 +1,41 @@
+.go-board-container {
+  position: relative;
+  padding: 20px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.go-board {
+  background-color: #e6c588;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2), inset 0 -3px 6px rgba(0,0,0,0.1);
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .go-board-container {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .go-board-container {
+    padding: 10px;
+  }
+
+  /* Adjust cell size for smaller screens */
+  .go-board {
+    --cell-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .go-board-container {
+    padding: 8px;
+  }
+
+  /* Further reduce cell size for mobile */
+  .go-board {
+    --cell-size: 24px;
+  }
+} 
