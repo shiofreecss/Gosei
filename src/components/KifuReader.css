@@ -254,11 +254,104 @@
 
   .move-button, .autoplay-button {
     padding: 8px;
+    font-size: 14px;
   }
 
   .move-range-info {
     font-size: 14px;
-    justify-content: center;
-    gap: 20px;
+    gap: 15px;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 360px) {
+  .board-container {
+    padding: 10px;
+  }
+
+  .game-info, .navigation-container {
+    padding: 10px;
+  }
+
+  .game-info-header {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .game-info-player {
+    width: 100%;
+  }
+
+  .game-info-player-name {
+    font-size: 14px;
+  }
+
+  .game-info-player-captures {
+    font-size: 12px;
+  }
+
+  .game-info-details {
+    font-size: 12px;
+  }
+
+  .game-info-detail {
+    padding: 6px 8px;
+  }
+
+  .move-slider {
+    gap: 5px;
+  }
+
+  .move-button, .autoplay-button {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .move-range-info {
+    font-size: 12px;
+    gap: 10px;
+  }
+}
+
+.kifu-reader-mobile .board-container {
+  margin-bottom: 10px;
+}
+
+.kifu-reader-mobile .game-info-header {
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kifu-reader-mobile .game-info-player {
+  width: 100%;
+}
+
+.kifu-reader-mobile .move-slider {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Simplify controls on mobile for better usability */
+.kifu-reader-mobile .move-range-info {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.kifu-reader-mobile .autoplay-button {
+  flex: 1;
+  min-width: 80px;
+}
+
+/* Hide optional elements on very small screens */
+@media (max-width: 360px) {
+  .kifu-reader-mobile .game-info-detail:nth-child(2) {
+    display: none;
+  }
+  
+  .kifu-reader-mobile .game-info-comment {
+    max-height: 120px;
+    overflow-y: auto;
   }
 } 

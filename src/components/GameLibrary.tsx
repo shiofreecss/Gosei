@@ -956,7 +956,7 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
                       border: 'none',
                       outline: 'none',
                       padding: '0 10px',
-                      width: '100%',
+                      width: '90%',
                       backgroundColor: 'transparent',
                       fontSize: '14px'
                     }}

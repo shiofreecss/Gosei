@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import KifuReader from './components/KifuReader';
 import SGFUploader from './components/SGFUploader';
@@ -6,15 +6,22 @@ import GameLibrary from './components/GameLibrary';
 import GameViewer from './components/GameViewer';
 
 function App() {
-  const [sgfContent, setSgfContent] = useState<string>('');
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [sgfContent, setSgfContent] = useState<string | null>(null);
+  const [isFromUpload, setIsFromUpload] = useState(false);
+  const [showGameViewer, setShowGameViewer] = useState(false);
+  const [gameViewerContent, setGameViewerContent] = useState('');
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showHelp, setShowHelp] = useState<boolean>(false);
-  const [showLibrary, setShowLibrary] = useState<boolean>(false);
-  // Track whether SGF content is from an upload or library selection
-  const [isFromUpload, setIsFromUpload] = useState<boolean>(false);
-  // Track whether to show the game viewer
-  const [showGameViewer, setShowGameViewer] = useState<boolean>(false);
-  // Store the SGF content for the game viewer
-  const [gameViewerContent, setGameViewerContent] = useState<string>('');
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleFileLoaded = (content: string) => {
     setSgfContent(content);
@@ -62,15 +69,25 @@ PW[White Player]PB[Black Player]
       minHeight: '100vh',
       fontFamily: '"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      width: '100%',
+      maxWidth: '100%',
+      overflow: 'hidden'
     }}>
       <header style={{ 
         backgroundColor: '#3a3a3a', 
         padding: '20px 0', 
         color: 'white',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        width: '100%'
       }}>
-        <div style={{ maxWidth: '1250px', margin: '0 auto', padding: '0 20px' }}>
+        <div style={{ 
+          maxWidth: '1250px', 
+          margin: '0 auto', 
+          padding: '0 20px',
+          width: '100%',
+          boxSizing: 'border-box'
+        }}>
           <h1 style={{ 
             margin: 0, 
             fontSize: '32px',
@@ -153,7 +170,9 @@ PW[White Player]PB[Black Player]
         maxWidth: '1250px', 
         margin: '0 auto', 
         padding: '30px 20px',
-        flex: '1 0 auto'
+        flex: '1 0 auto',
+        width: '100%',
+        boxSizing: 'border-box'
       }}>
         <p style={{ 
           fontSize: '16px', 
@@ -291,17 +310,18 @@ PW[White Player]PB[Black Player]
         {/* SGF Uploader */}
         <div style={{ 
           backgroundColor: 'white', 
-          padding: '25px', 
+          padding: windowWidth < 480 ? '15px' : '25px', 
           borderRadius: '8px',
           marginBottom: '30px',
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-          width: '100%'
+          width: '100%',
+          maxWidth: '100%'
         }}>
           <h2 style={{ 
             color: '#333',
-            fontSize: '22px',
+            fontSize: windowWidth < 480 ? '18px' : '22px',
             marginTop: 0,
-            marginBottom: '20px',
+            marginBottom: windowWidth < 480 ? '12px' : '20px',
             fontWeight: '600'
           }}>
             Upload SGF File
@@ -347,25 +367,33 @@ PW[White Player]PB[Black Player]
         padding: '20px 0',
         marginTop: 'auto',
         boxShadow: '0 -4px 6px rgba(0, 0, 0, 0.05)',
-        flexShrink: 0
+        flexShrink: 0,
+        width: '100%'
       }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px' }}>
+        <div style={{ 
+          maxWidth: '1400px', 
+          margin: '0 auto', 
+          padding: '0 20px',
+          width: '100%',
+          boxSizing: 'border-box'
+        }}>
           <div style={{ 
             display: 'flex', 
             flexDirection: 'column',
             gap: '15px',
-            fontSize: '14px'
+            fontSize: '14px',
+            textAlign: 'center'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
-              <div>
+            <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '20px' }}>
+              <div style={{ textAlign: 'center' }}>
                 <p style={{ margin: '0 0 10px 0', fontWeight: '500' }}>AI-Kifu</p>
                 <p style={{ margin: '0', opacity: '0.7', maxWidth: '500px' }}>
                   An open-source application dedicated to the Go community. Built to provide free access to Go game analysis and a comprehensive SGF library.
                 </p>
               </div>
-              <div style={{ minWidth: '200px' }}>
+              <div style={{ minWidth: '200px', textAlign: 'center' }}>
                 <p style={{ margin: '0 0 10px 0', fontWeight: '500' }}>Resources</p>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, opacity: '0.7' }}>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 auto', opacity: '0.7' }}>
                   <li style={{ marginBottom: '5px' }}>
                     <a href="https://homepages.cwi.nl/~aeb/go/games/games/" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>SGF Game Collection</a>
                   </li>
@@ -379,10 +407,10 @@ PW[White Player]PB[Black Player]
               borderTop: '1px solid rgba(255,255,255,0.1)', 
               paddingTop: '15px',
               display: 'flex',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               alignItems: 'center',
               flexWrap: 'wrap',
-              gap: '10px'
+              gap: '20px'
             }}>
               <p style={{ margin: '0', opacity: '0.7' }}>
                 © {new Date().getFullYear()} AI-Kifu

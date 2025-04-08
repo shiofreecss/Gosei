@@ -5,6 +5,19 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+html {
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
 }
 
 code {

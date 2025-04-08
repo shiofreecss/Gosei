@@ -152,4 +152,37 @@
     height: 32px;
     font-size: 20px;
   }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 360px) {
+  .game-viewer {
+    padding: 5px;
+  }
+
+  .game-viewer-modal {
+    padding: 10px;
+    width: 98%;
+  }
+
+  .game-viewer-content {
+    gap: 8px;
+  }
+
+  .game-info, .game-controls {
+    padding: 8px;
+  }
+
+  .game-viewer-close {
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .game-viewer-header {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
 } 

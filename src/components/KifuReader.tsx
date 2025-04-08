@@ -36,10 +36,21 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   const [capturedWhite, setCapturedWhite] = useState(0);
   const [capturedBlack, setCapturedBlack] = useState(0);
   const [capturedStones, setCapturedStones] = useState<{x: number, y: number, color: 'black' | 'white', moveNumber: number}[]>([]);
+  
+  // Add state to detect mobile viewport
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
     // Create audio element for move sounds
     audioRef.current = new Audio('/stone-sound.mp3');
+    
+    // Set up mobile detection
+    const checkForMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkForMobile();
+    window.addEventListener('resize', checkForMobile);
     
     return () => {
       // Cleanup
@@ -47,6 +58,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
         audioRef.current.pause();
         audioRef.current = null;
       }
+      window.removeEventListener('resize', checkForMobile);
     };
   }, []);
 
@@ -255,7 +267,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   );
 
   return (
-    <div className="kifu-reader">
+    <div className={`kifu-reader ${isMobile ? 'kifu-reader-mobile' : ''}`}>
       {error && (
         <div className="error">
           <span>⚠️</span>

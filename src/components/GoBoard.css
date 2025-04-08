@@ -38,4 +38,16 @@
   .go-board {
     --cell-size: 24px;
   }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 360px) {
+  .go-board-container {
+    padding: 5px;
+  }
+
+  /* Even smaller cell size for very small devices */
+  .go-board {
+    --cell-size: 20px;
+  }
 } 
