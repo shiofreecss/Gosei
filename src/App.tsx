@@ -4,6 +4,7 @@ import KifuReader from './components/KifuReader';
 import SGFUploader from './components/SGFUploader';
 import GameLibrary from './components/GameLibrary';
 import GameViewer from './components/GameViewer';
+import MusicPlayer from './components/MusicPlayer';
 
 function App() {
   const [showLibrary, setShowLibrary] = useState(false);
@@ -293,63 +294,114 @@ PW[White Player]PB[Black Player]
           </div>
         )}
         
-        {/* Game library panel */}
-        {showLibrary && (
-          <div style={{ 
-            backgroundColor: 'white', 
-            padding: '25px', 
-            borderRadius: '8px',
-            marginBottom: '30px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-            width: '100%'
-          }}>
-            <GameLibrary onSelectGame={handleGameSelected} />
-          </div>
-        )}
-        
-        {/* SGF Uploader */}
-        <div style={{ 
-          backgroundColor: 'white', 
-          padding: windowWidth < 480 ? '15px' : '25px', 
-          borderRadius: '8px',
-          marginBottom: '30px',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-          width: '100%',
-          maxWidth: '100%'
-        }}>
-          <h2 style={{ 
-            color: '#333',
-            fontSize: windowWidth < 480 ? '18px' : '22px',
-            marginTop: 0,
-            marginBottom: windowWidth < 480 ? '12px' : '20px',
-            fontWeight: '600'
-          }}>
-            Upload SGF File
-          </h2>
-          <SGFUploader onFileLoaded={handleFileLoaded} />
-        </div>
-        
-        {/* Kifu Reader - Only show when file is uploaded */}
-        {isFromUpload && sgfContent && (
-          <div style={{ 
-            backgroundColor: 'white', 
-            padding: '25px', 
-            borderRadius: '8px',
-            marginBottom: '30px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-            width: '100%'
-          }}>
-            <h2 style={{ 
-              color: '#333',
-              fontSize: '22px',
-              marginTop: 0,
-              marginBottom: '20px',
-              fontWeight: '600'
-            }}>
-              Game Board
-            </h2>
-            <KifuReader sgfContent={sgfContent} />
-          </div>
+        {showLibrary ? (
+          <GameLibrary onSelectGame={handleGameSelected} />
+        ) : (
+          <>
+            {sgfContent && isFromUpload ? (
+              <KifuReader sgfContent={sgfContent} />
+            ) : (
+              <>
+                <h2 style={{ 
+                  fontSize: '24px', 
+                  color: '#333', 
+                  marginBottom: '20px', 
+                  marginTop: '40px',
+                  fontWeight: '600' 
+                }}>
+                  Upload SGF File
+                </h2>
+                <SGFUploader onFileLoaded={handleFileLoaded} />
+                
+                {/* Go Game Instructions and History Section */}
+                <div style={{
+                  marginTop: '60px',
+                  borderTop: '1px solid #eee',
+                  paddingTop: '30px'
+                }}>
+                  <h2 style={{
+                    fontSize: '24px',
+                    color: '#333',
+                    marginBottom: '20px',
+                    fontWeight: '600'
+                  }}>
+                    About the Game of Go
+                  </h2>
+                  
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: windowWidth <= 768 ? 'column' : 'row',
+                    gap: '30px',
+                    marginBottom: '40px'
+                  }}>
+                    <div style={{
+                      flex: '1',
+                      backgroundColor: 'white',
+                      padding: '25px',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                    }}>
+                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#222' }}>
+                        The Rules of Go
+                      </h3>
+                      
+                      <p style={{ lineHeight: '1.6', marginBottom: '15px' }}>
+                        Go is played on a grid of black lines (usually 19×19). Game pieces, called stones, are played on the intersections of the lines.
+                      </p>
+                      
+                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px' }}>Basic Rules:</h4>
+                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px' }}>
+                        <li>Players take turns placing stones on the board</li>
+                        <li>Black plays first, then White</li>
+                        <li>Stones cannot be moved once placed</li>
+                        <li>Stones are captured when completely surrounded by opponent's stones</li>
+                        <li>The goal is to control more territory than your opponent</li>
+                        <li>The game ends when both players pass their turn</li>
+                      </ul>
+                      
+                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px' }}>Key Concepts:</h4>
+                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px' }}>
+                        <li><strong>Liberty:</strong> An empty adjacent point next to a stone</li>
+                        <li><strong>Capture:</strong> Removing opponent's stones that have no liberties</li>
+                        <li><strong>Territory:</strong> Empty intersections surrounded by your stones</li>
+                        <li><strong>Ko rule:</strong> Prevents infinite capturing cycles</li>
+                      </ul>
+                    </div>
+                    
+                    <div style={{
+                      flex: '1',
+                      backgroundColor: 'white',
+                      padding: '25px',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                    }}>
+                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#222' }}>
+                        History of Go
+                      </h3>
+                      
+                      <p style={{ lineHeight: '1.6', marginBottom: '15px' }}>
+                        Go originated in China more than 2,500 years ago and is believed to be the oldest board game continuously played today.
+                      </p>
+                      
+                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px' }}>Historical Timeline:</h4>
+                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px' }}>
+                        <li><strong>500-300 BCE:</strong> Earliest evidence of Go in China</li>
+                        <li><strong>7th Century:</strong> Introduced to Japan, where it flourished</li>
+                        <li><strong>17th Century:</strong> Development of the four major Go schools in Japan</li>
+                        <li><strong>1920s:</strong> First international Go tournaments</li>
+                        <li><strong>1990s:</strong> Growing popularity in Western countries</li>
+                        <li><strong>2016:</strong> AlphaGo defeats world champion Lee Sedol</li>
+                      </ul>
+                      
+                      <p style={{ lineHeight: '1.6', marginTop: '20px' }}>
+                        Go has been considered not just a game, but an art form and martial art of the mind. It has been the subject of countless books, poems, and philosophical discussions throughout Asian history.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </>
         )}
       </main>
       
@@ -361,6 +413,9 @@ PW[White Player]PB[Black Player]
         />
       )}
 
+      {/* Music Player floating button */}
+      <MusicPlayer />
+      
       <footer style={{
         backgroundColor: '#3a3a3a',
         color: 'white',
