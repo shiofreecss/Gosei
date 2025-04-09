@@ -179,5 +179,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - [Beaver Foundation](https://beaver.foundation) for supporting this open-source project
 - [SGF collection](https://homepages.cwi.nl/~aeb/go/games/games/) maintained by Andries E. Brouwer for providing the game data
+- [Netlify](https://www.netlify.com/) for their generous hosting and continuous deployment platform that powers our application
 - The global Go/Baduk/Weiqi community that continues to preserve and share the rich history of this beautiful game
 - Copyright © GoSei
