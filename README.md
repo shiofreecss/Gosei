@@ -1,14 +1,14 @@
-# AI-Kifu - Go Game Analysis Tool
+# GoSei | AI-Kifu - Go Game Analysis Tool
 
-AI-Kifu is an open-source web application dedicated to the Go community for reading, visualizing, and analyzing Go game records (kifu) in both SGF (Smart Game Format) and traditional Japanese kifu format.
+GoSei | AI-Kifu is an open-source web application dedicated to the Go community for reading, visualizing, and analyzing Go game records (kifu) in both SGF (Smart Game Format) and traditional Japanese kifu format.
 
 ## Live Demo
 
-Check out the live deployment of AI-Kifu at [https://kifu.netlify.app/](https://kifu.netlify.app/)
+Check out the live deployment of GoSei | AI-Kifu at [https://gosei.xyz/](https://gosei.xyz/)
 
 ## About the Project
 
-AI-Kifu is built as a contribution to the Go community, providing free access to both game visualization tools and an extensive library of historical games. The application features thousands of professional games sourced from the [comprehensive SGF collection](https://homepages.cwi.nl/~aeb/go/games/games/) maintained by Andries E. Brouwer.
+GoSei | AI-Kifu is built as a contribution to the Go community, providing free access to both game visualization tools and an extensive library of historical games. The application features thousands of professional games sourced from the [comprehensive SGF collection](https://homepages.cwi.nl/~aeb/go/games/games/) maintained by Andries E. Brouwer.
 
 The project is powered by the [Beaver Foundation](https://beaver.foundation), supporting open-source development for the Go community.
 
@@ -37,7 +37,7 @@ The project is powered by the [Beaver Foundation](https://beaver.foundation), su
 
 ## Game Library
 
-The AI-Kifu game library includes thousands of professional Go games, organized into categories:
+The GoSei | AI-Kifu game library includes thousands of professional Go games, organized into categories:
 
 - **Major Tournaments**: Meijin, Honinbo, Judan, Tengen, Kisei, Gosei, Oza, and historical title matches
 - **Other Japanese Tournaments**: Fast games, women's tournaments, special formats, and sponsored events
@@ -56,7 +56,7 @@ All game data is sourced from the [SGF collection](https://homepages.cwi.nl/~aeb
 
 ## Performance Optimizations
 
-AI-Kifu includes several performance optimizations to ensure smooth and responsive user experience:
+GoSei | AI-Kifu includes several performance optimizations to ensure smooth and responsive user experience:
 
 ### Game Library Organization
 - Hierarchical category structure for intuitive navigation
@@ -163,7 +163,7 @@ The application will automatically convert this to SGF format for visualization.
 
 ## Contributing
 
-AI-Kifu is an open-source project, and contributions are warmly welcomed! Whether you're fixing bugs, improving the UI, adding new features, or enhancing documentation, your help is appreciated.
+GoSei | AI-Kifu is an open-source project, and contributions are warmly welcomed! Whether you're fixing bugs, improving the UI, adding new features, or enhancing documentation, your help is appreciated.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -180,3 +180,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Beaver Foundation](https://beaver.foundation) for supporting this open-source project
 - [SGF collection](https://homepages.cwi.nl/~aeb/go/games/games/) maintained by Andries E. Brouwer for providing the game data
 - The global Go/Baduk/Weiqi community that continues to preserve and share the rich history of this beautiful game
+- Copyright © GoSei
