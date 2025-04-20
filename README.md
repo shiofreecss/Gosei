@@ -4,7 +4,7 @@ GoSei | AI-Kifu is an open-source web application dedicated to the Go community 
 
 ## Live Demo
 
-Check out the live deployment of GoSei | AI-Kifu at [https://gosei.xyz/](https://gosei.xyz/)
+Check out the live deployment of GoSei | AI-Kifu at [https://kifu.gosei.xyz/](https://kifu.gosei.xyz/)
 
 ## About the Project
 
