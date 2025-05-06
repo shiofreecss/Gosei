@@ -367,16 +367,16 @@ PW[White Player]PB[Black Player]
                       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
                       border: '1px solid rgba(255, 255, 255, 0.6)'
                     }}>
-                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600' }}>
+                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600', textAlign: 'center' }}>
                         The Rules of Go
                       </h3>
                       
-                      <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333' }}>
+                      <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333', textAlign: 'center' }}>
                         Go is played on a grid of black lines (usually 19×19). Game pieces, called stones, are played on the intersections of the lines.
                       </p>
                       
-                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a' }}>Basic Rules:</h4>
-                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333' }}>
+                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Basic Rules:</h4>
+                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
                         <li>Players take turns placing stones on the board</li>
                         <li>Black plays first, then White</li>
                         <li>Stones cannot be moved once placed</li>
@@ -385,13 +385,49 @@ PW[White Player]PB[Black Player]
                         <li>The game ends when both players pass their turn</li>
                       </ul>
                       
-                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a' }}>Key Concepts:</h4>
-                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333' }}>
+                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Key Concepts:</h4>
+                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
                         <li><strong>Liberty:</strong> An empty adjacent point next to a stone</li>
                         <li><strong>Capture:</strong> Removing opponent's stones that have no liberties</li>
                         <li><strong>Territory:</strong> Empty intersections surrounded by your stones</li>
                         <li><strong>Ko rule:</strong> Prevents infinite capturing cycles</li>
                       </ul>
+                      
+                      {/* Go Painting Image - moved to bottom */}
+                      <div className="go-image-container" style={{ 
+                        marginTop: '30px',
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.8)',
+                        transition: 'all 0.3s ease'
+                      }}>
+                        <img 
+                          src="/Go-Painting.jpg" 
+                          alt="Traditional Go painting" 
+                          className="go-game-image"
+                          style={{
+                            width: '100%',
+                            height: 'auto',
+                            display: 'block'
+                          }}
+                          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                            // Fallback to placeholder if image doesn't load
+                            e.currentTarget.src = "https://via.placeholder.com/600x400?text=Go+Painting";
+                          }}
+                        />
+                        <div style={{
+                          padding: '10px 15px',
+                          background: 'rgba(255, 255, 255, 0.9)',
+                          backdropFilter: 'blur(5px)',
+                          borderTop: '1px solid rgba(200, 210, 230, 0.5)',
+                          fontSize: '14px',
+                          color: '#444',
+                          textAlign: 'center'
+                        }}>
+                          Traditional Go painting showing players engaged in the ancient game
+                        </div>
+                      </div>
                     </div>
                     
                     <div style={{
@@ -403,16 +439,16 @@ PW[White Player]PB[Black Player]
                       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
                       border: '1px solid rgba(255, 255, 255, 0.6)'
                     }}>
-                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600' }}>
+                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600', textAlign: 'center' }}>
                         History of Go
                       </h3>
                       
-                      <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333' }}>
+                      <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333', textAlign: 'center' }}>
                         Go originated in China more than 2,500 years ago and is believed to be the oldest board game continuously played today.
                       </p>
                       
-                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a' }}>Historical Timeline:</h4>
-                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333' }}>
+                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Historical Timeline:</h4>
+                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
                         <li><strong>500-300 BCE:</strong> Earliest evidence of Go in China</li>
                         <li><strong>7th Century:</strong> Introduced to Japan, where it flourished</li>
                         <li><strong>17th Century:</strong> Development of the four major Go schools in Japan</li>
@@ -421,9 +457,46 @@ PW[White Player]PB[Black Player]
                         <li><strong>2016:</strong> AlphaGo defeats world champion Lee Sedol</li>
                       </ul>
                       
-                      <p style={{ lineHeight: '1.6', marginTop: '20px', color: '#333' }}>
+                      <p style={{ lineHeight: '1.6', marginTop: '20px', color: '#333', textAlign: 'center' }}>
                         Go has been considered not just a game, but an art form and martial art of the mind. It has been the subject of countless books, poems, and philosophical discussions throughout Asian history.
+                        The elegant simplicity of its rules contrasted with the profound strategic depth has made Go a metaphor for life in many Eastern philosophical traditions.
                       </p>
+
+                      {/* Go Game Image - moved to bottom */}
+                      <div className="go-image-container" style={{ 
+                        marginTop: '30px',
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.8)',
+                        transition: 'all 0.3s ease'
+                      }}>
+                        <img 
+                          src="/game-of-go.jpg" 
+                          alt="Game of Go board with stones" 
+                          className="go-game-image"
+                          style={{
+                            width: '100%',
+                            height: 'auto',
+                            display: 'block'
+                          }}
+                          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                            // Fallback to placeholder if image doesn't load
+                            e.currentTarget.src = "https://via.placeholder.com/600x400?text=Game+of+Go";
+                          }}
+                        />
+                        <div style={{
+                          padding: '10px 15px',
+                          background: 'rgba(255, 255, 255, 0.9)',
+                          backdropFilter: 'blur(5px)',
+                          borderTop: '1px solid rgba(200, 210, 230, 0.5)',
+                          fontSize: '14px',
+                          color: '#444',
+                          textAlign: 'center'
+                        }}>
+                          Game of Go - one of the oldest board games still played today
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

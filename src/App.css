@@ -58,3 +58,24 @@
   opacity: 1;
   transform: translateY(-1px);
 }
+
+/* Hover effect for game image */
+.go-game-image {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.go-game-image:hover {
+  transform: scale(1.02);
+  filter: brightness(1.05);
+}
+
+/* Image container hover effect */
+.go-image-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.go-image-container:hover {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+}
