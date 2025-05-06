@@ -189,51 +189,59 @@ PW[White Player]PB[Black Player]
         width: '100%',
         boxSizing: 'border-box'
       }}>
-        <p style={{ 
-          fontSize: '17px', 
-          marginBottom: '30px',
-          color: '#333',
-          lineHeight: '1.6',
-          textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
-        }}>
-          Welcome to Gosei - AI-Kifu! An open-source application dedicated to the Go community. Upload a Go game record (SGF file), paste SGF content below, or browse the extensive game library to analyze and review games.
-        </p>
-        
-        {showHelp && (
-          <div style={{ 
-            background: 'rgba(255, 255, 255, 0.8)',
-            backdropFilter: 'blur(10px)',
-            padding: '25px', 
-            borderRadius: '12px',
-            marginBottom: '30px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-            border: '1px solid rgba(255, 255, 255, 0.6)',
-            width: '100%'
-          }}>
-            <h2 style={{ 
-              color: '#2a3f6a',
-              fontSize: '22px',
-              marginTop: 0,
-              marginBottom: '15px',
-              fontWeight: 600
-            }}>
-              How to Use Gosei
-            </h2>
-            <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
-              Gosei supports both standard SGF files and traditional Japanese kifu format. Japanese kifu typically follow this structure:
-            </p>
-            
-            <pre style={{ 
-              background: 'rgba(245, 248, 255, 0.7)', 
-              padding: '15px', 
-              borderRadius: '10px',
-              overflow: 'auto',
-              fontFamily: 'monospace',
-              fontSize: '14px',
-              border: '1px solid rgba(200, 210, 230, 0.5)',
-              backdropFilter: 'blur(5px)',
-              boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.03)'
-            }}>
+        {showLibrary ? (
+          <GameLibrary onSelectGame={handleGameSelected} />
+        ) : (
+          <>
+            {sgfContent && isFromUpload ? (
+              <KifuReader sgfContent={sgfContent} />
+            ) : (
+              <>
+                <p style={{ 
+                  fontSize: '17px', 
+                  marginBottom: '30px',
+                  color: '#333',
+                  lineHeight: '1.6',
+                  textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
+                }}>
+                  Welcome to Gosei - AI-Kifu! An open-source application dedicated to the Go community. Upload a Go game record (SGF file), paste SGF content below, or browse the extensive game library to analyze and review games.
+                </p>
+                
+                {showHelp && (
+                  <div style={{ 
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                    padding: '25px', 
+                    borderRadius: '12px',
+                    marginBottom: '30px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    width: '100%'
+                  }}>
+                    <h2 style={{ 
+                      color: '#2a3f6a',
+                      fontSize: '22px',
+                      marginTop: 0,
+                      marginBottom: '15px',
+                      fontWeight: 600
+                    }}>
+                      How to Use Gosei
+                    </h2>
+                    <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
+                      Gosei supports both standard SGF files and traditional Japanese kifu format. Japanese kifu typically follow this structure:
+                    </p>
+                    
+                    <pre style={{ 
+                      background: 'rgba(245, 248, 255, 0.7)', 
+                      padding: '15px', 
+                      borderRadius: '10px',
+                      overflow: 'auto',
+                      fontFamily: 'monospace',
+                      fontSize: '14px',
+                      border: '1px solid rgba(200, 210, 230, 0.5)',
+                      backdropFilter: 'blur(5px)',
+                      boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.03)'
+                    }}>
 {`# 棋譜（Japanese Kifu Format）
 # 黒：Player Black
 # 白：Player White
@@ -244,86 +252,78 @@ PW[White Player]PB[Black Player]
 2. 白: D4
 3. 黒: Q4
 ...`}
-            </pre>
-            
-            <h3 style={{ fontSize: '18px', marginTop: '20px', color: '#444' }}>Key elements of Japanese kifu:</h3>
-            <ul style={{ 
-              listStyleType: 'none', 
-              padding: 0, 
-              margin: '15px 0', 
-              lineHeight: '1.6' 
-            }}>
-              <li style={{ 
-                padding: '8px 0 8px 25px', 
-                position: 'relative' 
-              }}>
-                <span style={{ 
-                  position: 'absolute', 
-                  left: 0, 
-                  top: '9px',
-                  width: '12px',
-                  height: '12px',
-                  backgroundColor: 'black',
-                  borderRadius: '50%'
-                }}></span>
-                Header information with # prefix, containing player names, date, and result
-              </li>
-              <li style={{ 
-                padding: '8px 0 8px 25px', 
-                position: 'relative' 
-              }}>
-                <span style={{ 
-                  position: 'absolute', 
-                  left: 0, 
-                  top: '9px',
-                  width: '12px',
-                  height: '12px',
-                  backgroundColor: 'white',
-                  borderRadius: '50%',
-                  border: '1px solid #ddd'
-                }}></span>
-                Moves are numbered sequentially, with color (黒/白 for black/white) and coordinates
-              </li>
-              <li style={{ 
-                padding: '8px 0 8px 25px', 
-                position: 'relative' 
-              }}>
-                <span style={{ 
-                  position: 'absolute', 
-                  left: 0, 
-                  top: '9px',
-                  width: '12px',
-                  height: '12px',
-                  backgroundColor: '#f0f0f0',
-                  borderRadius: '3px',
-                  border: '1px solid #ddd'
-                }}></span>
-                Coordinates use letters (A-T, excluding I) for columns and numbers (1-19) for rows
-              </li>
-            </ul>
-            
-            <p style={{ 
-              padding: '12px', 
-              background: 'rgba(220, 240, 255, 0.6)', 
-              borderLeft: '4px solid #3498db',
-              borderRadius: '8px',
-              color: '#2a4a6a',
-              marginTop: '15px',
-              backdropFilter: 'blur(5px)'
-            }}>
-              Our parser automatically converts Japanese kifu format to SGF for rendering on the board.
-            </p>
-          </div>
-        )}
-        
-        {showLibrary ? (
-          <GameLibrary onSelectGame={handleGameSelected} />
-        ) : (
-          <>
-            {sgfContent && isFromUpload ? (
-              <KifuReader sgfContent={sgfContent} />
-            ) : (
-              <>
+                    </pre>
+                    
+                    <h3 style={{ fontSize: '18px', marginTop: '20px', color: '#444' }}>Key elements of Japanese kifu:</h3>
+                    <ul style={{ 
+                      listStyleType: 'none', 
+                      padding: 0, 
+                      margin: '15px 0', 
+                      lineHeight: '1.6' 
+                    }}>
+                      <li style={{ 
+                        padding: '8px 0 8px 25px', 
+                        position: 'relative' 
+                      }}>
+                        <span style={{ 
+                          position: 'absolute', 
+                          left: 0, 
+                          top: '9px',
+                          width: '12px',
+                          height: '12px',
+                          backgroundColor: 'black',
+                          borderRadius: '50%'
+                        }}></span>
+                        Header information with # prefix, containing player names, date, and result
+                      </li>
+                      <li style={{ 
+                        padding: '8px 0 8px 25px', 
+                        position: 'relative' 
+                      }}>
+                        <span style={{ 
+                          position: 'absolute', 
+                          left: 0, 
+                          top: '9px',
+                          width: '12px',
+                          height: '12px',
+                          backgroundColor: 'white',
+                          borderRadius: '50%',
+                          border: '1px solid #ddd'
+                        }}></span>
+                        Moves are numbered sequentially, with color (黒/白 for black/white) and coordinates
+                      </li>
+                      <li style={{ 
+                        padding: '8px 0 8px 25px', 
+                        position: 'relative' 
+                      }}>
+                        <span style={{ 
+                          position: 'absolute', 
+                          left: 0, 
+                          top: '9px',
+                          width: '12px',
+                          height: '12px',
+                          backgroundColor: '#f0f0f0',
+                          borderRadius: '3px',
+                          border: '1px solid #ddd'
+                        }}></span>
+                        Coordinates use letters (A-T, excluding I) for columns and numbers (1-19) for rows
+                      </li>
+                    </ul>
+                    
+                    <p style={{ 
+                      padding: '12px', 
+                      background: 'rgba(220, 240, 255, 0.6)', 
+                      borderLeft: '4px solid #3498db',
+                      borderRadius: '8px',
+                      color: '#2a4a6a',
+                      marginTop: '15px',
+                      backdropFilter: 'blur(5px)'
+                    }}>
+                      Our parser automatically converts Japanese kifu format to SGF for rendering on the board.
+                    </p>
+                  </div>
+                )}
+                
                 <h2 style={{ 
                   fontSize: '24px', 
                   color: '#2a3f6a', 
