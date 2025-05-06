@@ -66,21 +66,29 @@ PW[White Player]PB[Black Player]
 
   return (
     <div className="App" style={{ 
-      backgroundColor: '#f7f7f7', 
+      background: `
+        linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 245, 255, 0.85)),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")
+      `,
+      backgroundAttachment: 'fixed',
       minHeight: '100vh',
       fontFamily: '"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       display: 'flex',
       flexDirection: 'column',
       width: '100%',
       maxWidth: '100%',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      color: '#2a2a2a'
     }}>
       <header style={{ 
-        backgroundColor: '#3a3a3a', 
+        background: 'linear-gradient(135deg, rgba(60, 70, 90, 0.9), rgba(40, 50, 70, 0.85))',
+        backdropFilter: 'blur(10px)',
         padding: '20px 0', 
         color: 'white',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        width: '100%'
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+        width: '100%',
+        position: 'relative',
+        zIndex: 10
       }}>
         <div style={{ 
           maxWidth: '1250px', 
@@ -95,7 +103,8 @@ PW[White Player]PB[Black Player]
             fontWeight: '600',
             display: 'flex',
             alignItems: 'center',
-            gap: '10px'
+            gap: '10px',
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)'
           }}>
             <span style={{ 
               display: 'inline-block', 
@@ -104,12 +113,13 @@ PW[White Player]PB[Black Player]
               borderRadius: '50%', 
               backgroundColor: '#000', 
               border: '2px solid #fff',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
             }}></span>
             Gosei
             <span style={{ 
               fontSize: '18px', 
               fontWeight: 'normal', 
-              opacity: 0.8, 
+              opacity: 0.9, 
               marginLeft: '10px' 
             }}>
               Go Game Analysis Tool
@@ -119,18 +129,20 @@ PW[White Player]PB[Black Player]
             <button 
               onClick={() => setShowLibrary(!showLibrary)}
               style={{ 
-                backgroundColor: showLibrary ? '#555' : 'transparent',
-                border: '1px solid white',
+                backgroundColor: showLibrary ? 'rgba(100, 120, 180, 0.8)' : 'rgba(70, 90, 150, 0.6)',
+                backdropFilter: 'blur(5px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
                 color: 'white',
                 padding: '8px 15px',
-                borderRadius: '4px',
+                borderRadius: '6px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
                 fontSize: '14px',
                 fontWeight: '500',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -142,18 +154,20 @@ PW[White Player]PB[Black Player]
             <button 
               onClick={() => setShowHelp(!showHelp)}
               style={{ 
-                backgroundColor: showHelp ? '#555' : 'transparent',
-                border: '1px solid white',
+                backgroundColor: showHelp ? 'rgba(100, 120, 180, 0.8)' : 'rgba(70, 90, 150, 0.6)',
+                backdropFilter: 'blur(5px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
                 color: 'white',
                 padding: '8px 15px',
-                borderRadius: '4px',
+                borderRadius: '6px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
                 fontSize: '14px',
                 fontWeight: '500',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -176,42 +190,49 @@ PW[White Player]PB[Black Player]
         boxSizing: 'border-box'
       }}>
         <p style={{ 
-          fontSize: '16px', 
+          fontSize: '17px', 
           marginBottom: '30px',
-          color: '#555',
-          lineHeight: '1.5'
+          color: '#333',
+          lineHeight: '1.6',
+          textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
         }}>
           Welcome to Gosei - AI-Kifu! An open-source application dedicated to the Go community. Upload a Go game record (SGF file), paste SGF content below, or browse the extensive game library to analyze and review games.
         </p>
         
         {showHelp && (
           <div style={{ 
-            backgroundColor: 'white', 
+            background: 'rgba(255, 255, 255, 0.8)',
+            backdropFilter: 'blur(10px)',
             padding: '25px', 
-            borderRadius: '8px',
+            borderRadius: '12px',
             marginBottom: '30px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
             width: '100%'
           }}>
             <h2 style={{ 
-              color: '#333',
+              color: '#2a3f6a',
               fontSize: '22px',
               marginTop: 0,
               marginBottom: '15px',
-              fontWeight: '600'
-            }}>About Japanese Kifu Format</h2>
+              fontWeight: 600
+            }}>
+              How to Use Gosei
+            </h2>
             <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
               Gosei supports both standard SGF files and traditional Japanese kifu format. Japanese kifu typically follow this structure:
             </p>
             
             <pre style={{ 
-              backgroundColor: '#f5f5f5', 
+              background: 'rgba(245, 248, 255, 0.7)', 
               padding: '15px', 
-              borderRadius: '6px',
+              borderRadius: '10px',
               overflow: 'auto',
               fontFamily: 'monospace',
               fontSize: '14px',
-              border: '1px solid #eee'
+              border: '1px solid rgba(200, 210, 230, 0.5)',
+              backdropFilter: 'blur(5px)',
+              boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.03)'
             }}>
 {`# 棋譜（Japanese Kifu Format）
 # 黒：Player Black
@@ -283,11 +304,12 @@ PW[White Player]PB[Black Player]
             
             <p style={{ 
               padding: '12px', 
-              backgroundColor: '#edf8ff', 
+              background: 'rgba(220, 240, 255, 0.6)', 
               borderLeft: '4px solid #3498db',
-              borderRadius: '4px',
-              color: '#555',
-              marginTop: '15px'
+              borderRadius: '8px',
+              color: '#2a4a6a',
+              marginTop: '15px',
+              backdropFilter: 'blur(5px)'
             }}>
               Our parser automatically converts Japanese kifu format to SGF for rendering on the board.
             </p>
@@ -304,10 +326,11 @@ PW[White Player]PB[Black Player]
               <>
                 <h2 style={{ 
                   fontSize: '24px', 
-                  color: '#333', 
+                  color: '#2a3f6a', 
                   marginBottom: '20px', 
                   marginTop: '40px',
-                  fontWeight: '600' 
+                  fontWeight: '600',
+                  textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
                 }}>
                   Upload SGF File
                 </h2>
@@ -316,14 +339,15 @@ PW[White Player]PB[Black Player]
                 {/* Go Game Instructions and History Section */}
                 <div style={{
                   marginTop: '60px',
-                  borderTop: '1px solid #eee',
+                  borderTop: '1px solid rgba(200, 210, 230, 0.5)',
                   paddingTop: '30px'
                 }}>
                   <h2 style={{
                     fontSize: '24px',
-                    color: '#333',
+                    color: '#2a3f6a',
                     marginBottom: '20px',
-                    fontWeight: '600'
+                    fontWeight: '600',
+                    textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
                   }}>
                     About the Game of Go
                   </h2>
@@ -336,21 +360,23 @@ PW[White Player]PB[Black Player]
                   }}>
                     <div style={{
                       flex: '1',
-                      backgroundColor: 'white',
+                      background: 'rgba(255, 255, 255, 0.7)',
+                      backdropFilter: 'blur(10px)',
                       padding: '25px',
-                      borderRadius: '8px',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                      borderRadius: '12px',
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
+                      border: '1px solid rgba(255, 255, 255, 0.6)'
                     }}>
-                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#222' }}>
+                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600' }}>
                         The Rules of Go
                       </h3>
                       
-                      <p style={{ lineHeight: '1.6', marginBottom: '15px' }}>
+                      <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333' }}>
                         Go is played on a grid of black lines (usually 19×19). Game pieces, called stones, are played on the intersections of the lines.
                       </p>
                       
-                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px' }}>Basic Rules:</h4>
-                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px' }}>
+                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a' }}>Basic Rules:</h4>
+                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333' }}>
                         <li>Players take turns placing stones on the board</li>
                         <li>Black plays first, then White</li>
                         <li>Stones cannot be moved once placed</li>
@@ -359,8 +385,8 @@ PW[White Player]PB[Black Player]
                         <li>The game ends when both players pass their turn</li>
                       </ul>
                       
-                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px' }}>Key Concepts:</h4>
-                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px' }}>
+                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a' }}>Key Concepts:</h4>
+                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333' }}>
                         <li><strong>Liberty:</strong> An empty adjacent point next to a stone</li>
                         <li><strong>Capture:</strong> Removing opponent's stones that have no liberties</li>
                         <li><strong>Territory:</strong> Empty intersections surrounded by your stones</li>
@@ -370,21 +396,23 @@ PW[White Player]PB[Black Player]
                     
                     <div style={{
                       flex: '1',
-                      backgroundColor: 'white',
+                      background: 'rgba(255, 255, 255, 0.7)',
+                      backdropFilter: 'blur(10px)',
                       padding: '25px',
-                      borderRadius: '8px',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                      borderRadius: '12px',
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
+                      border: '1px solid rgba(255, 255, 255, 0.6)'
                     }}>
-                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#222' }}>
+                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600' }}>
                         History of Go
                       </h3>
                       
-                      <p style={{ lineHeight: '1.6', marginBottom: '15px' }}>
+                      <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333' }}>
                         Go originated in China more than 2,500 years ago and is believed to be the oldest board game continuously played today.
                       </p>
                       
-                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px' }}>Historical Timeline:</h4>
-                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px' }}>
+                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a' }}>Historical Timeline:</h4>
+                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333' }}>
                         <li><strong>500-300 BCE:</strong> Earliest evidence of Go in China</li>
                         <li><strong>7th Century:</strong> Introduced to Japan, where it flourished</li>
                         <li><strong>17th Century:</strong> Development of the four major Go schools in Japan</li>
@@ -393,7 +421,7 @@ PW[White Player]PB[Black Player]
                         <li><strong>2016:</strong> AlphaGo defeats world champion Lee Sedol</li>
                       </ul>
                       
-                      <p style={{ lineHeight: '1.6', marginTop: '20px' }}>
+                      <p style={{ lineHeight: '1.6', marginTop: '20px', color: '#333' }}>
                         Go has been considered not just a game, but an art form and martial art of the mind. It has been the subject of countless books, poems, and philosophical discussions throughout Asian history.
                       </p>
                     </div>
@@ -417,13 +445,16 @@ PW[White Player]PB[Black Player]
       <MusicPlayer />
       
       <footer style={{
-        backgroundColor: '#3a3a3a',
+        background: 'linear-gradient(135deg, rgba(60, 70, 90, 0.9), rgba(40, 50, 70, 0.85))',
+        backdropFilter: 'blur(10px)',
         color: 'white',
-        padding: '20px 0',
+        padding: '25px 0',
         marginTop: 'auto',
-        boxShadow: '0 -4px 6px rgba(0, 0, 0, 0.05)',
+        boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.1)',
         flexShrink: 0,
-        width: '100%'
+        width: '100%',
+        position: 'relative',
+        zIndex: 10
       }}>
         <div style={{ 
           maxWidth: '1400px', 
@@ -441,25 +472,49 @@ PW[White Player]PB[Black Player]
           }}>
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '20px' }}>
               <div style={{ textAlign: 'center' }}>
-                <p style={{ margin: '0 0 10px 0', fontWeight: '500' }}>Gosei - AI-Kifu</p>
-                <p style={{ margin: '0', opacity: '0.7', maxWidth: '500px' }}>
+                <p style={{ margin: '0 0 10px 0', fontWeight: '500', textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)' }}>Gosei - AI-Kifu</p>
+                <p style={{ margin: '0', opacity: '0.9', maxWidth: '500px' }}>
                   An open-source application dedicated to the Go community. Built to provide free access to Go game analysis and a comprehensive SGF library.
                 </p>
               </div>
               <div style={{ minWidth: '200px', textAlign: 'center' }}>
-                <p style={{ margin: '0 0 10px 0', fontWeight: '500' }}>Resources</p>
-                <ul style={{ listStyle: 'none', padding: 0, margin: '0 auto', opacity: '0.7' }}>
+                <p style={{ margin: '0 0 10px 0', fontWeight: '500', textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)' }}>Resources</p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 auto', opacity: '0.9' }}>
                   <li style={{ marginBottom: '5px' }}>
-                    <a href="https://homepages.cwi.nl/~aeb/go/games/games/" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>SGF Game Collection</a>
+                    <a 
+                      href="https://homepages.cwi.nl/~aeb/go/games/games/" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      style={{ 
+                        color: 'white', 
+                        textDecoration: 'none', 
+                        transition: 'opacity 0.2s ease'
+                      }}
+                      className="hover-link"
+                    >
+                      SGF Game Collection
+                    </a>
                   </li>
                   <li style={{ marginBottom: '5px' }}>
-                    <a href="https://github.com/shiofreecss/AI-Kifu" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>GitHub Repository</a>
+                    <a 
+                      href="https://github.com/shiofreecss/AI-Kifu" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      style={{ 
+                        color: 'white', 
+                        textDecoration: 'none', 
+                        transition: 'opacity 0.2s ease'
+                      }}
+                      className="hover-link"
+                    >
+                      GitHub Repository
+                    </a>
                   </li>
                 </ul>
               </div>
             </div>
             <div style={{ 
-              borderTop: '1px solid rgba(255,255,255,0.1)', 
+              borderTop: '1px solid rgba(255,255,255,0.2)', 
               paddingTop: '15px',
               display: 'flex',
               justifyContent: 'center',
@@ -467,13 +522,13 @@ PW[White Player]PB[Black Player]
               flexWrap: 'wrap',
               gap: '20px'
             }}>
-              <p style={{ margin: '0', opacity: '0.7' }}>
+              <p style={{ margin: '0', opacity: '0.9' }}>
                 © {new Date().getFullYear()} Gosei
               </p>
-              <p style={{ margin: '0', opacity: '0.7' }}>
+              <p style={{ margin: '0', opacity: '0.9' }}>
                 Powered by <a href="https://beaver.foundation" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>Beaver Foundation</a>
               </p>
-              <p style={{ margin: '0', opacity: '0.7', fontSize: '12px' }}>
+              <p style={{ margin: '0', opacity: '0.9', fontSize: '12px' }}>
                 Game data sourced from <a href="https://homepages.cwi.nl/~aeb/go/games/games/" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>homepages.cwi.nl/~aeb/go/games/games</a>
               </p>
             </div>

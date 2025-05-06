@@ -1,5 +1,15 @@
 # GoSei AI-Kifu Version History
 
+## v1.0.2 - 2025-05-10
+
+### UI/UX Improvements
+- Modernized the application theme with transparent glass-morphism design
+- Added subtle noise gradient background for visual interest
+- Improved color scheme for better readability and visual hierarchy
+- Implemented consistent hover animations for interactive elements
+- Enhanced text readability with optimized contrast and subtle text shadows
+- Replaced solid backgrounds with semi-transparent panels with backdrop-filter blur effects
+
 ## v1.0.1 - 2025-05-06
 
 ### UI/UX Improvements

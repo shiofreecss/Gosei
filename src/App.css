@@ -47,3 +47,14 @@
     transform: rotate(360deg);
   }
 }
+
+/* Hover effect for footer links */
+.hover-link {
+  opacity: 0.8;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.hover-link:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
