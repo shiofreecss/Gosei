@@ -2,10 +2,12 @@
 
 GoSei | AI-Kifu is an open-source web application dedicated to the Go community for reading, visualizing, and analyzing Go game records (kifu) in both SGF (Smart Game Format) and traditional Japanese kifu format.
 
-## Latest Updates (v1.0.1)
+## Latest Updates (v1.0.3)
 
-- Improved mobile experience with 5 games per page on smaller screens
-- Updated UI with consistent dark grey button styling
+- Added customizable board themes with realistic 3D stones and wood textures
+- Implemented 4 theme options: Default Board, Dark Wood 3D, Light Wood 3D, and Universe
+- Improved coordinate visibility by positioning them behind stones on all four sides of the board
+- Enhanced visual experience with realistic lighting and shadow effects for stones
 - See [VERSION.md](VERSION.md) for complete version history
 
 ## Live Demo
@@ -22,6 +24,9 @@ The project is powered by the [Beaver Foundation](https://beaver.foundation), su
 
 - 📋 Support for both SGF and Japanese kifu formats
 - 🎮 Interactive Go board visualization
+  - Multiple board themes (Default, Dark Wood 3D, Light Wood 3D, Universe)
+  - Realistic 3D stone rendering with proper lighting and shadows
+  - Coordinates visible on all four sides of the board for better reference
 - ⏩ Move-by-move navigation through games
 - 📝 Display of game information and move comments
 - 📤 File upload and text paste functionality

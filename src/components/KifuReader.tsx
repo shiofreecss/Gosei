@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import GoBoard from './GoBoard';
+import GoBoard, { BoardTheme } from './GoBoard';
 import KifuSettings from './KifuSettings';
 import { ParsedGame, parseSGF, movesToStones } from '../utils/sgfParser';
 import { applyMove, createBoardFromStones, getHandicapPositions, findCapturedStones, Position } from '../utils/goRules';
@@ -17,6 +17,8 @@ interface KifuSettingsProps {
   onToggleSound: () => void;
   autoplaySpeed?: number;
   onAutoplaySpeedChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  boardTheme?: BoardTheme;
+  onBoardThemeChange?: (theme: BoardTheme) => void;
 }
 
 const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
@@ -29,6 +31,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   // New state for toggles
   const [showMoveNumbers, setShowMoveNumbers] = useState<boolean>(false);
   const [enableSound, setEnableSound] = useState<boolean>(false);
+  const [boardTheme, setBoardTheme] = useState<BoardTheme>('light-wood-3d');
   
   // Reference for audio element
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -60,6 +63,14 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
       }
       window.removeEventListener('resize', checkForMobile);
     };
+  }, []);
+
+  // Load saved theme preference if available
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('gosei-board-theme');
+    if (savedTheme) {
+      setBoardTheme(savedTheme as BoardTheme);
+    }
   }, []);
 
   useEffect(() => {
@@ -238,6 +249,12 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     setEnableSound(prev => !prev);
   };
 
+  const handleBoardThemeChange = (theme: BoardTheme) => {
+    setBoardTheme(theme);
+    // Save theme preference to localStorage
+    localStorage.setItem('gosei-board-theme', theme);
+  };
+
   const getCurrentMoveInfo = () => {
     if (!game || currentMove < 0) return null;
     return game.moves[currentMove];
@@ -285,6 +302,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             currentMove={currentMove}
             showMoveNumbers={showMoveNumbers}
             capturedStones={visibleCapturedStones}
+            theme={boardTheme}
           />
         </div>
         <div className="controls-container">
@@ -359,6 +377,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             onToggleSound={handleToggleSound}
             autoplaySpeed={autoplaySpeed}
             onAutoplaySpeedChange={handleAutoplaySpeedChange}
+            boardTheme={boardTheme}
+            onBoardThemeChange={handleBoardThemeChange}
           />
         </div>
       </div>

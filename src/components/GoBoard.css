@@ -8,7 +8,40 @@
 .go-board {
   background-color: #e6c588;
   border-radius: 8px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2), inset 0 -3px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25), inset 0 -3px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* Board coordinates appearance */
+.go-board text {
+  pointer-events: none; /* Make sure coordinates don't interfere with interactions */
+  user-select: none;
+}
+
+/* Add a subtle 3D board edge effect */
+.go-board:before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 10px;
+  z-index: -1;
+  background: linear-gradient(135deg, #987648, #6b4423);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* 3D stone hover effect */
+.go-board .stone-overlay:hover {
+  opacity: 0.3;
+  cursor: pointer;
+}
+
+/* Enhance 3D effects for captured stones */
+.go-board .captured-stone {
+  opacity: 0.7;
+  transition: all 0.3s ease;
 }
 
 /* Responsive styles */

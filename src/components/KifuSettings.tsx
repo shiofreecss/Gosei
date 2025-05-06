@@ -1,13 +1,16 @@
 import React from 'react';
+import type { BoardTheme } from './GoBoard';
 
 interface KifuSettingsProps {
   showMoveNumbers: boolean;
   enableSound: boolean;
   showCapturedStones?: boolean;
+  boardTheme?: BoardTheme;
   onToggleMoveNumbers: () => void;
   onToggleSound: () => void;
   onToggleCapturedStones?: () => void;
   onShowHandicapSettings?: () => void;
+  onBoardThemeChange?: (theme: BoardTheme) => void;
   autoplaySpeed?: number;
   onAutoplaySpeedChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -16,10 +19,12 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
   showMoveNumbers, 
   enableSound, 
   showCapturedStones = false,
+  boardTheme = 'default',
   onToggleMoveNumbers, 
   onToggleSound,
   onToggleCapturedStones,
   onShowHandicapSettings,
+  onBoardThemeChange,
   autoplaySpeed = 1000,
   onAutoplaySpeedChange
 }) => {
@@ -49,6 +54,57 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
       </h3>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {/* Board Theme Dropdown Selector */}
+        {onBoardThemeChange && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            padding: '12px 10px',
+            backgroundColor: '#f9f9f9',
+            borderRadius: '8px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="3" y1="9" x2="21" y2="9" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="3" y1="15" x2="21" y2="15" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="9" y1="3" x2="9" y2="21" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="15" y1="3" x2="15" y2="21" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ fontWeight: '500', color: '#333', fontSize: '16px' }}>Board Theme</span>
+            </div>
+            
+            <select
+              value={boardTheme}
+              onChange={(e) => onBoardThemeChange(e.target.value as BoardTheme)}
+              style={{
+                appearance: 'none',
+                padding: '8px 30px 8px 12px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#333',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                backgroundColor: 'white',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 8px center',
+                backgroundSize: '16px',
+                cursor: 'pointer',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                width: '160px'
+              }}
+              aria-label="Select board theme"
+            >
+              <option value="default">Default Board</option>
+              <option value="dark-wood-3d">Dark Wood 3D</option>
+              <option value="light-wood-3d">Light Wood 3D</option>
+              <option value="universe">Universe</option>
+            </select>
+          </div>
+        )}
+      
         <div style={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
@@ -257,12 +313,10 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="#444" strokeWidth="2"/>
-                <circle cx="8" cy="8" r="2" fill="#444"/>
-                <circle cx="16" cy="8" r="2" fill="#444"/>
-                <circle cx="16" cy="16" r="2" fill="#444"/>
-                <circle cx="8" cy="16" r="2" fill="#444"/>
-                <circle cx="12" cy="12" r="2" fill="#444"/>
+                <circle cx="6" cy="6" r="3" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="6" cy="18" r="3" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="18" cy="6" r="3" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="18" cy="18" r="3" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <span style={{ fontWeight: '500', color: '#333', fontSize: '16px' }}>Handicap Settings</span>
             </div>
@@ -273,19 +327,22 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '8px 16px',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                border: 'none',
+                backgroundColor: '#f0f0f0',
+                color: '#333',
+                border: '1px solid #ddd',
                 borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '16px',
+                padding: '6px 10px',
+                fontSize: '14px',
                 fontWeight: '500',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
               }}
-              aria-label="Configure handicap settings"
+              aria-label="Show handicap settings"
             >
               Configure
+              <svg width="14" height="14" style={{ marginLeft: '5px' }} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18l6-6-6-6" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </button>
           </div>
         )}

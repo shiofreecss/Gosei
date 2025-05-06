@@ -1,5 +1,17 @@
 # GoSei AI-Kifu Version History
 
+## v1.0.3 - 2025-05-15
+
+### Board Visualization Improvements
+- Added customizable board themes with dropdown selector
+- Implemented 4 theme options: Default Board, Dark Wood 3D, Light Wood 3D, and Universe
+- Enhanced 3D stone appearance with realistic lighting and shadow effects
+- Added wood grain texture to 3D board themes for increased realism
+- Repositioned coordinates to appear behind stones while maintaining visibility
+- Added coordinates on all four sides of the board for better reference
+- Fixed issues with stone placement and coordinate visibility
+- Improved visual accessibility with semi-transparent coordinates
+
 ## v1.0.2 - 2025-05-10
 
 ### UI/UX Improvements
