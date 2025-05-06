@@ -72,7 +72,7 @@
     padding-bottom: 20px;
     margin-bottom: 20px;
     height: auto;
-    max-height: 300px;
+    max-height: 600px;
   }
 
   .game-library-content {
@@ -91,7 +91,7 @@
   }
 
   .game-library-sidebar {
-    max-height: 250px;
+    max-height: 600px;
   }
 
   .game-list {
@@ -130,7 +130,7 @@
   }
 
   .game-library-sidebar {
-    max-height: 200px;
+    max-height: 600px;
   }
 
   .game-item {
