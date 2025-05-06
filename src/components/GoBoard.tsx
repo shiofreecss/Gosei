@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import './GoBoard.css';
+import { generateHeatMap } from '../utils/boardAnalysis';
 
 export type BoardTheme = 'default' | 'dark-wood-3d' | 'light-wood-3d' | 'universe';
 
@@ -24,6 +25,7 @@ interface GoBoardProps {
   capturedStones?: CapturedStone[];
   onClick?: (x: number, y: number) => void;
   theme?: BoardTheme;
+  showHeatMap?: boolean;
 }
 
 // Theme configurations for different board styles
@@ -98,7 +100,8 @@ const GoBoard: React.FC<GoBoardProps> = ({
   showMoveNumbers = false,
   capturedStones = [],
   onClick,
-  theme = 'default'
+  theme = 'default',
+  showHeatMap = false
 }) => {
   // Make cellSize responsive based on screen width
   const [cellSize, setCellSize] = useState(32);
@@ -167,6 +170,12 @@ const GoBoard: React.FC<GoBoardProps> = ({
     // If stone is in the captured map, it's not visible
     return false;
   }, [capturedStonesMap]);
+  
+  // Generate heat map data when stones change or when toggled
+  const heatMapData = useMemo(() => {
+    if (!showHeatMap) return null;
+    return generateHeatMap(stones.slice(0, currentMove >= 0 ? currentMove + 1 : stones.length), size);
+  }, [showHeatMap, stones, currentMove, size]);
   
   const renderStones = useCallback(() => {
     const visibleStones = stones.slice(0, currentMove >= 0 ? currentMove + 1 : stones.length);
@@ -500,6 +509,64 @@ const GoBoard: React.FC<GoBoardProps> = ({
     return overlays;
   }, [size, cellSize, stones, isStoneVisible, onClick, handleCellClick]);
   
+  // Render heat map overlay
+  const renderHeatMap = useCallback(() => {
+    if (!showHeatMap || !heatMapData) return null;
+    
+    const { blackInfluence, whiteInfluence } = heatMapData;
+    const heatMapCells = [];
+    
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        // Skip positions with stones
+        const hasStone = stones.some(
+          stone => stone.x === x && stone.y === y && isStoneVisible(stone.x, stone.y)
+        );
+        
+        if (hasStone) continue;
+        
+        const blackValue = blackInfluence[y][x];
+        const whiteValue = whiteInfluence[y][x];
+        
+        if (blackValue > 0 || whiteValue > 0) {
+          let color;
+          let opacity;
+          
+          // Determine if this is a black or white dominated area
+          if (blackValue > whiteValue) {
+            // Black influence - more intense red for stronger influence
+            color = 'rgb(255, 0, 0)';
+            opacity = Math.min(0.7, blackValue * 0.8);
+          } else if (whiteValue > blackValue) {
+            // White influence - more intense blue for stronger influence
+            color = 'rgb(0, 100, 255)';
+            opacity = Math.min(0.7, whiteValue * 0.8);
+          } else {
+            // Equal influence - show as purple
+            color = 'rgb(128, 0, 128)';
+            opacity = Math.min(0.5, (blackValue + whiteValue) * 0.4);
+          }
+          
+          heatMapCells.push(
+            <rect
+              key={`heat-${x}-${y}`}
+              x={(x * cellSize) - (cellSize / 2)}
+              y={(y * cellSize) - (cellSize / 2)}
+              width={cellSize}
+              height={cellSize}
+              fill={color}
+              opacity={opacity}
+              rx={2}
+              ry={2}
+            />
+          );
+        }
+      }
+    }
+    
+    return heatMapCells;
+  }, [showHeatMap, heatMapData, size, cellSize, stones, isStoneVisible]);
+  
   return (
     <div className="go-board-container">
       <svg
@@ -558,6 +625,9 @@ const GoBoard: React.FC<GoBoardProps> = ({
         
         {/* Star points */}
         <g>{renderHoshiPoints()}</g>
+        
+        {/* Heat map overlay - render before stones but after grid */}
+        {showHeatMap && <g className="heat-map">{renderHeatMap()}</g>}
         
         {/* Captured stones' marks */}
         <g>{renderCapturedStones()}</g>

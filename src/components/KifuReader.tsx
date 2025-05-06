@@ -15,6 +15,8 @@ interface KifuSettingsProps {
   onToggleMoveNumbers: () => void;
   enableSound: boolean;
   onToggleSound: () => void;
+  showHeatMap?: boolean;
+  onToggleHeatMap?: () => void;
   autoplaySpeed?: number;
   onAutoplaySpeedChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   boardTheme?: BoardTheme;
@@ -31,6 +33,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   // New state for toggles
   const [showMoveNumbers, setShowMoveNumbers] = useState<boolean>(false);
   const [enableSound, setEnableSound] = useState<boolean>(false);
+  const [showHeatMap, setShowHeatMap] = useState<boolean>(false); // Add heat map toggle state
   const [boardTheme, setBoardTheme] = useState<BoardTheme>('light-wood-3d');
   
   // Reference for audio element
@@ -249,6 +252,10 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     setEnableSound(prev => !prev);
   };
 
+  const handleToggleHeatMap = () => {
+    setShowHeatMap(prev => !prev);
+  };
+
   const handleBoardThemeChange = (theme: BoardTheme) => {
     setBoardTheme(theme);
     // Save theme preference to localStorage
@@ -303,6 +310,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             showMoveNumbers={showMoveNumbers}
             capturedStones={visibleCapturedStones}
             theme={boardTheme}
+            showHeatMap={showHeatMap}
           />
         </div>
         <div className="controls-container">
@@ -375,6 +383,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             onToggleMoveNumbers={handleToggleMoveNumbers}
             enableSound={enableSound}
             onToggleSound={handleToggleSound}
+            showHeatMap={showHeatMap}
+            onToggleHeatMap={handleToggleHeatMap}
             autoplaySpeed={autoplaySpeed}
             onAutoplaySpeedChange={handleAutoplaySpeedChange}
             boardTheme={boardTheme}

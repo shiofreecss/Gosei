@@ -5,10 +5,12 @@ interface KifuSettingsProps {
   showMoveNumbers: boolean;
   enableSound: boolean;
   showCapturedStones?: boolean;
+  showHeatMap?: boolean;
   boardTheme?: BoardTheme;
   onToggleMoveNumbers: () => void;
   onToggleSound: () => void;
   onToggleCapturedStones?: () => void;
+  onToggleHeatMap?: () => void;
   onShowHandicapSettings?: () => void;
   onBoardThemeChange?: (theme: BoardTheme) => void;
   autoplaySpeed?: number;
@@ -19,10 +21,12 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
   showMoveNumbers, 
   enableSound, 
   showCapturedStones = false,
+  showHeatMap = false,
   boardTheme = 'default',
   onToggleMoveNumbers, 
   onToggleSound,
   onToggleCapturedStones,
+  onToggleHeatMap,
   onShowHandicapSettings,
   onBoardThemeChange,
   autoplaySpeed = 1000,
@@ -105,6 +109,63 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
           </div>
         )}
       
+        {/* Heat Map Toggle (new) */}
+        {onToggleHeatMap && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            padding: '12px 10px',
+            backgroundColor: '#f9f9f9',
+            borderRadius: '8px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="#444" strokeWidth="2"/>
+                <circle cx="8" cy="8" r="2" fill="#F44336" />
+                <circle cx="16" cy="8" r="2" fill="#2196F3" />
+                <circle cx="12" cy="12" r="3" fill="#9C27B0" opacity="0.7" />
+                <circle cx="8" cy="16" r="2" fill="#F44336" opacity="0.6" />
+                <circle cx="16" cy="16" r="2" fill="#2196F3" opacity="0.6" />
+              </svg>
+              <span style={{ fontWeight: '500', color: '#333', fontSize: '16px' }}>Show Influence Heatmap</span>
+            </div>
+            
+            <button 
+              onClick={onToggleHeatMap}
+              style={{
+                position: 'relative',
+                width: '52px',
+                height: '28px',
+                backgroundColor: showHeatMap ? '#4CAF50' : '#ccc',
+                borderRadius: '14px',
+                border: 'none',
+                outline: 'none',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '2px'
+              }}
+              aria-pressed={showHeatMap}
+              aria-label={showHeatMap ? "Hide influence heatmap" : "Show influence heatmap"}
+            >
+              <span 
+                style={{
+                  position: 'absolute',
+                  left: showHeatMap ? '26px' : '2px',
+                  width: '24px',
+                  height: '24px',
+                  backgroundColor: 'white',
+                  borderRadius: '50%',
+                  transition: 'left 0.3s',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                }}
+              />
+            </button>
+          </div>
+        )}
+        
         <div style={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
