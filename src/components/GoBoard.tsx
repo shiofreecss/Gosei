@@ -266,7 +266,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
         <text
           key={`col-${i}`}
           x={i * cellSize}
-          y={boardSize + boardPadding * 2}
+          y={boardSize + boardPadding}
           textAnchor="middle"
           fill="#333" // Darker text for better contrast
           fontSize={cellSize * 0.45} // Larger font for coordinates
@@ -283,7 +283,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
       coords.push(
         <text
           key={`row-${i}`}
-          x={-boardPadding * 1.5}
+          x={-boardPadding}
           y={i * cellSize + cellSize * 0.15}
           textAnchor="middle"
           fill="#333" // Darker text for better contrast
@@ -356,9 +356,9 @@ const GoBoard: React.FC<GoBoardProps> = ({
     <div className="go-board-container">
       <svg
         className="go-board"
-        width={boardSize + boardPadding * 3}
+        width={boardSize + boardPadding * 4}
         height={boardSize + boardPadding * 4}
-        viewBox={`${-boardPadding * 2} ${-boardPadding} ${boardSize + boardPadding * 3} ${boardSize + boardPadding * 4}`}
+        viewBox={`${-boardPadding * 2} ${-boardPadding *2} ${boardSize + boardPadding * 4} ${boardSize + boardPadding * 4}`}
       >
         {/* Board grid */}
         <g>{renderGrid()}</g>
