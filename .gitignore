@@ -21,3 +21,20 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Documentation
+/docs/**/*.temp
+/docs/**/*.tmp
+/docs/**/_draft*
+/docs/**/_archive
+/docs/**/.vscode
+/docs/**/node_modules
+/docs/**/_site
+/docs/**/.docusaurus
+/docs/**/build
+/docs/**/.cache
+/docs/**/.env*
+/docs/**/*.log
+/docs/**/*.bak
+/docs/**/*.swp
+/docs/**/*.swo
