@@ -2,8 +2,9 @@
 
 GoSei | AI-Kifu is an open-source web application dedicated to the Go community for reading, visualizing, and analyzing Go game records (kifu) in both SGF (Smart Game Format) and traditional Japanese kifu format.
 
-## Latest Updates (v1.0.3)
+## Latest Updates (v1.0.4)
 
+- Added modern high-resolution noise background with dynamic gradient overlay
 - Added customizable board themes with realistic 3D stones and wood textures
 - Implemented 4 theme options: Default Board, Dark Wood 3D, Light Wood 3D, and Universe
 - Improved coordinate visibility by positioning them behind stones on all four sides of the board
@@ -22,6 +23,7 @@ The project is powered by the [Beaver Foundation](https://beaver.foundation), su
 
 ## Features
 
+- 🎨 Modern UI with high-resolution noise texture and dynamic gradients
 - 📋 Support for both SGF and Japanese kifu formats
 - 🎮 Interactive Go board visualization
   - Multiple board themes (Default, Dark Wood 3D, Light Wood 3D, Universe)
@@ -39,14 +41,17 @@ The project is powered by the [Beaver Foundation](https://beaver.foundation), su
 
 ## Screenshots
 
-![Main Game Viewer](/Examples/3_game_preview.jpg)
-*The main game viewer interface showing an interactive Go board with move history and navigation controls*
+![Main Interface](/Examples/1-Main-page.png)
+*The main interface featuring our modern design with high-resolution noise background and clean UI*
 
-![Game Library](/Examples/2_game_lib.jpg)
-*Browse thousands of professional games organized by tournaments, players, and categories*
+![Information and Music Player](/Examples/2-Information-Music-player.png)
+*Interactive information display and integrated music player for an enhanced experience*
 
-![SGF File Upload](/Examples/1_game_upload.jpg)
-*Upload your own SGF files or paste Japanese kifu format for instant visualization*
+![Game Library Interface](/Examples/3-Go-Library.png)
+*Browse thousands of professional games with our intuitive game library interface*
+
+![Kifu Reader with Heatmap](/Examples/4-Kifu-Reader-heatmap.png)
+*Advanced Kifu reader featuring move analysis and heatmap visualization*
 
 ## Game Library
 
