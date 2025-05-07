@@ -6,13 +6,19 @@ interface KifuSettingsProps {
   enableSound: boolean;
   showCapturedStones?: boolean;
   showHeatMap?: boolean;
+  showLibertyAnalysis?: boolean;
+  showWinRateChart?: boolean;
   boardTheme?: BoardTheme;
+  analysisType?: 'liberty' | 'influence';
   onToggleMoveNumbers: () => void;
   onToggleSound: () => void;
   onToggleCapturedStones?: () => void;
   onToggleHeatMap?: () => void;
+  onToggleLibertyAnalysis?: () => void;
+  onToggleWinRateChart?: () => void;
   onShowHandicapSettings?: () => void;
   onBoardThemeChange?: (theme: BoardTheme) => void;
+  onAnalysisTypeChange?: (type: 'liberty' | 'influence') => void;
   autoplaySpeed?: number;
   onAutoplaySpeedChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -22,13 +28,19 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
   enableSound, 
   showCapturedStones = false,
   showHeatMap = false,
+  showLibertyAnalysis = false,
+  showWinRateChart = false,
   boardTheme = 'default',
+  analysisType = 'liberty',
   onToggleMoveNumbers, 
   onToggleSound,
   onToggleCapturedStones,
   onToggleHeatMap,
+  onToggleLibertyAnalysis,
+  onToggleWinRateChart,
   onShowHandicapSettings,
   onBoardThemeChange,
+  onAnalysisTypeChange,
   autoplaySpeed = 1000,
   onAutoplaySpeedChange
 }) => {
@@ -109,7 +121,167 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
           </div>
         )}
       
-        {/* Heat Map Toggle (new) */}
+        {/* Win Rate Chart Toggle (new) */}
+        {onToggleWinRateChart && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            padding: '12px 10px',
+            backgroundColor: '#f9f9f9',
+            borderRadius: '8px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3v18h18" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M21 12l-5-5-6 6-4-4" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="7" cy="14" r="2" fill="#333" fillOpacity="0.7" />
+                <circle cx="16" cy="7" r="2" fill="#777" fillOpacity="0.7" />
+              </svg>
+              <span style={{ fontWeight: '500', color: '#333', fontSize: '16px' }}>Win Rate Chart</span>
+            </div>
+            
+            <button 
+              onClick={onToggleWinRateChart}
+              style={{
+                position: 'relative',
+                width: '52px',
+                height: '28px',
+                backgroundColor: showWinRateChart ? '#2196F3' : '#ccc',
+                borderRadius: '14px',
+                border: 'none',
+                outline: 'none',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '2px'
+              }}
+              aria-pressed={showWinRateChart}
+              aria-label={showWinRateChart ? "Hide win rate chart" : "Show win rate chart"}
+            >
+              <span 
+                style={{
+                  position: 'absolute',
+                  left: showWinRateChart ? '26px' : '2px',
+                  width: '24px',
+                  height: '24px',
+                  backgroundColor: 'white',
+                  borderRadius: '50%',
+                  transition: 'left 0.3s',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                }}
+              />
+            </button>
+          </div>
+        )}
+        
+        {/* Analysis Type Selector (new) - Only show when win rate chart is enabled */}
+        {showWinRateChart && onAnalysisTypeChange && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            padding: '12px 10px',
+            backgroundColor: '#e6f4ff',
+            borderRadius: '8px',
+            marginLeft: '20px',
+            borderLeft: '3px solid #2196F3'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 12h4m4 0h8m4 0h2" stroke="#444" strokeWidth="2" strokeLinecap="round" />
+                <path d="M6 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" stroke="#444" strokeWidth="2" />
+                <path d="M18 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" stroke="#444" strokeWidth="2" />
+              </svg>
+              <span style={{ fontWeight: '500', color: '#2196F3', fontSize: '16px' }}>Analysis Method</span>
+            </div>
+            
+            <select
+              value={analysisType}
+              onChange={(e) => onAnalysisTypeChange(e.target.value as 'liberty' | 'influence')}
+              style={{
+                appearance: 'none',
+                padding: '8px 30px 8px 12px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#333',
+                border: '1px solid #2196F3',
+                borderRadius: '6px',
+                backgroundColor: 'white',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232196F3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 8px center',
+                backgroundSize: '16px',
+                cursor: 'pointer',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                width: '160px'
+              }}
+              aria-label="Select analysis type"
+            >
+              <option value="liberty">Liberty Analysis</option>
+              <option value="influence">Influence Analysis</option>
+            </select>
+          </div>
+        )}
+        
+        {/* Liberty Analysis Toggle */}
+        {onToggleLibertyAnalysis && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            padding: '12px 10px',
+            backgroundColor: '#f9f9f9',
+            borderRadius: '8px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3v18h18" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M7 17l4-6 6-3" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="7" cy="14" r="3" fill="#333" fillOpacity="0.7" />
+                <circle cx="11" cy="11" r="3" fill="#333" fillOpacity="0.5" />
+                <circle cx="17" cy="8" r="3" fill="#777" fillOpacity="0.5" />
+              </svg>
+              <span style={{ fontWeight: '500', color: '#333', fontSize: '16px' }}>Liberty Analysis</span>
+            </div>
+            
+            <button 
+              onClick={onToggleLibertyAnalysis}
+              style={{
+                position: 'relative',
+                width: '52px',
+                height: '28px',
+                backgroundColor: showLibertyAnalysis ? '#2196F3' : '#ccc',
+                borderRadius: '14px',
+                border: 'none',
+                outline: 'none',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '2px'
+              }}
+              aria-pressed={showLibertyAnalysis}
+              aria-label={showLibertyAnalysis ? "Hide liberty analysis" : "Show liberty analysis"}
+            >
+              <span 
+                style={{
+                  position: 'absolute',
+                  left: showLibertyAnalysis ? '26px' : '2px',
+                  width: '24px',
+                  height: '24px',
+                  backgroundColor: 'white',
+                  borderRadius: '50%',
+                  transition: 'left 0.3s',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                }}
+              />
+            </button>
+          </div>
+        )}
+        
+        {/* Heat Map Toggle */}
         {onToggleHeatMap && (
           <div style={{ 
             display: 'flex', 
@@ -137,7 +309,7 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
                 position: 'relative',
                 width: '52px',
                 height: '28px',
-                backgroundColor: showHeatMap ? '#4CAF50' : '#ccc',
+                backgroundColor: showHeatMap ? '#2196F3' : '#ccc',
                 borderRadius: '14px',
                 border: 'none',
                 outline: 'none',
@@ -188,7 +360,7 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
               position: 'relative',
               width: '52px',
               height: '28px',
-              backgroundColor: showMoveNumbers ? '#4CAF50' : '#ccc',
+              backgroundColor: showMoveNumbers ? '#2196F3' : '#ccc',
               borderRadius: '14px',
               border: 'none',
               outline: 'none',
@@ -239,7 +411,7 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
               position: 'relative',
               width: '52px',
               height: '28px',
-              backgroundColor: enableSound ? '#4CAF50' : '#ccc',
+              backgroundColor: enableSound ? '#2196F3' : '#ccc',
               borderRadius: '14px',
               border: 'none',
               outline: 'none',
@@ -334,7 +506,7 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
                 position: 'relative',
                 width: '52px',
                 height: '28px',
-                backgroundColor: showCapturedStones ? '#4CAF50' : '#ccc',
+                backgroundColor: showCapturedStones ? '#2196F3' : '#ccc',
                 borderRadius: '14px',
                 border: 'none',
                 outline: 'none',

@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import GoBoard, { BoardTheme } from './GoBoard';
 import KifuSettings from './KifuSettings';
+import LibertyAnalysis from './LibertyAnalysis';
+import WinRateChart from './WinRateChart';
 import { ParsedGame, parseSGF, movesToStones } from '../utils/sgfParser';
-import { applyMove, createBoardFromStones, getHandicapPositions, findCapturedStones, Position } from '../utils/goRules';
+import { applyMove, createBoardFromStones, getHandicapPositions, findCapturedStones, Position, Stone } from '../utils/goRules';
 import './KifuReader.css';
 
 interface KifuReaderProps {
@@ -17,6 +19,12 @@ interface KifuSettingsProps {
   onToggleSound: () => void;
   showHeatMap?: boolean;
   onToggleHeatMap?: () => void;
+  showLibertyAnalysis?: boolean;
+  onToggleLibertyAnalysis?: () => void;
+  showWinRateChart?: boolean;
+  onToggleWinRateChart?: () => void;
+  analysisType?: 'liberty' | 'influence';
+  onAnalysisTypeChange?: (type: 'liberty' | 'influence') => void;
   autoplaySpeed?: number;
   onAutoplaySpeedChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   boardTheme?: BoardTheme;
@@ -33,7 +41,10 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   // New state for toggles
   const [showMoveNumbers, setShowMoveNumbers] = useState<boolean>(false);
   const [enableSound, setEnableSound] = useState<boolean>(false);
-  const [showHeatMap, setShowHeatMap] = useState<boolean>(false); // Add heat map toggle state
+  const [showHeatMap, setShowHeatMap] = useState<boolean>(false);
+  const [showLibertyAnalysis, setShowLibertyAnalysis] = useState<boolean>(false);
+  const [showWinRateChart, setShowWinRateChart] = useState<boolean>(false);
+  const [analysisType, setAnalysisType] = useState<'liberty' | 'influence'>('liberty');
   const [boardTheme, setBoardTheme] = useState<BoardTheme>('light-wood-3d');
   
   // Reference for audio element
@@ -253,12 +264,23 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   };
 
   const handleToggleHeatMap = () => {
-    setShowHeatMap(prev => !prev);
+    setShowHeatMap(!showHeatMap);
+  };
+
+  const handleToggleLibertyAnalysis = () => {
+    setShowLibertyAnalysis(!showLibertyAnalysis);
+  };
+
+  const handleToggleWinRateChart = () => {
+    setShowWinRateChart(!showWinRateChart);
+  };
+
+  const handleAnalysisTypeChange = (type: 'liberty' | 'influence') => {
+    setAnalysisType(type);
   };
 
   const handleBoardThemeChange = (theme: BoardTheme) => {
     setBoardTheme(theme);
-    // Save theme preference to localStorage
     localStorage.setItem('gosei-board-theme', theme);
   };
 
@@ -290,6 +312,93 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     stone => stone.moveNumber <= currentMove + 1
   );
 
+  // Get the current stones on the board based on the move history
+  const getCurrentStones = () => {
+    if (!game) return [];
+    
+    // Start with handicap stones if any (ensure they have proper type with color)
+    const stones: Stone[] = game.handicapStones ? 
+      game.handicapStones.map(stone => ({
+        x: stone.x,
+        y: stone.y,
+        color: 'black' // Handicap stones are always black
+      })) : [];
+    
+    // Add moves up to the current move
+    for (let i = 0; i <= currentMove; i++) {
+      if (i >= 0 && i < game.moves.length) {
+        const move = game.moves[i];
+        
+        // Skip pass moves (negative coordinates)
+        if (move.x >= 0 && move.y >= 0) {
+          stones.push(move);
+        }
+      }
+    }
+    
+    return stones;
+  };
+
+  // Create a move history array for the WinRateChart
+  const moveHistory = useMemo(() => {
+    if (!game) return [];
+    
+    const history: Stone[][] = [];
+    
+    // Start with handicap stones if any, ensuring they have the 'black' color property
+    let currentStones: Stone[] = game.handicapStones ? 
+      game.handicapStones.map(pos => ({ x: pos.x, y: pos.y, color: 'black' as const })) : 
+      [];
+    
+    // Add initial position (just handicap stones if any)
+    history.push([...currentStones]);
+    
+    // Add each move one by one
+    game.moves.forEach(move => {
+      if (move.x >= 0 && move.y >= 0) { // Skip pass moves
+        // Copy current stones
+        const updatedStones = [...currentStones];
+        
+        // Add the new move
+        updatedStones.push({
+          x: move.x,
+          y: move.y,
+          color: move.color
+        });
+        
+        // Remove any captured stones
+        if (move.captures && move.captures.length > 0) {
+          move.captures.forEach(capturedPos => {
+            const index = updatedStones.findIndex(stone => 
+              stone.x === capturedPos.x && stone.y === capturedPos.y
+            );
+            if (index >= 0) {
+              updatedStones.splice(index, 1);
+            }
+          });
+        }
+        
+        // Update current stones
+        currentStones = updatedStones;
+        
+        // Add to history
+        history.push([...currentStones]);
+      } else {
+        // For pass moves, just duplicate the previous position
+        history.push([...currentStones]);
+      }
+    });
+    
+    return history;
+  }, [game]);
+
+  const shortenPlayerName = (name: string, maxLength: number = 10) => {
+    if (name.length > maxLength) {
+      return name.slice(0, maxLength) + '...';
+    }
+    return name;
+  };
+
   return (
     <div className={`kifu-reader ${isMobile ? 'kifu-reader-mobile' : ''}`}>
       {error && (
@@ -302,33 +411,54 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
         <div className="board-container">
           <GoBoard
             size={game?.info.size || 19}
-            stones={game ? movesToStones(
-              currentMove >= 0 ? game.moves.slice(0, currentMove + 1) : [],
-              game.handicapStones
-            ) : []}
+            stones={getCurrentStones()}
             currentMove={currentMove}
             showMoveNumbers={showMoveNumbers}
             capturedStones={visibleCapturedStones}
             theme={boardTheme}
             showHeatMap={showHeatMap}
           />
+          
+          {/* Add the LibertyAnalysis component */}
+          {showLibertyAnalysis && (
+            <LibertyAnalysis 
+              stones={getCurrentStones()}
+              boardSize={game?.info.size || 19}
+            />
+          )}
+          
+          {/* Add the WinRateChart component */}
+          {showWinRateChart && moveHistory.length > 0 && game && (
+            <WinRateChart 
+              moveHistory={moveHistory}
+              currentMove={currentMove}
+              boardSize={game.info.size}
+              analysisType={analysisType}
+            />
+          )}
         </div>
         <div className="controls-container">
           <div className="game-info">
             <div className="game-info-header">
               <div className="game-info-player">
+                <div className="stone-icon black" aria-label="Black stone"></div>
                 <div className="game-info-player-name">
-                  <span>Black: {game?.info.playerBlack || 'Unknown'}</span>
+                  <div className="player-name" title={game?.info.playerBlack || 'Unknown'}>
+                    {game?.info.playerBlack ? shortenPlayerName(game.info.playerBlack, 20) : 'Unknown'}
+                  </div>
                   <span className="game-info-player-captures">
-                    Captures: {capturedBlack}
+                    Captures: {capturedWhite}
                   </span>
                 </div>
               </div>
               <div className="game-info-player">
+                <div className="stone-icon white" aria-label="White stone"></div>
                 <div className="game-info-player-name">
-                  <span>White: {game?.info.playerWhite || 'Unknown'}</span>
+                  <div className="player-name" title={game?.info.playerWhite || 'Unknown'}>
+                    {game?.info.playerWhite ? shortenPlayerName(game.info.playerWhite, 20) : 'Unknown'}
+                  </div>
                   <span className="game-info-player-captures">
-                    Captures: {capturedWhite}
+                    Captures: {capturedBlack}
                   </span>
                 </div>
               </div>
@@ -338,6 +468,9 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               <span className="game-info-detail">Size: {game?.info.size || 19}×{game?.info.size || 19}</span>
               {game?.info.handicap && game.info.handicap > 1 && (
                 <span className="game-info-detail">Handicap: {game.info.handicap}</span>
+              )}
+              {game?.info.result && (
+                <span className="game-info-detail">Result: {game.info.result}</span>
               )}
             </div>
             {currentMoveInfo?.comment && (
@@ -380,15 +513,21 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
           </div>
           <KifuSettings
             showMoveNumbers={showMoveNumbers}
-            onToggleMoveNumbers={handleToggleMoveNumbers}
             enableSound={enableSound}
-            onToggleSound={handleToggleSound}
             showHeatMap={showHeatMap}
+            showLibertyAnalysis={showLibertyAnalysis}
+            showWinRateChart={showWinRateChart}
+            analysisType={analysisType}
+            onToggleMoveNumbers={handleToggleMoveNumbers}
+            onToggleSound={handleToggleSound}
             onToggleHeatMap={handleToggleHeatMap}
-            autoplaySpeed={autoplaySpeed}
-            onAutoplaySpeedChange={handleAutoplaySpeedChange}
+            onToggleLibertyAnalysis={handleToggleLibertyAnalysis}
+            onToggleWinRateChart={handleToggleWinRateChart}
+            onAnalysisTypeChange={handleAnalysisTypeChange}
             boardTheme={boardTheme}
             onBoardThemeChange={handleBoardThemeChange}
+            autoplaySpeed={autoplaySpeed}
+            onAutoplaySpeedChange={handleAutoplaySpeedChange}
           />
         </div>
       </div>

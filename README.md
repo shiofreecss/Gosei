@@ -2,13 +2,14 @@
 
 GoSei | AI-Kifu is an open-source web application dedicated to the Go community for reading, visualizing, and analyzing Go game records (kifu) in both SGF (Smart Game Format) and traditional Japanese kifu format.
 
-## Latest Updates (v1.0.4)
+## Latest Updates (v1.0.5)
 
-- Added modern high-resolution noise background with dynamic gradient overlay
-- Added customizable board themes with realistic 3D stones and wood textures
-- Implemented 4 theme options: Default Board, Dark Wood 3D, Light Wood 3D, and Universe
-- Improved coordinate visibility by positioning them behind stones on all four sides of the board
-- Enhanced visual experience with realistic lighting and shadow effects for stones
+- Added advanced game analysis features with AI-powered insights:
+  - **Liberty Analysis**: Shows stone liberties and group counts with win probability estimation
+  - **Win Rate Chart**: Visualizes game progression with analysis based on either liberties or influence
+  - **Influence Heatmap**: Displays territorial influence with a color-coded heatmap
+- Improved player information display with stone icons and optimized for all screen sizes
+- Enhanced responsive design for mobile devices
 - See [VERSION.md](VERSION.md) for complete version history
 
 ## Live Demo
@@ -23,6 +24,10 @@ The project is powered by the [Beaver Foundation](https://beaver.foundation), su
 
 ## Features
 
+- 🧠 Advanced AI analysis features:
+  - Liberty analysis with win probability estimation
+  - Win rate charts based on either liberty or influence metrics
+  - Influence heatmap visualization for territorial analysis
 - 🎨 Modern UI with high-resolution noise texture and dynamic gradients
 - 📋 Support for both SGF and Japanese kifu formats
 - 🎮 Interactive Go board visualization
@@ -53,6 +58,12 @@ The project is powered by the [Beaver Foundation](https://beaver.foundation), su
 ![Kifu Reader with Heatmap](/Examples/4-Kifu-Reader-heatmap.png)
 *Advanced Kifu reader featuring move analysis and heatmap visualization*
 
+![Win Rate Analysis](/Examples/5-Win-Rate-Chart.png)
+*Win rate chart showing game progression with significant move highlights*
+
+![Liberty Analysis](/Examples/6-Liberty-Analysis.png)
+*Liberty analysis showing stone liberties, group counts, and win probability*
+
 ## Game Library
 
 The GoSei | AI-Kifu game library includes thousands of professional Go games, organized into categories:
@@ -64,6 +75,28 @@ The GoSei | AI-Kifu game library includes thousands of professional Go games, or
 - **Special Collections**: Unusual games, different board sizes, and historical collections
 
 All game data is sourced from the [SGF collection](https://homepages.cwi.nl/~aeb/go/games/games/) maintained by Andries E. Brouwer at CWI.
+
+## AI Analysis Features
+
+GoSei | AI-Kifu includes advanced analysis features that help players understand game dynamics:
+
+### Liberty Analysis
+- Shows liberty counts and group counts for both players
+- Calculates liberty advantage and estimates win probability
+- Provides visual indicators of which player is favored
+
+### Win Rate Chart
+- Visualizes win probability changes throughout the game
+- Supports both liberty-based and influence-based analysis modes
+- Highlights significant moves that change the game's trajectory
+- Provides expandable view for detailed examination
+
+### Influence Heatmap
+- Displays territorial influence with red (black) and blue (white) coloring
+- Shows which areas of the board are controlled by each player
+- Updates dynamically as the game progresses
+
+For more details on these features, see [AI-ANALYSIS.md](docs/AI-ANALYSIS.md).
 
 ## Technology Stack
 
@@ -152,6 +185,18 @@ The build artifacts will be stored in the `build/` directory.
 3. Use pagination controls to navigate through multiple games
 4. Search for specific games using the search bar
 5. Click on a game to load and display it in the viewer
+
+### Using AI Analysis Features
+
+1. Load a game from the library or upload your own SGF file
+2. In the display settings panel, toggle the analysis features you want to use:
+   - Win Rate Chart
+   - Liberty Analysis
+   - Influence Heatmap
+3. For the Win Rate Chart, select your preferred analysis method:
+   - Liberty Analysis: Based on stone liberties and group connections
+   - Influence Analysis: Based on territorial control and board position
+4. Use the navigation controls to see how these metrics change during the game
 
 ### Using Japanese Kifu Format
 

@@ -16,99 +16,173 @@
 
 .kifu-content {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 20px;
-  align-items: flex-start;
-  max-width: 100%;
 }
 
 .board-container {
-  width: 60%;
-  min-width: 480px;
-  background-color: rgba(249, 249, 249, 0.5);
-  padding: 25px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.controls-container {
-  width: 35%;
-  min-width: 330px;
   display: flex;
   flex-direction: column;
   gap: 15px;
+  background-color: rgba(249, 249, 249, 0.5);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure the Go board is centered and responsive */
+.go-board-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  overflow: auto;
+}
+
+.controls-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
 }
 
 .game-info {
-  padding: 20px;
+  margin-bottom: 20px;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .game-info-header {
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid #eee;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
 }
 
 .game-info-player {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 15px;
   flex: 1;
+  min-height: 80px;
+  text-align: center;
+}
+
+.game-info-player:first-child {
+  border-right: 1px solid #eee;
+}
+
+.stone-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.stone-icon.black {
+  background: radial-gradient(circle at 35% 35%, #555, #222 60%, #000);
+  border: 1px solid #111;
+}
+
+.stone-icon.black::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.stone-icon.white {
+  background: radial-gradient(circle at 35% 35%, #fff, #f0f0f0 60%, #ddd);
+  border: 1px solid #ccc;
+}
+
+.stone-icon.white::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.6);
 }
 
 .game-info-player-name {
-  font-weight: bold;
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;
+  width: 100%;
   align-items: center;
-  gap: 10px;
-  font-size: 18px;
-  margin-bottom: 8px;
+}
+
+.game-info-player-name .player-name {
+  font-weight: 500;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  padding: 0 10px;
+  text-align: center;
 }
 
 .game-info-player-captures {
-  font-size: 16px;
-  color: #444;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  font-size: 13px;
+  color: #666;
+  margin-top: 5px;
+  text-align: center;
 }
 
 .game-info-details {
   display: flex;
-  justify-content: space-between;
-  font-size: 16px;
-  color: #333;
   flex-wrap: wrap;
   gap: 10px;
+  padding: 10px 15px;
+  background-color: #f9f9f9;
+  font-size: 14px;
 }
 
 .game-info-detail {
-  background-color: #f9f9f9;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-weight: 500;
+  color: #444;
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background-color: #eee;
+  white-space: nowrap;
 }
 
 .game-info-comment {
-  margin-top: 15px;
-  padding: 15px;
-  background-color: #f5f9ff;
-  border-radius: 6px;
-  font-size: 16px;
+  margin-top: 10px;
+  padding: 10px 15px;
+  font-size: 14px;
   line-height: 1.5;
-  border: 1px solid #e0e8f5;
+  color: #555;
+  background-color: #fff8e1;
+  border-top: 1px solid #ffe0b2;
+}
+
+.game-info-comment-title {
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #795548;
 }
 
 .navigation-container {
   background-color: white;
   border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  padding: 15px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .move-slider {
@@ -174,6 +248,29 @@
 }
 
 /* Responsive styles */
+@media (min-width: 992px) {
+  .kifu-content {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  
+  .board-container {
+    flex: 3;
+  }
+  
+  .controls-container {
+    flex: 2;
+    position: sticky;
+    top: 20px;
+  }
+}
+
+@media (max-width: 991px) {
+  .kifu-content {
+    flex-direction: column;
+  }
+}
+
 @media (max-width: 1024px) {
   .kifu-content {
     gap: 15px;
@@ -201,6 +298,7 @@
     width: 100%;
     min-width: 0;
     order: 1;
+    padding: 10px;
   }
 
   .controls-container {
@@ -209,8 +307,43 @@
     order: 2;
   }
 
-  .game-info {
-    padding: 15px;
+  .game-info-header {
+    flex-direction: column;
+  }
+  
+  .game-info-player:first-child {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .game-info-player {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 15px;
+  }
+  
+  .stone-icon {
+    margin-bottom: 0;
+  }
+  
+  .game-info-player-name {
+    flex: 1;
+    align-items: flex-start;
+  }
+
+  .game-info-player-name .player-name {
+    max-width: 100%;
+    text-align: left;
+    padding: 0;
+  }
+  
+  .game-info-player-captures {
+    text-align: left;
+  }
+
+  .game-info-details {
+    justify-content: space-between;
   }
 
   .navigation-container {
@@ -236,16 +369,22 @@
     padding: 12px;
   }
 
-  .game-info-player-name {
-    font-size: 16px;
+  .game-info-player {
+    padding: 10px;
   }
-
-  .game-info-player-captures {
-    font-size: 14px;
+  
+  .game-info-player-name .player-name {
+    margin-bottom: 2px;
   }
-
+  
   .game-info-details {
-    font-size: 14px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .game-info-detail {
+    width: 100%;
   }
 
   .navigation-container {
@@ -260,6 +399,10 @@
   .move-range-info {
     font-size: 14px;
     gap: 15px;
+  }
+
+  .game-info-player-name .player-name {
+    max-width: 100%;
   }
 }
 
@@ -281,10 +424,16 @@
   }
 
   .game-info-player {
-    width: 100%;
+    padding: 8px;
+    gap: 10px;
   }
 
-  .game-info-player-name {
+  .stone-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .game-info-player-name .player-name {
     font-size: 14px;
   }
 
