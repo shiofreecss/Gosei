@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Stone } from '../utils/goRules';
 import { findAllStoneGroups } from '../utils/boardAnalysis';
 import { createBoardFromStones } from '../utils/goRules';
@@ -19,11 +19,13 @@ const WIN_RATES = [
 ];
 
 interface LibertyAnalysisProps {
-  stones: Stone[];
+  stones: { x: number; y: number; color: 'black' | 'white' }[];
   boardSize: number;
 }
 
 const LibertyAnalysis: React.FC<LibertyAnalysisProps> = ({ stones, boardSize }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
   // Track previous liberty values for animation
   const [prevBlackLiberties, setPrevBlackLiberties] = useState(0);
   const [prevWhiteLiberties, setPrevWhiteLiberties] = useState(0);
@@ -111,8 +113,22 @@ const LibertyAnalysis: React.FC<LibertyAnalysisProps> = ({ stones, boardSize }) 
   const blackPercent = total === 0 ? 50 : (blackLiberties / total) * 100;
   const whitePercent = total === 0 ? 50 : (whiteLiberties / total) * 100;
   
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    // The actual drawing logic is here...
+    // ... existing code ...
+    
+  }, [stones, boardSize]);
+  
   return (
     <div className="liberty-analysis">
+      <h3 className="analysis-title">Liberty Analysis</h3>
+      <div className="canvas-container">
+        <canvas ref={canvasRef} width={600} height={300} />
+      </div>
+      
       <div className="liberty-heading">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M3 3v18h18" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
