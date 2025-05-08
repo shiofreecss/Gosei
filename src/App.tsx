@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import './App.css';
 import KifuReader from './components/KifuReader';
 import SGFUploader from './components/SGFUploader';
@@ -16,35 +16,41 @@ function App() {
   const [showHelp, setShowHelp] = useState<boolean>(false);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
     const handleResize = () => {
-      setWindowWidth(window.innerWidth);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setWindowWidth(window.innerWidth);
+      }, 150);
     };
     
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
-  const handleFileLoaded = (content: string) => {
+  const handleFileLoaded = useCallback((content: string) => {
     setSgfContent(content);
     setIsFromUpload(true);
-    // Hide library if it's open
     if (showLibrary) {
       setShowLibrary(false);
     }
-  };
+  }, [showLibrary]);
 
-  const handleGameSelected = (content: string) => {
-    // Don't display the board directly, just store the content and show the game viewer
+  const handleGameSelected = useCallback((content: string) => {
     setGameViewerContent(content);
     setShowGameViewer(true);
-  };
+  }, []);
 
-  const handleCloseGameViewer = () => {
+  const handleCloseGameViewer = useCallback(() => {
     setShowGameViewer(false);
-  };
+  }, []);
 
-  // Sample SGF content
-  const sampleSGF = `(;GM[1]FF[4]CA[UTF-8]AP[CGoban:3]ST[2]
+  // Memoize the sample SGF content since it never changes
+  const sampleSGF = useMemo(() => `(;GM[1]FF[4]CA[UTF-8]AP[CGoban:3]ST[2]
 RU[Japanese]SZ[19]KM[6.50]
 PW[White Player]PB[Black Player]
 ;B[pd]C[This is the first move.]
@@ -62,17 +68,37 @@ PW[White Player]PB[Black Player]
 ;B[pe]
 ;W[pf]
 ;B[qj]
-)`;
+)`, []);
+
+  // Memoize style objects to prevent unnecessary re-renders
+  const containerStyle = useMemo(() => ({
+    maxWidth: '1250px', 
+    margin: '0 auto', 
+    padding: '0 20px',
+    width: '100%',
+    boxSizing: 'border-box' as const
+  }), []);
+
+  const mainStyle = useMemo(() => ({
+    maxWidth: '1250px', 
+    margin: '0 auto', 
+    padding: '30px 20px',
+    flex: '1 0 auto',
+    width: '100%',
+    boxSizing: 'border-box' as const
+  }), []);
 
   return (
     <div className="App" style={{ 
-      background: `
+      background: windowWidth <= 768 ? 
+        'linear-gradient(135deg, #f5f7fa, #e8ecf3)' : 
+        `
         linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(240, 245, 255, 0.88)),
         url("data:image/svg+xml,%3Csvg viewBox='0 0 2000 2000' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch' seed='0'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0.1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"),
         linear-gradient(135deg, #f5f7fa, #e8ecf3)
       `,
-      backgroundAttachment: 'fixed',
-      backgroundBlendMode: 'soft-light, normal, normal',
+      backgroundAttachment: windowWidth <= 768 ? 'initial' : 'fixed',
+      backgroundBlendMode: windowWidth <= 768 ? 'normal' : 'soft-light, normal, normal',
       minHeight: '100vh',
       fontFamily: '"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       display: 'flex',
@@ -83,8 +109,10 @@ PW[White Player]PB[Black Player]
       color: '#2a2a2a'
     }}>
       <header style={{ 
-        background: 'linear-gradient(135deg, rgba(60, 70, 90, 0.9), rgba(40, 50, 70, 0.85))',
-        backdropFilter: 'blur(10px)',
+        background: windowWidth <= 768 ? 
+          'rgba(40, 50, 70, 0.95)' : 
+          'linear-gradient(135deg, rgba(60, 70, 90, 0.9), rgba(40, 50, 70, 0.85))',
+        backdropFilter: windowWidth <= 768 ? 'none' : 'blur(10px)',
         padding: '20px 0', 
         color: 'white',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
@@ -400,7 +428,7 @@ PW[White Player]PB[Black Player]
                         marginTop: '30px',
                         borderRadius: '10px',
                         overflow: 'hidden',
-                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+                        boxShadow: windowWidth <= 768 ? '0 5px 15px rgba(0, 0, 0, 0.1)' : '0 10px 30px rgba(0, 0, 0, 0.1)',
                         border: '1px solid rgba(255, 255, 255, 0.8)',
                         transition: 'all 0.3s ease'
                       }}>
@@ -408,13 +436,16 @@ PW[White Player]PB[Black Player]
                           src="/game-of-go-2.jpg" 
                           alt="Traditional Go painting" 
                           className="go-game-image"
+                          loading="lazy"
+                          width={windowWidth <= 768 ? "100%" : "600"}
+                          height={windowWidth <= 768 ? "auto" : "400"}
                           style={{
                             width: '100%',
                             height: 'auto',
-                            display: 'block'
+                            display: 'block',
+                            maxWidth: windowWidth <= 768 ? '100%' : '600px'
                           }}
                           onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                            // Fallback to placeholder if image doesn't load
                             e.currentTarget.src = "https://via.placeholder.com/600x400?text=Go+Painting";
                           }}
                         />
@@ -469,7 +500,7 @@ PW[White Player]PB[Black Player]
                         marginTop: '30px',
                         borderRadius: '10px',
                         overflow: 'hidden',
-                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+                        boxShadow: windowWidth <= 768 ? '0 5px 15px rgba(0, 0, 0, 0.1)' : '0 10px 30px rgba(0, 0, 0, 0.1)',
                         border: '1px solid rgba(255, 255, 255, 0.8)',
                         transition: 'all 0.3s ease'
                       }}>
@@ -477,13 +508,16 @@ PW[White Player]PB[Black Player]
                           src="/game-of-go.jpg" 
                           alt="Game of Go board with stones" 
                           className="go-game-image"
+                          loading="lazy"
+                          width={windowWidth <= 768 ? "100%" : "600"}
+                          height={windowWidth <= 768 ? "auto" : "400"}
                           style={{
                             width: '100%',
                             height: 'auto',
-                            display: 'block'
+                            display: 'block',
+                            maxWidth: windowWidth <= 768 ? '100%' : '600px'
                           }}
                           onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                            // Fallback to placeholder if image doesn't load
                             e.currentTarget.src = "https://via.placeholder.com/600x400?text=Game+of+Go";
                           }}
                         />
