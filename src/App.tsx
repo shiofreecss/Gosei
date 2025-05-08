@@ -117,7 +117,7 @@ PW[White Player]PB[Black Player]
               border: '2px solid #fff',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
             }}></span>
-            Gosei
+            Gosei Kifu
             <span style={{ 
               fontSize: '18px', 
               fontWeight: 'normal', 
@@ -206,7 +206,7 @@ PW[White Player]PB[Black Player]
                   lineHeight: '1.6',
                   textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
                 }}>
-                  Welcome to Gosei - AI-Kifu! An open-source application dedicated to the Go community. Upload a Go game record (SGF file), paste SGF content below, or browse the extensive game library to analyze and review games.
+                  Welcome to Gosei Kifu! An open-source application dedicated to the Go community. Upload a Go game record (SGF file), paste SGF content below, or browse the extensive game library to analyze and review games with our intuitive tools.
                 </p>
                 
                 {showHelp && (
@@ -227,10 +227,10 @@ PW[White Player]PB[Black Player]
                       marginBottom: '15px',
                       fontWeight: 600
                     }}>
-                      How to Use Gosei
+                      How to Use Gosei Kifu
                     </h2>
                     <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
-                      Gosei supports both standard SGF files and traditional Japanese kifu format. Japanese kifu typically follow this structure:
+                      Gosei Kifu supports both standard SGF files and traditional Japanese kifu format. Japanese kifu typically follow this structure:
                     </p>
                     
                     <pre style={{ 
@@ -547,7 +547,7 @@ PW[White Player]PB[Black Player]
           }}>
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '20px' }}>
               <div style={{ textAlign: 'center' }}>
-                <p style={{ margin: '0 0 10px 0', fontWeight: '500', textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)' }}>Gosei - AI-Kifu</p>
+                <p style={{ margin: '0 0 10px 0', fontWeight: '500', textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)' }}>Gosei Kifu</p>
                 <p style={{ margin: '0', opacity: '0.9', maxWidth: '500px' }}>
                   An open-source application dedicated to the Go community. Built to provide free access to Go game analysis and a comprehensive SGF library.
                 </p>
@@ -598,7 +598,7 @@ PW[White Player]PB[Black Player]
               gap: '20px'
             }}>
               <p style={{ margin: '0', opacity: '0.9' }}>
-                © {new Date().getFullYear()} Gosei
+                © {new Date().getFullYear()} Gosei Kifu
               </p>
               <p style={{ margin: '0', opacity: '0.9' }}>
                 Powered by <a href="https://beaver.foundation" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>Beaver Foundation</a>
