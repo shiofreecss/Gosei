@@ -40,7 +40,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   
   // New state for toggles
   const [showMoveNumbers, setShowMoveNumbers] = useState<boolean>(false);
-  const [enableSound, setEnableSound] = useState<boolean>(false);
+  const [enableSound, setEnableSound] = useState<boolean>(true);
   const [showHeatMap, setShowHeatMap] = useState<boolean>(false);
   const [showLibertyAnalysis, setShowLibertyAnalysis] = useState<boolean>(false);
   const [showWinRateChart, setShowWinRateChart] = useState<boolean>(false);

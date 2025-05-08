@@ -266,13 +266,16 @@ const GoBoard: React.FC<GoBoardProps> = ({
           {showMoveNumbers && (
             <text
               x={stone.x * cellSize}
-              y={stone.y * cellSize + 5}
+              y={stone.y * cellSize}
               textAnchor="middle"
-              fontSize={cellSize * 0.4} // Larger font for better readability
-              fontFamily="sans-serif"
-              fontWeight="bold"
+              dominantBaseline="central"
               fill={stone.color === 'black' ? 'white' : 'black'}
-              style={{ userSelect: 'none' }}
+              fontSize={cellSize <= 15 ? cellSize * 0.4 : cellSize * 0.35}
+              fontWeight="bold"
+              style={{
+                userSelect: 'none',
+                pointerEvents: 'none'
+              }}
             >
               {moveNumber}
             </text>
