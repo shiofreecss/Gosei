@@ -572,7 +572,7 @@ PW[White Player]PB[Black Player]
                   </li>
                   <li style={{ marginBottom: '5px' }}>
                     <a 
-                      href="https://github.com/shiofreecss/AI-Kifu" 
+                      href="https://github.com/shiofreecss/Gosei-Kifu" 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       style={{ 
