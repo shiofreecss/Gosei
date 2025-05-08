@@ -117,7 +117,7 @@ PW[White Player]PB[Black Player]
               border: '2px solid #fff',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
             }}></span>
-            Gosei Kifu
+            Gosei
             <span style={{ 
               fontSize: '18px', 
               fontWeight: 'normal', 
