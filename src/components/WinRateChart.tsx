@@ -26,17 +26,21 @@ const LIBERTY_WIN_RATES = [
 
 // Heatmap influence win rates
 const INFLUENCE_WIN_RATES = [
-  { advantage: -0.5, blackWinRate: 0.10 },
-  { advantage: -0.4, blackWinRate: 0.20 },
-  { advantage: -0.3, blackWinRate: 0.30 },
+  { advantage: -1.0, blackWinRate: 0.05 },
+  { advantage: -0.8, blackWinRate: 0.10 },
+  { advantage: -0.6, blackWinRate: 0.20 },
+  { advantage: -0.4, blackWinRate: 0.30 },
+  { advantage: -0.3, blackWinRate: 0.35 },
   { advantage: -0.2, blackWinRate: 0.40 },
   { advantage: -0.1, blackWinRate: 0.45 },
   { advantage: 0, blackWinRate: 0.52 },  // Slightly favors black due to komi
   { advantage: 0.1, blackWinRate: 0.58 },
   { advantage: 0.2, blackWinRate: 0.65 },
   { advantage: 0.3, blackWinRate: 0.75 },
-  { advantage: 0.4, blackWinRate: 0.85 },
-  { advantage: 0.5, blackWinRate: 0.90 },
+  { advantage: 0.4, blackWinRate: 0.80 },
+  { advantage: 0.6, blackWinRate: 0.85 },
+  { advantage: 0.8, blackWinRate: 0.90 },
+  { advantage: 1.0, blackWinRate: 0.95 },
 ];
 
 // Estimate win probability based on liberty advantage
@@ -70,27 +74,30 @@ const getWinProbabilityFromLiberties = (libertyAdvantage: number): number => {
 
 // Estimate win probability based on heatmap influence advantage
 const getWinProbabilityFromInfluence = (influenceAdvantage: number): number => {
+  // Clamp the advantage value to our reference range
+  const clampedAdvantage = Math.max(-1.0, Math.min(1.0, influenceAdvantage));
+  
   // Find the closest advantage in our reference data
   const sorted = [...INFLUENCE_WIN_RATES].sort((a, b) => 
-    Math.abs(a.advantage - influenceAdvantage) - Math.abs(b.advantage - influenceAdvantage)
+    Math.abs(a.advantage - clampedAdvantage) - Math.abs(b.advantage - clampedAdvantage)
   );
   
   if (sorted.length === 0) return 0.5;
   
   // If we have an exact match
-  if (sorted[0].advantage === influenceAdvantage) {
+  if (sorted[0].advantage === clampedAdvantage) {
     return sorted[0].blackWinRate;
   }
   
   // Otherwise interpolate between the two closest points
   if (sorted.length >= 2) {
-    const lower = sorted.find(r => r.advantage <= influenceAdvantage) || sorted[0];
-    const upper = sorted.find(r => r.advantage >= influenceAdvantage) || sorted[0];
+    const lower = sorted.find(r => r.advantage <= clampedAdvantage) || sorted[0];
+    const upper = sorted.find(r => r.advantage >= clampedAdvantage) || sorted[0];
     
     if (lower.advantage === upper.advantage) return lower.blackWinRate;
     
     // Linear interpolation
-    const ratio = (influenceAdvantage - lower.advantage) / (upper.advantage - lower.advantage);
+    const ratio = (clampedAdvantage - lower.advantage) / (upper.advantage - lower.advantage);
     return lower.blackWinRate + ratio * (upper.blackWinRate - lower.blackWinRate);
   }
   
@@ -111,15 +118,15 @@ const calculateInfluenceAdvantage = (blackInfluence: number[][], whiteInfluence:
     }
   }
   
-  // Normalize and calculate advantage as a value between -0.5 and 0.5
+  // Normalize and calculate advantage as a value between -1.0 and 1.0
   const totalInfluence = totalBlackInfluence + totalWhiteInfluence;
   if (totalInfluence === 0) return 0;
   
   const blackShare = totalBlackInfluence / totalInfluence;
   const whiteShare = totalWhiteInfluence / totalInfluence;
   
-  // Return a value between -0.5 and 0.5, with positive favoring black
-  return (blackShare - whiteShare) / 2;
+  // Return a value between -1.0 and 1.0, with positive favoring black
+  return blackShare - whiteShare;
 };
 
 interface PointData {
@@ -230,7 +237,7 @@ const WinRateChart: React.FC<WinRateChartProps> = ({ moveHistory, currentMove, b
       return { 
         blackWinRate,
         whiteWinRate: 1 - blackWinRate,
-        advantage: analysisMode === 'liberty' ? libertyAdvantage : influenceAdvantage * 20, // Scale for display
+        advantage: analysisMode === 'liberty' ? libertyAdvantage : influenceAdvantage,
         blackLiberties: blackTotal,
         whiteLiberties: whiteTotal,
         blackInfluence: totalBlackInfluence,
