@@ -419,6 +419,41 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             showHeatMap={showHeatMap}
           />
           
+          {/* Play controls positioned right after the board on mobile */}
+          {isMobile && (
+            <div className="navigation-container mobile-navigation">
+              <div className="move-slider">
+                <button className="move-button" onClick={handleFirstMove} title="First move">
+                  ⏮️
+                </button>
+                <button className="move-button" onClick={handlePrevMove} title="Previous move">
+                  ⏪
+                </button>
+                <button className="autoplay-button" onClick={toggleAutoplay}>
+                  {autoplayActive ? '⏸️ Stop' : '▶️ Play'}
+                </button>
+                <button className="move-button" onClick={handleNextMove} title="Next move">
+                  ⏩
+                </button>
+                <button className="move-button" onClick={handleLastMove} title="Last move">
+                  ⏭️
+                </button>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max={game?.moves.length || 0}
+                value={currentMove}
+                onChange={(e) => handleMoveChange(parseInt(e.target.value, 10))}
+                className="move-range"
+              />
+              <div className="move-range-info">
+                <span>Move: {currentMove + 1}</span>
+                <span>Total: {game?.moves.length || 0}</span>
+              </div>
+            </div>
+          )}
+          
           {/* Add the LibertyAnalysis component */}
           {showLibertyAnalysis && (
             <LibertyAnalysis 
@@ -480,37 +515,42 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               </div>
             )}
           </div>
-          <div className="navigation-container">
-            <div className="move-slider">
-              <button className="move-button" onClick={handleFirstMove} title="First move">
-                ⏮️
-              </button>
-              <button className="move-button" onClick={handlePrevMove} title="Previous move">
-                ⏪
-              </button>
-              <button className="autoplay-button" onClick={toggleAutoplay}>
-                {autoplayActive ? '⏸️ Stop' : '▶️ Play'}
-              </button>
-              <button className="move-button" onClick={handleNextMove} title="Next move">
-                ⏩
-              </button>
-              <button className="move-button" onClick={handleLastMove} title="Last move">
-                ⏭️
-              </button>
+          
+          {/* Only show navigation container in controls section on non-mobile */}
+          {!isMobile && (
+            <div className="navigation-container">
+              <div className="move-slider">
+                <button className="move-button" onClick={handleFirstMove} title="First move">
+                  ⏮️
+                </button>
+                <button className="move-button" onClick={handlePrevMove} title="Previous move">
+                  ⏪
+                </button>
+                <button className="autoplay-button" onClick={toggleAutoplay}>
+                  {autoplayActive ? '⏸️ Stop' : '▶️ Play'}
+                </button>
+                <button className="move-button" onClick={handleNextMove} title="Next move">
+                  ⏩
+                </button>
+                <button className="move-button" onClick={handleLastMove} title="Last move">
+                  ⏭️
+                </button>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max={game?.moves.length || 0}
+                value={currentMove}
+                onChange={(e) => handleMoveChange(parseInt(e.target.value, 10))}
+                className="move-range"
+              />
+              <div className="move-range-info">
+                <span>Move: {currentMove + 1}</span>
+                <span>Total: {game?.moves.length || 0}</span>
+              </div>
             </div>
-            <input
-              type="range"
-              min="0"
-              max={game?.moves.length || 0}
-              value={currentMove}
-              onChange={(e) => handleMoveChange(parseInt(e.target.value, 10))}
-              className="move-range"
-            />
-            <div className="move-range-info">
-              <span>Move: {currentMove + 1}</span>
-              <span>Total: {game?.moves.length || 0}</span>
-            </div>
-          </div>
+          )}
+          
           <KifuSettings
             showMoveNumbers={showMoveNumbers}
             enableSound={enableSound}

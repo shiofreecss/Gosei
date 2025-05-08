@@ -503,4 +503,62 @@
     max-height: 120px;
     overflow-y: auto;
   }
+}
+
+/* Mobile navigation container styling */
+.mobile-navigation {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.kifu-reader-mobile .mobile-navigation {
+  order: 2; /* Order: 1 is GoBoard, 2 is navigation, 3+ are analysis panels */
+}
+
+.kifu-reader-mobile .mobile-navigation .move-slider {
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.kifu-reader-mobile .mobile-navigation .move-button {
+  padding: 8px;
+  min-width: 40px;
+}
+
+.kifu-reader-mobile .mobile-navigation .autoplay-button {
+  flex: 1;
+  min-width: 80px;
+  padding: 8px 12px;
+}
+
+.kifu-reader-mobile .mobile-navigation .move-range {
+  height: 10px;
+  margin: 5px 0;
+}
+
+.kifu-reader-mobile .mobile-navigation .move-range-info {
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+@media (max-width: 360px) {
+  .kifu-reader-mobile .mobile-navigation {
+    padding: 8px;
+  }
+  
+  .kifu-reader-mobile .mobile-navigation .move-slider {
+    gap: 4px;
+  }
+  
+  .kifu-reader-mobile .mobile-navigation .move-button,
+  .kifu-reader-mobile .mobile-navigation .autoplay-button {
+    padding: 6px;
+    font-size: 12px;
+  }
 } 
