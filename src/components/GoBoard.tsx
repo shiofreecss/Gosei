@@ -26,6 +26,11 @@ interface GoBoardProps {
   onClick?: (x: number, y: number) => void;
   theme?: BoardTheme;
   showHeatMap?: boolean;
+  koPosition?: { x: number, y: number } | null;
+  game?: { 
+    moves: Array<{ x: number; y: number; color?: 'black' | 'white' }>;
+    handicapStones?: Array<{ x: number; y: number }>;
+  };
 }
 
 // Theme configurations for different board styles
@@ -101,7 +106,9 @@ const GoBoard: React.FC<GoBoardProps> = ({
   capturedStones = [],
   onClick,
   theme = 'default',
-  showHeatMap = false
+  showHeatMap = false,
+  koPosition = null,
+  game
 }) => {
   // Make cellSize responsive based on screen width
   const [cellSize, setCellSize] = useState(32);
@@ -154,7 +161,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
   // Create a map of captured stones for easier lookup
   const capturedStonesMap = useMemo(() => {
     const map = new Map<string, CapturedStone>();
-    if (capturedStones.length > 0) {
+    if (capturedStones && capturedStones.length > 0) {
       capturedStones.forEach(stone => {
         map.set(`${stone.x},${stone.y}`, stone);
       });
@@ -162,14 +169,21 @@ const GoBoard: React.FC<GoBoardProps> = ({
     return map;
   }, [capturedStones]);
   
-  // Determine if a stone at given coordinates is captured
-  const isStoneVisible = useCallback((x: number, y: number) => {
+  // Determine if a stone at given coordinates is visible
+  const isStoneVisible = useCallback((x: number, y: number): boolean => {
     const key = `${x},${y}`;
-    if (!capturedStonesMap.has(key)) return true;
     
-    // If stone is in the captured map, it's not visible
-    return false;
-  }, [capturedStonesMap]);
+    // Check if the coordinates match a captured stone for the current move number
+    const currentMoveNumber = currentMove >= 0 ? currentMove + 1 : 0;
+    const capturedStone = capturedStonesMap.get(key);
+    
+    if (capturedStone && capturedStone.moveNumber <= currentMoveNumber) {
+      console.log(`Stone at ${x},${y} was captured in move ${capturedStone.moveNumber}, current move: ${currentMoveNumber}`);
+      return false; // Stone is captured and should not be visible
+    }
+    
+    return true; // Stone is visible
+  }, [capturedStonesMap, currentMove]);
   
   // Generate heat map data when stones change or when toggled
   const heatMapData = useMemo(() => {
@@ -177,21 +191,85 @@ const GoBoard: React.FC<GoBoardProps> = ({
     return generateHeatMap(stones.slice(0, currentMove >= 0 ? currentMove + 1 : stones.length), size);
   }, [showHeatMap, stones, currentMove, size]);
   
-  const renderStones = useCallback(() => {
-    const visibleStones = stones.slice(0, currentMove >= 0 ? currentMove + 1 : stones.length);
+  // Find the latest stone for current move marker
+  const latestStone = useMemo(() => {
+    if (stones.length === 0 || currentMove < 0) return null;
     
-    return visibleStones.map((stone, index) => {
-      const isLatestMove = index === (currentMove >= 0 ? currentMove : visibleStones.length - 1);
-      const moveNumber = index + 1;
+    // For improved user experience, directly find the stone that corresponds to the current move
+    if (currentMove >= 0) {
+      // Get the current move from the stones array
+      const currentMoveStone = game?.moves[currentMove];
       
-      // Skip rendering if the stone is captured
-      if (!isStoneVisible(stone.x, stone.y)) return null;
-      
+      // If the current move is a valid stone placement (not a pass move)
+      if (currentMoveStone && currentMoveStone.x >= 0 && currentMoveStone.y >= 0) {
+        // Find the corresponding stone in our stones array
+        return stones.find(stone => 
+          stone.x === currentMoveStone.x && 
+          stone.y === currentMoveStone.y
+        );
+      }
+    }
+    
+    return null;
+  }, [stones, currentMove, game?.moves]);
+  
+  const renderStones = useCallback(() => {
+    const visibleStones = stones;
+    
+    // Log all stones for debugging
+    console.log("Rendering stones:", visibleStones.map(s => `${s.color} at ${s.x},${s.y}`), "total:", visibleStones.length);
+    console.log("Latest stone (current move):", latestStone);
+    
+    // Create a map to ensure we only render each position once
+    // In case of overlapping positions, prioritize the last stone in the array (latest move)
+    const stonesByPosition = new Map<string, Stone>();
+    
+    // Process stones in order, so later stones (latest moves) overwrite earlier ones
+    visibleStones.forEach(stone => {
+      const posKey = `${stone.x},${stone.y}`;
+      stonesByPosition.set(posKey, stone);
+    });
+    
+    // Create an array from the map values to render
+    const stonesToRender = Array.from(stonesByPosition.values());
+    console.log("Stones to render after deduplication:", stonesToRender.length);
+    
+    // Render stones
+    return stonesToRender.map((stone) => {
       // Adjust stone size for better visibility on small screens
       const stoneRadius = cellSize <= 15 ? cellSize * 0.48 : cellSize * 0.45;
       
+      // Check if this is the latest move
+      const isLatestMove = latestStone && stone.x === latestStone.x && stone.y === latestStone.y;
+      
+      if (isLatestMove) {
+        console.log("Rendering latest move indicator on:", stone);
+      }
+      
+      // Find move number for this stone
+      let moveNumber = -1;
+      if (game && game.moves) {
+        moveNumber = game.moves.findIndex(move => 
+          move.x === stone.x && 
+          move.y === stone.y &&
+          (!move.color || move.color === stone.color)
+        );
+        
+        // Check if this is a handicap stone (black stones placed at the beginning)
+        const isHandicapStone = 
+          moveNumber === -1 && 
+          stone.color === 'black' && 
+          game.handicapStones !== undefined && 
+          game.handicapStones.some((hs: {x: number, y: number}) => hs.x === stone.x && hs.y === stone.y);
+          
+        // Don't display move numbers for handicap stones
+        if (isHandicapStone) {
+          moveNumber = -1;
+        }
+      }
+      
       return (
-        <g key={`${stone.x}-${stone.y}`}>
+        <g key={`${stone.x}-${stone.y}`} className="stone">
           {/* Stone shadow */}
           <circle
             cx={stone.x * cellSize}
@@ -259,11 +337,12 @@ const GoBoard: React.FC<GoBoardProps> = ({
               r={cellSize * 0.18} // Larger indicator
               fill={stone.color === 'black' ? 'white' : 'black'}
               opacity={0.8}
+              className="latest-move-indicator"
             />
           )}
           
           {/* Move number */}
-          {showMoveNumbers && (
+          {showMoveNumbers && moveNumber >= 0 && (
             <text
               x={stone.x * cellSize}
               y={stone.y * cellSize}
@@ -277,13 +356,13 @@ const GoBoard: React.FC<GoBoardProps> = ({
                 pointerEvents: 'none'
               }}
             >
-              {moveNumber}
+              {moveNumber + 1}
             </text>
           )}
         </g>
       );
     });
-  }, [stones, currentMove, showMoveNumbers, isStoneVisible, cellSize, themeConfig.stoneEffects, themeConfig.stoneGradient]);
+  }, [stones, showMoveNumbers, cellSize, themeConfig, latestStone, currentMove, game]);
   
   // Render any captured stones with a special style
   const renderCapturedStones = useCallback(() => {
@@ -570,6 +649,132 @@ const GoBoard: React.FC<GoBoardProps> = ({
     return heatMapCells;
   }, [showHeatMap, heatMapData, size, cellSize, stones, isStoneVisible]);
   
+  // Render a Ko position indicator
+  const renderKoIndicator = useCallback(() => {
+    if (!koPosition) return null;
+    
+    return (
+      <g className="ko-indicator">
+        <circle
+          cx={koPosition.x * cellSize}
+          cy={koPosition.y * cellSize}
+          r={cellSize * 0.3}
+          fill="transparent"
+          stroke="#ff4500"
+          strokeWidth={2}
+          strokeDasharray="4,2"
+          opacity={0.8}
+        />
+        <text
+          x={koPosition.x * cellSize}
+          y={koPosition.y * cellSize - cellSize * 0.5}
+          textAnchor="middle"
+          fill="#ff4500"
+          fontSize={cellSize * 0.4}
+          fontWeight="bold"
+          opacity={0.9}
+        >
+          Ko
+        </text>
+      </g>
+    );
+  }, [koPosition, cellSize]);
+  
+  // DEBUG: Add a function to check and visualize stones with no liberties
+  const checkStonesWithNoLiberties = useCallback(() => {
+    // Create a board representation from the stones
+    const board = Array(size).fill(null).map(() => Array(size).fill(null));
+    stones.forEach(stone => {
+      board[stone.y][stone.x] = stone.color;
+    });
+    
+    // Find stones with no liberties
+    const noLibertyStones: {x: number, y: number}[] = [];
+    
+    stones.forEach(stone => {
+      // Find the group this stone belongs to
+      const group: {x: number, y: number}[] = [];
+      const visited = Array(size).fill(false).map(() => Array(size).fill(false));
+      const queue = [{x: stone.x, y: stone.y}];
+      
+      while (queue.length > 0) {
+        const pos = queue.shift()!;
+        if (visited[pos.y][pos.x]) continue;
+        
+        visited[pos.y][pos.x] = true;
+        group.push(pos);
+        
+        // Check adjacent positions
+        const directions = [{x: 0, y: -1}, {x: 1, y: 0}, {x: 0, y: 1}, {x: -1, y: 0}];
+        directions.forEach(dir => {
+          const newX = pos.x + dir.x;
+          const newY = pos.y + dir.y;
+          
+          // Skip if out of bounds
+          if (newX < 0 || newX >= size || newY < 0 || newY >= size) return;
+          
+          // Add to queue if same color and not visited
+          if (!visited[newY][newX] && board[newY][newX] === stone.color) {
+            queue.push({x: newX, y: newY});
+          }
+        });
+      }
+      
+      // Count liberties for this group
+      let hasLiberties = false;
+      for (const pos of group) {
+        const directions = [{x: 0, y: -1}, {x: 1, y: 0}, {x: 0, y: 1}, {x: -1, y: 0}];
+        for (const dir of directions) {
+          const newX = pos.x + dir.x;
+          const newY = pos.y + dir.y;
+          
+          // Skip if out of bounds
+          if (newX < 0 || newX >= size || newY < 0 || newY >= size) continue;
+          
+          // If empty space, group has liberty
+          if (board[newY][newX] === null) {
+            hasLiberties = true;
+            break;
+          }
+        }
+        if (hasLiberties) break;
+      }
+      
+      // If no liberties found, add all stones in group to result
+      if (!hasLiberties) {
+        noLibertyStones.push(...group);
+      }
+    });
+    
+    // Render debugging markers for stones with no liberties
+    return noLibertyStones.map((pos, index) => (
+      <g key={`no-liberty-${pos.x}-${pos.y}-${index}`} className="no-liberty-marker">
+        <rect
+          x={(pos.x * cellSize) - (cellSize * 0.4)}
+          y={(pos.y * cellSize) - (cellSize * 0.4)}
+          width={cellSize * 0.8}
+          height={cellSize * 0.8}
+          fill="none"
+          stroke="red"
+          strokeWidth={3}
+          strokeDasharray="5,3"
+          opacity={0.8}
+        />
+        <text
+          x={pos.x * cellSize}
+          y={pos.y * cellSize + cellSize * 0.6}
+          textAnchor="middle"
+          fill="red"
+          fontSize={cellSize * 0.35}
+          fontWeight="bold"
+          opacity={0.9}
+        >
+          !
+        </text>
+      </g>
+    ));
+  }, [stones, size, cellSize]);
+  
   return (
     <div className="go-board-container">
       <svg
@@ -635,8 +840,14 @@ const GoBoard: React.FC<GoBoardProps> = ({
         {/* Captured stones' marks */}
         <g>{renderCapturedStones()}</g>
         
+        {/* Ko indicator */}
+        <g>{renderKoIndicator()}</g>
+        
         {/* Active stones */}
         <g>{renderStones()}</g>
+        
+        {/* Debug markers for stones with no liberties */}
+        <g>{checkStonesWithNoLiberties()}</g>
         
         {/* Interactive overlays */}
         {onClick && <g>{renderCellOverlays()}</g>}

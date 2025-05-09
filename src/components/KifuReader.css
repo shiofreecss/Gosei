@@ -586,4 +586,26 @@
 
 .win-rate-chart {
   order: 4; /* Win rate chart comes last */
+}
+
+/* Ko explanation styles */
+.ko-explanation {
+  margin-top: 8px;
+  border: 1px dashed #ff4500;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: rgba(255, 69, 0, 0.05);
+}
+
+.ko-alert {
+  display: block;
+  font-weight: bold;
+  color: #ff4500;
+  margin-bottom: 4px;
+}
+
+.ko-explanation p {
+  margin: 0;
+  font-size: 0.9em;
+  color: #333;
 } 

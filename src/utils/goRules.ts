@@ -146,12 +146,88 @@ export const findCapturedStones = (
 };
 
 /**
- * Checks if a move is valid according to Go rules
+ * Checks if a move creates a Ko situation
+ * A Ko happens when:
+ * 1. Player captures exactly one stone
+ * 2. The capturing stone would be immediately recapturable
+ * 3. The resulting board position would be identical to the previous position
+ */
+export const isKoSituation = (
+  currentBoard: ('black' | 'white' | null)[][],
+  move: Stone,
+  boardHistory: ('black' | 'white' | null)[][][]
+): boolean => {
+  // If no history or only one previous board state, can't be a Ko violation
+  if (!boardHistory || boardHistory.length < 1) {
+    return false;
+  }
+  
+  // Get the potential captured stones
+  const capturedStones = findCapturedStones(currentBoard, move);
+  
+  // Ko requires capturing exactly one stone
+  if (capturedStones.length !== 1) {
+    return false;
+  }
+  
+  // Create a temporary board with the move applied and captures removed
+  const tempBoard = currentBoard.map(row => [...row]);
+  tempBoard[move.y][move.x] = move.color;
+  capturedStones.forEach(pos => {
+    tempBoard[pos.y][pos.x] = null;
+  });
+  
+  // Get previous board state (not the current one but the one before that)
+  const previousBoard = boardHistory.length >= 2 ? boardHistory[boardHistory.length - 2] : null;
+  
+  // Compare with previous board state
+  if (previousBoard) {
+    // Check if the resulting board equals the previous board state (ko)
+    const boardsEqual = previousBoard.every((row, y) => 
+      row.every((cell, x) => cell === tempBoard[y][x])
+    );
+    
+    if (boardsEqual) {
+      return true; // Ko rule violation
+    }
+  }
+  
+  return false;
+};
+
+/**
+ * Checks if a move creates a suicide situation (and doesn't capture any stones)
+ */
+export const isSuicideMove = (
+  board: ('black' | 'white' | null)[][],
+  move: Stone
+): boolean => {
+  // First check if we capture any opponent stones
+  const captures = findCapturedStones(board, move);
+  if (captures.length > 0) {
+    // If we capture stones, it's not suicide since we'll have liberties after capture
+    return false;
+  }
+  
+  // Create a temporary board with the new move
+  const tempBoard = board.map(row => [...row]);
+  tempBoard[move.y][move.x] = move.color;
+  
+  // Find the group that would be formed by this move
+  const group = findGroup(tempBoard, move);
+  const liberties = countLiberties(tempBoard, group);
+  
+  // If the group has no liberties, it's suicide
+  return liberties === 0;
+};
+
+/**
+ * Checks if a move is valid according to Go rules (including Ko rule)
  */
 export const isValidMove = (
   board: ('black' | 'white' | null)[][],
   move: Stone,
-  previousBoard?: ('black' | 'white' | null)[][]
+  previousBoards?: ('black' | 'white' | null)[][][]
 ): boolean => {
   const boardSize = board.length;
   
@@ -165,46 +241,19 @@ export const isValidMove = (
     return false;
   }
   
-  // Create a temporary board with the new move
-  const tempBoard = board.map(row => [...row]);
-  tempBoard[move.y][move.x] = move.color;
-  
-  // Find the group that would be formed by this move
-  const group = findGroup(tempBoard, move);
-  const liberties = countLiberties(tempBoard, group);
-  
-  // If move creates a group with liberties, it's valid
-  if (liberties > 0) {
-    return true;
-  }
-  
-  // Check if move captures opponent stones
-  const capturedStones = findCapturedStones(board, move);
-  
-  if (capturedStones.length > 0) {
-    // Check for ko rule if previous board state is provided
-    if (previousBoard) {
-      // Apply captures to create next board state
-      const nextBoard = tempBoard.map(row => [...row]);
-      capturedStones.forEach(pos => {
-        nextBoard[pos.y][pos.x] = null;
-      });
-      
-      // Check if next board state equals previous board state (ko)
-      const boardsEqual = previousBoard.every((row, y) => 
-        row.every((cell, x) => cell === nextBoard[y][x])
-      );
-      
-      if (boardsEqual) {
-        return false; // Ko rule violation
-      }
+  // Check for Ko rule if board history is provided
+  if (previousBoards && previousBoards.length > 0) {
+    if (isKoSituation(board, move, previousBoards)) {
+      return false; // Ko rule violation
     }
-    
-    return true; // Capturing moves are valid
+  }
+
+  // Check if the move is suicide
+  if (isSuicideMove(board, move)) {
+    return false; // Suicide moves are invalid
   }
   
-  // Move is suicide and doesn't capture - invalid
-  return false;
+  return true;
 };
 
 /**
@@ -227,6 +276,17 @@ export const applyMove = (
   capturedStones.forEach(pos => {
     newBoard[pos.y][pos.x] = null;
   });
+  
+  // Verify the placed stone still has liberties after captures
+  // This is a safety check to make sure we're not in a suicide position
+  const placedStoneGroup = findGroup(newBoard, move);
+  const liberties = countLiberties(newBoard, placedStoneGroup);
+  
+  // In a valid move, the stone should always have liberties after captures
+  // If not, something is wrong, but we'll keep the stone anyway for debugging
+  if (liberties === 0) {
+    console.warn("Stone placed with no liberties - potential rules issue", move);
+  }
   
   return { newBoard, capturedStones };
 };

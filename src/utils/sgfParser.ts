@@ -15,6 +15,7 @@ export interface Move {
   moveNumber: number;
   comment?: string;
   captures?: { x: number, y: number }[];  // Stores positions of captured stones
+  isKoSituation?: boolean;  // Indicates if this move creates a Ko situation
 }
 
 export interface ParsedGame {
@@ -123,7 +124,8 @@ export const parseSGF = (sgfContent: string): ParsedGame => {
             y: sgfToCoordinate(coords[1]),
             moveNumber,
             comment: lastComment || undefined,
-            captures: captureData[moveNumber] || []
+            captures: captureData[moveNumber] || [],
+            isKoSituation: false
           });
           lastComment = '';
           currentColor = 'white';
@@ -139,7 +141,8 @@ export const parseSGF = (sgfContent: string): ParsedGame => {
             y: sgfToCoordinate(coords[1]),
             moveNumber,
             comment: lastComment || undefined,
-            captures: captureData[moveNumber] || []
+            captures: captureData[moveNumber] || [],
+            isKoSituation: false
           });
           lastComment = '';
           currentColor = 'black';
@@ -206,7 +209,8 @@ const parseJapaneseKifu = (lines: string[], game: ParsedGame) => {
         y,
         moveNumber,
         comment: '',
-        captures: []
+        captures: [],
+        isKoSituation: false
       });
     }
     

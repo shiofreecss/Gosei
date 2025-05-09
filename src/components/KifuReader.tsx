@@ -4,7 +4,7 @@ import KifuSettings from './KifuSettings';
 import LibertyAnalysis from './LibertyAnalysis';
 import WinRateChart from './WinRateChart';
 import { ParsedGame, parseSGF, movesToStones } from '../utils/sgfParser';
-import { applyMove, createBoardFromStones, getHandicapPositions, findCapturedStones, Position, Stone } from '../utils/goRules';
+import { applyMove, createBoardFromStones, getHandicapPositions, findCapturedStones, Position, Stone, isValidMove, isKoSituation } from '../utils/goRules';
 import './KifuReader.css';
 
 interface KifuReaderProps {
@@ -56,6 +56,15 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   
   // Add state to detect mobile viewport
   const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  // Add board history state to track previous board positions for Ko detection
+  const [boardHistory, setBoardHistory] = useState<('black' | 'white' | null)[][][]>([]);
+
+  // Add state to track Ko position for visual indication
+  const [koPosition, setKoPosition] = useState<{x: number, y: number} | null>(null);
+
+  // Add state for Ko explanation
+  const [koExplanation, setKoExplanation] = useState<string | null>(null);
 
   useEffect(() => {
     // Create audio element for move sounds
@@ -119,6 +128,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   // Calculate captures for all moves in the game
   const calculateAllCaptures = (parsedGame: ParsedGame) => {
     const size = parsedGame.info.size;
+    
+    // Initialize an empty board
     let board = createBoardFromStones(
       movesToStones([], parsedGame.handicapStones), 
       size
@@ -126,10 +137,39 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     
     const allCapturedStones: {x: number, y: number, color: 'black' | 'white', moveNumber: number}[] = [];
     
+    // Initialize board history with the initial board state
+    const history: ('black' | 'white' | null)[][][] = [board.map(row => [...row])];
+    
     // Process each move and find captures
     parsedGame.moves.forEach((move, index) => {
       // Skip pass moves
-      if (move.x < 0 || move.y < 0) return;
+      if (move.x < 0 || move.y < 0) {
+        // For pass moves, just add the current board state to history
+        history.push(board.map(row => [...row]));
+        return;
+      }
+      
+      console.log(`Processing move ${index + 1}: ${move.color} at ${move.x},${move.y}`);
+      
+      // Check if the move is valid, including Ko rule
+      if (!isValidMove(board, {
+        x: move.x,
+        y: move.y,
+        color: move.color
+      }, history)) {
+        // Log invalid move (should not happen with valid SGF files)
+        console.warn(`Invalid move detected at move ${index + 1}:`, move);
+        
+        // Check if it's a Ko situation
+        if (isKoSituation(board, {
+          x: move.x,
+          y: move.y,
+          color: move.color
+        }, history)) {
+          // Mark this move as a Ko situation in the move object for reference
+          move.isKoSituation = true;
+        }
+      }
       
       // Find stones that would be captured by this move
       const capturedPositions = findCapturedStones(board, {
@@ -139,9 +179,10 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
       });
       
       // Record captured stones with their color (opposite of current move)
-      // Use a proper type assertion to ensure type safety
       const capturedColor: 'black' | 'white' = move.color === 'black' ? 'white' : 'black';
       const moveNumber = index + 1;
+      
+      console.log(`Move ${moveNumber} captures ${capturedPositions.length} stones`);
       
       const capturedStonesWithMetadata = capturedPositions.map(pos => ({
         x: pos.x,
@@ -159,16 +200,40 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
         y: pos.y
       }));
       
-      // Apply the move to the board
-      const { newBoard } = applyMove(board, {
-        x: move.x,
-        y: move.y,
-        color: move.color
-      });
+      // Apply the move to the board - use our applyMove function to ensure proper stone placement
+      try {
+        const { newBoard } = applyMove(board, {
+          x: move.x,
+          y: move.y,
+          color: move.color
+        });
+        
+        // Validate the new board state
+        board = newBoard;
+        
+        // Double-check that our stone was actually placed
+        if (board[move.y][move.x] !== move.color) {
+          console.error(`Stone at ${move.x},${move.y} not correctly placed! Fixing manually.`);
+          board[move.y][move.x] = move.color;
+        }
+        
+        // Double-check that captured stones were removed
+        capturedPositions.forEach(pos => {
+          if (board[pos.y][pos.x] !== null) {
+            console.error(`Captured stone at ${pos.x},${pos.y} not removed! Fixing manually.`);
+            board[pos.y][pos.x] = null;
+          }
+        });
+      } catch (e) {
+        console.error(`Error applying move ${index + 1}:`, move, e);
+      }
       
-      board = newBoard;
+      // Add the new board state to history
+      history.push(board.map(row => [...row]));
     });
     
+    // Set the state with the calculated board history
+    setBoardHistory(history);
     setCapturedStones(allCapturedStones);
     // Update the modified game with capture information
     setGame({...parsedGame});
@@ -225,23 +290,69 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
 
   const handlePrevMove = () => {
     setAutoplayActive(false);
+    setKoPosition(null);
+    setKoExplanation(null);
     setCurrentMove(prev => Math.max(-1, prev - 1));
   };
 
   const handleNextMove = () => {
     setAutoplayActive(false);
-    if (game) {
-      setCurrentMove(prev => Math.min(game.moves.length - 1, prev + 1));
+    if (game && currentMove < game.moves.length - 1) {
+      // Get the next move
+      const nextMoveIndex = currentMove + 1;
+      const nextMove = game.moves[nextMoveIndex];
+      
+      // Reset Ko position and explanation
+      setKoPosition(null);
+      setKoExplanation(null);
+      
+      // Skip validation for pass moves
+      if (nextMove.x < 0 || nextMove.y < 0 || !boardHistory) {
+        setCurrentMove(nextMoveIndex);
+        return;
+      }
+      
+      // Get current board state
+      const currentBoard = getCurrentBoardState();
+      
+      // Check if the move is valid (including Ko rule)
+      if (isValidMove(currentBoard, nextMove, boardHistory.slice(0, nextMoveIndex))) {
+        setCurrentMove(nextMoveIndex);
+      } else if (isKoSituation(currentBoard, nextMove, boardHistory.slice(0, nextMoveIndex))) {
+        // Add informative comment if the move violates Ko
+        console.info(`Move ${nextMoveIndex + 1} is a Ko situation`);
+        
+        // Set Ko position for visual indication
+        if (nextMove.captures && nextMove.captures.length === 1) {
+          setKoPosition({
+            x: nextMove.captures[0].x,
+            y: nextMove.captures[0].y
+          });
+          
+          // Set Ko explanation
+          setKoExplanation(
+            "Ko rule: Player must play elsewhere before recapturing at this position."
+          );
+        }
+        
+        setCurrentMove(nextMoveIndex);
+      } else {
+        setCurrentMove(nextMoveIndex);
+      }
     }
   };
 
   const handleFirstMove = () => {
     setAutoplayActive(false);
+    setKoPosition(null);
+    setKoExplanation(null);
     setCurrentMove(-1);
   };
 
   const handleLastMove = () => {
     setAutoplayActive(false);
+    setKoPosition(null);
+    setKoExplanation(null);
     if (game) {
       setCurrentMove(game.moves.length - 1);
     }
@@ -292,12 +403,10 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   const currentMoveInfo = getCurrentMoveInfo();
 
   const handleMoveChange = (newMoveIndex: number) => {
-    if (!game) return;
-    
-    if (newMoveIndex >= -1 && newMoveIndex < game.moves.length) {
-      setCurrentMove(newMoveIndex);
-      playStoneSound();
-    }
+    setAutoplayActive(false);
+    setKoPosition(null);
+    setKoExplanation(null);
+    setCurrentMove(newMoveIndex);
   };
 
   const playStoneSound = () => {
@@ -315,28 +424,100 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   // Get the current stones on the board based on the move history
   const getCurrentStones = () => {
     if (!game) return [];
+
+    // Completely rebuild the board state based on the SGF data
+    // This approach ensures all stones are correctly placed
+    const size = game.info.size;
     
-    // Start with handicap stones if any (ensure they have proper type with color)
-    const stones: Stone[] = game.handicapStones ? 
-      game.handicapStones.map(stone => ({
-        x: stone.x,
-        y: stone.y,
-        color: 'black' // Handicap stones are always black
-      })) : [];
+    // Create a 2D array to track the board state
+    const boardState: Array<Array<Stone | null>> = Array(size)
+      .fill(null)
+      .map(() => Array(size).fill(null));
     
-    // Add moves up to the current move
-    for (let i = 0; i <= currentMove; i++) {
-      if (i >= 0 && i < game.moves.length) {
-        const move = game.moves[i];
+    // Add handicap stones first
+    const handicapStones = game.handicapStones || [];
+    handicapStones.forEach(stone => {
+      if (stone.x >= 0 && stone.x < size && stone.y >= 0 && stone.y < size) {
+        boardState[stone.y][stone.x] = {
+          x: stone.x,
+          y: stone.y,
+          color: 'black' // Handicap stones are always black
+        };
+      }
+    });
+    
+    // Apply all moves up to the current move sequentially
+    const movesToApply = game.moves.slice(0, currentMove + 1);
+    
+    console.log(`Applying ${movesToApply.length} moves to rebuild board state`);
+    
+    // Track the latest move for the current move indicator
+    let latestMove: Stone | null = null;
+    
+    for (let i = 0; i < movesToApply.length; i++) {
+      const move = movesToApply[i];
+      
+      // Skip pass moves
+      if (move.x < 0 || move.y < 0) {
+        continue;
+      }
+      
+      // If this is the latest move, store it for the current move indicator
+      if (i === movesToApply.length - 1) {
+        latestMove = {
+          x: move.x,
+          y: move.y,
+          color: move.color
+        };
+      }
+      
+      // Place the stone on the board
+      if (move.x < size && move.y < size) {
+        boardState[move.y][move.x] = {
+          x: move.x,
+          y: move.y,
+          color: move.color
+        };
         
-        // Skip pass moves (negative coordinates)
-        if (move.x >= 0 && move.y >= 0) {
-          stones.push(move);
+        // Process captures
+        if (move.captures && move.captures.length > 0) {
+          move.captures.forEach(capturedPos => {
+            if (capturedPos.x >= 0 && capturedPos.x < size && 
+                capturedPos.y >= 0 && capturedPos.y < size) {
+              // Remove the captured stone from the board
+              boardState[capturedPos.y][capturedPos.x] = null;
+            }
+          });
         }
       }
     }
     
-    return stones;
+    // Convert the 2D board state to a flat list of stones
+    const resultStones: Stone[] = [];
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        if (boardState[y][x] !== null) {
+          resultStones.push(boardState[y][x]!);
+        }
+      }
+    }
+    
+    console.log(`Final board has ${resultStones.length} stones`);
+    
+    // Ensure the latest move is added
+    if (latestMove && currentMove >= 0) {
+      // Check if the latestMove is already in the resultStones
+      const hasLatestMove = resultStones.some(
+        stone => stone.x === latestMove!.x && stone.y === latestMove!.y
+      );
+      
+      if (!hasLatestMove) {
+        console.warn(`Last move at ${latestMove.x},${latestMove.y} is missing - forcing add`);
+        resultStones.push(latestMove);
+      }
+    }
+    
+    return resultStones;
   };
 
   // Create a move history array for the WinRateChart
@@ -357,26 +538,23 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     game.moves.forEach(move => {
       if (move.x >= 0 && move.y >= 0) { // Skip pass moves
         // Copy current stones
-        const updatedStones = [...currentStones];
+        let updatedStones = [...currentStones];
         
-        // Add the new move
+        // First, remove any captured stones
+        if (move.captures && move.captures.length > 0) {
+          updatedStones = updatedStones.filter(stone => 
+            !move.captures!.some(capture => 
+              capture.x === stone.x && capture.y === stone.y
+            )
+          );
+        }
+        
+        // Then add the new move stone
         updatedStones.push({
           x: move.x,
           y: move.y,
           color: move.color
         });
-        
-        // Remove any captured stones
-        if (move.captures && move.captures.length > 0) {
-          move.captures.forEach(capturedPos => {
-            const index = updatedStones.findIndex(stone => 
-              stone.x === capturedPos.x && stone.y === capturedPos.y
-            );
-            if (index >= 0) {
-              updatedStones.splice(index, 1);
-            }
-          });
-        }
         
         // Update current stones
         currentStones = updatedStones;
@@ -399,6 +577,29 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     return name;
   };
 
+  // Calculate current board state for Ko rule validation
+  const getCurrentBoardState = (): ('black' | 'white' | null)[][] => {
+    if (!game) return Array(19).fill(null).map(() => Array(19).fill(null));
+    
+    const size = game.info.size;
+    const initialStones = game.handicapStones || [];
+    const movesToApply = game.moves.slice(0, currentMove + 1).filter(m => m.x >= 0 && m.y >= 0);
+    
+    // Create initial board with handicap stones
+    let board = createBoardFromStones(
+      initialStones.map(stone => ({ ...stone, color: 'black' as const })), 
+      size
+    );
+    
+    // Apply each move in sequence
+    for (const move of movesToApply) {
+      const { newBoard } = applyMove(board, move);
+      board = newBoard;
+    }
+    
+    return board;
+  };
+
   return (
     <div className={`kifu-reader ${isMobile ? 'kifu-reader-mobile' : ''}`}>
       {error && (
@@ -417,6 +618,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             capturedStones={visibleCapturedStones}
             theme={boardTheme}
             showHeatMap={showHeatMap}
+            koPosition={koPosition}
+            game={game || undefined}
           />
           
           {/* Play controls positioned right after the board on mobile */}
@@ -506,6 +709,12 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               )}
               {game?.info.result && (
                 <span className="game-info-detail">Result: {game.info.result}</span>
+              )}
+              {koExplanation && (
+                <div className="ko-explanation">
+                  <span className="ko-alert">⚠️ Ko Detected</span>
+                  <p>{koExplanation}</p>
+                </div>
               )}
             </div>
             {currentMoveInfo?.comment && (
