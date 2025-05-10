@@ -18,11 +18,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
-  const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
   const [scale, setScale] = useState<number>(1.0);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [animationStyle, setAnimationStyle] = useState<'fade' | 'slide' | 'flip' | 'book'>('fade');
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<HTMLDivElement>(null);
   
@@ -81,18 +78,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
   function handlePageChange(newPage: number) {
     if (newPage < 1 || (numPages && newPage > numPages)) return;
     
-    setDirection(newPage > currentPage ? 'forward' : 'backward');
-    setIsAnimating(true);
-    
-    // Wait for animation to start
-    setTimeout(() => {
-      setCurrentPage(newPage);
-      
-      // Reset animation after it completes
-      setTimeout(() => {
-        setIsAnimating(false);
-      }, 500); // Match this with CSS animation duration
-    }, 50);
+    // Set new page immediately without animation
+    setCurrentPage(newPage);
   }
 
   function goToNextPage() {
@@ -136,10 +123,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
       document.exitFullscreen();
     }
   }
-  
-  function changeAnimationStyle(style: 'fade' | 'slide' | 'flip' | 'book') {
-    setAnimationStyle(style);
-  }
 
   function getFileName() {
     // Clean up and extract just the filename part from the path
@@ -153,7 +136,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
       // Mobile view: Single page
       return (
         <div 
-          className={`pdf-page animation-${animationStyle} ${isAnimating ? `animate-${direction}` : ''}`}
+          className="pdf-page"
           key={currentPage}
           style={{ transform: `scale(${scale})` }}
         >
@@ -174,7 +157,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
       
       return (
         <div 
-          className={`pdf-spread animation-${animationStyle} ${isAnimating ? `animate-${direction}` : ''}`}
+          className="pdf-spread"
           key={`${leftPage}-${rightPage}`}
           style={{ transform: `scale(${scale})` }}
         >
@@ -264,43 +247,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
             <button className="zoom-button" onClick={handleZoomReset} title="Reset Zoom">⟲</button>
             <button className="zoom-button" onClick={handleZoomIn} title="Zoom In">+</button>
           </div>
-          
-          <div className="animation-controls">
-            <button 
-              className={`animation-button ${animationStyle === 'fade' ? 'active' : ''}`}
-              onClick={() => changeAnimationStyle('fade')} 
-              title="Fade Animation"
-            >
-              Fade
-            </button>
-            <button 
-              className={`animation-button ${animationStyle === 'slide' ? 'active' : ''}`}
-              onClick={() => changeAnimationStyle('slide')} 
-              title="Slide Animation"
-            >
-              Slide
-            </button>
-            <button 
-              className={`animation-button ${animationStyle === 'flip' ? 'active' : ''}`}
-              onClick={() => changeAnimationStyle('flip')} 
-              title="Flip Animation"
-            >
-              Flip
-            </button>
-            <button 
-              className={`animation-button ${animationStyle === 'book' ? 'active' : ''}`}
-              onClick={() => changeAnimationStyle('book')} 
-              title="Book Animation"
-            >
-              Book
-            </button>
-          </div>
         </div>
         
         <div className="pdf-controls">
           <button 
             onClick={goToPreviousPage} 
-            disabled={currentPage <= 1 || isAnimating}
+            disabled={currentPage <= 1}
             className="pdf-nav-button"
           >
             ← Previous
@@ -310,7 +262,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
           
           <button 
             onClick={goToNextPage} 
-            disabled={!numPages || currentPage >= numPages || isAnimating}
+            disabled={!numPages || currentPage >= numPages}
             className="pdf-nav-button"
           >
             Next →
