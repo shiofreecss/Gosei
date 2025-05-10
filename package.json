@@ -9,11 +9,11 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.126",
-    "@types/react": "^19.1.0",
-    "@types/react-dom": "^19.1.1",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
     "fs-extra": "^11.3.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-pdf": "^7.7.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
@@ -29,7 +29,7 @@
     "setup": "npm run copy-games && npm run copy-books",
     "start-with-copy": "npm run setup && npm start",
     "build-with-copy": "npm run setup && npm run build",
-    "build-netlify": "npm run setup && GENERATE_SOURCEMAP=false CI=false npm run build"
+    "build-netlify": "npm run setup && npm run build"
   },
   "eslintConfig": {
     "extends": [
@@ -50,6 +50,5 @@
     ]
   },
   "devDependencies": {
-    "@types/react-pdf": "^6.2.0"
   }
 }
