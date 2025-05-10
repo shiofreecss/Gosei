@@ -5,9 +5,11 @@ import SGFUploader from './components/SGFUploader';
 import GameLibrary from './components/GameLibrary';
 import GameViewer from './components/GameViewer';
 import MusicPlayer from './components/MusicPlayer';
+import BookLibrary from './components/BookLibrary';
 
 function App() {
   const [showLibrary, setShowLibrary] = useState(false);
+  const [showBookLibrary, setShowBookLibrary] = useState(false);
   const [sgfContent, setSgfContent] = useState<string | null>(null);
   const [isFromUpload, setIsFromUpload] = useState(false);
   const [showGameViewer, setShowGameViewer] = useState(false);
@@ -47,6 +49,18 @@ function App() {
 
   const handleCloseGameViewer = useCallback(() => {
     setShowGameViewer(false);
+  }, []);
+
+  const handleShowBookLibrary = useCallback(() => {
+    setShowBookLibrary(true);
+    // Hide other components when showing book library
+    if (showLibrary) setShowLibrary(false);
+    if (showGameViewer) setShowGameViewer(false);
+    if (showHelp) setShowHelp(false);
+  }, [showLibrary, showGameViewer, showHelp]);
+  
+  const handleCloseBookLibrary = useCallback(() => {
+    setShowBookLibrary(false);
   }, []);
 
   // Memoize the sample SGF content since it never changes
@@ -120,13 +134,7 @@ PW[White Player]PB[Black Player]
         position: 'relative',
         zIndex: 10
       }}>
-        <div style={{ 
-          maxWidth: '1250px', 
-          margin: '0 auto', 
-          padding: '0 20px',
-          width: '100%',
-          boxSizing: 'border-box'
-        }}>
+        <div style={containerStyle}>
           <h1 style={{ 
             margin: 0, 
             fontSize: '32px',
@@ -156,6 +164,31 @@ PW[White Player]PB[Black Player]
             </span>
           </h1>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', gap: '10px' }}>
+            <button 
+              onClick={() => setShowBookLibrary(!showBookLibrary)}
+              style={{ 
+                backgroundColor: showBookLibrary ? 'rgba(100, 120, 180, 0.8)' : 'rgba(70, 90, 150, 0.6)',
+                backdropFilter: 'blur(5px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                color: 'white',
+                padding: '8px 15px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 4H8V20H4V4Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 4H20C21.1046 4 22 4.89543 22 6V18C22 19.1046 21.1046 20 20 20H12V4Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              {showBookLibrary ? 'Hide Books' : 'Book Library'}
+            </button>
             <button 
               onClick={() => setShowLibrary(!showLibrary)}
               style={{ 
@@ -203,75 +236,81 @@ PW[White Player]PB[Black Player]
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M12 17V17.01" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 13.5C11.9816 13.1754 12.0692 12.8536 12.2493 12.5803C12.4295 12.307 12.6933 12.0976 13 11.98C13.3759 11.8387 13.7132 11.6146 13.9856 11.3236C14.2579 11.0326 14.4577 10.6826 14.5693 10.3028C14.6809 9.92297 14.7015 9.52366 14.6292 9.13421C14.5568 8.74476 14.3937 8.37609 14.1537 8.05731C13.9138 7.73853 13.6031 7.47569 13.2457 7.28882C12.8883 7.10194 12.4934 6.99602 12.09 6.98C11.6924 6.96285 11.2961 7.03498 10.9279 7.19192C10.5597 7.34887 10.2279 7.58696 9.95462 7.89C9.68139 8.19303 9.47359 8.55392 9.34566 8.94675C9.21774 9.33958 9.17287 9.75451 9.21427 10.165" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 13.5C11.9816 13.1754 12.0692 12.8536 12.2495 12.5833C12.4299 12.313 12.6933 12.1101 13 12C13.3759 11.8347 13.7132 11.598 13.9856 11.3052C14.2581 11.0123 14.4591 10.6698 14.5747 10.2987C14.6903 9.9276 14.7176 9.5366 14.6544 9.15353C14.5912 8.77046 14.4392 8.40481 14.2092 8.08481C13.9793 7.76482 13.6768 7.49816 13.3261 7.3025C12.9754 7.10684 12.5849 6.98639 12.1827 6.94994C11.7805 6.91348 11.3759 6.96198 10.9933 7.09204C10.6108 7.2221 10.2603 7.43064 9.96667 7.7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              {showHelp ? 'Hide Help' : 'Show Help'}
+              {showHelp ? 'Hide Help' : 'Help'}
             </button>
           </div>
         </div>
       </header>
       
-      <main style={{ 
-        maxWidth: '1250px', 
-        margin: '0 auto', 
-        padding: '30px 20px',
-        flex: '1 0 auto',
-        width: '100%',
-        boxSizing: 'border-box'
-      }}>
-        {showLibrary ? (
-          <GameLibrary onSelectGame={handleGameSelected} />
-        ) : (
+      <main style={mainStyle}>
+        {/* Conditional rendering for Book Library */}
+        {showBookLibrary && <BookLibrary />}
+
+        {/* Conditional rendering for Game Library */}
+        {showLibrary && <GameLibrary onSelectGame={handleGameSelected} />}
+
+        {/* Conditional rendering for Game Viewer */}
+        {showGameViewer && (
+          <GameViewer 
+            sgfContent={gameViewerContent} 
+            onClose={handleCloseGameViewer} 
+          />
+        )}
+        
+        {!showLibrary && !showGameViewer && !showBookLibrary && (
           <>
             {sgfContent && isFromUpload ? (
               <KifuReader sgfContent={sgfContent} />
             ) : (
               <>
-                <p style={{ 
-                  fontSize: '17px', 
-                  marginBottom: '30px',
-                  color: '#333',
-                  lineHeight: '1.6',
-                  textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
-                }}>
-                  Welcome to Gosei Kifu! An open-source application dedicated to the Go community. Upload a Go game record (SGF file), paste SGF content below, or browse the extensive game library to analyze and review games with our intuitive tools.
-                </p>
-                
-                {showHelp && (
-                  <div style={{ 
-                    background: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                    padding: '25px', 
-                    borderRadius: '12px',
+                <div className="uploader-section" style={{ marginBottom: '40px' }}>
+                  <p style={{ 
+                    fontSize: '17px', 
                     marginBottom: '30px',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    width: '100%'
+                    color: '#333',
+                    lineHeight: '1.6',
+                    textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
                   }}>
-                    <h2 style={{ 
-                      color: '#2a3f6a',
-                      fontSize: '22px',
-                      marginTop: 0,
-                      marginBottom: '15px',
-                      fontWeight: 600
+                    Welcome to Gosei Kifu! An open-source application dedicated to the Go community. Upload a Go game record (SGF file), paste SGF content below, or browse the extensive game library to analyze and review games with our intuitive tools.
+                  </p>
+                  
+                  {showHelp && (
+                    <div style={{ 
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(10px)',
+                      padding: '25px', 
+                      borderRadius: '12px',
+                      marginBottom: '30px',
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.6)',
+                      width: '100%'
                     }}>
-                      How to Use Gosei Kifu
-                    </h2>
-                    <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
-                      Gosei Kifu supports both standard SGF files and traditional Japanese kifu format. Japanese kifu typically follow this structure:
-                    </p>
-                    
-                    <pre style={{ 
-                      background: 'rgba(245, 248, 255, 0.7)', 
-                      padding: '15px', 
-                      borderRadius: '10px',
-                      overflow: 'auto',
-                      fontFamily: 'monospace',
-                      fontSize: '14px',
-                      border: '1px solid rgba(200, 210, 230, 0.5)',
-                      backdropFilter: 'blur(5px)',
-                      boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.03)'
-                    }}>
+                      <h2 style={{ 
+                        color: '#2a3f6a',
+                        fontSize: '22px',
+                        marginTop: 0,
+                        marginBottom: '15px',
+                        fontWeight: 600
+                      }}>
+                        How to Use Gosei Kifu
+                      </h2>
+                      <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
+                        Gosei Kifu supports both standard SGF files and traditional Japanese kifu format. Japanese kifu typically follow this structure:
+                      </p>
+                      
+                      <pre style={{ 
+                        background: 'rgba(245, 248, 255, 0.7)', 
+                        padding: '15px', 
+                        borderRadius: '10px',
+                        overflow: 'auto',
+                        fontFamily: 'monospace',
+                        fontSize: '14px',
+                        border: '1px solid rgba(200, 210, 230, 0.5)',
+                        backdropFilter: 'blur(5px)',
+                        boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.03)'
+                      }}>
 {`# 棋譜（Japanese Kifu Format）
 # 黒：Player Black
 # 白：Player White
@@ -282,255 +321,256 @@ PW[White Player]PB[Black Player]
 2. 白: D4
 3. 黒: Q4
 ...`}
-                    </pre>
-                    
-                    <h3 style={{ fontSize: '18px', marginTop: '20px', color: '#444' }}>Key elements of Japanese kifu:</h3>
-                    <ul style={{ 
-                      listStyleType: 'none', 
-                      padding: 0, 
-                      margin: '15px 0', 
-                      lineHeight: '1.6' 
-                    }}>
-                      <li style={{ 
-                        padding: '8px 0 8px 25px', 
-                        position: 'relative' 
+                      </pre>
+                      
+                      <h3 style={{ fontSize: '18px', marginTop: '20px', color: '#444' }}>Key elements of Japanese kifu:</h3>
+                      <ul style={{ 
+                        listStyleType: 'none', 
+                        padding: 0, 
+                        margin: '15px 0', 
+                        lineHeight: '1.6' 
                       }}>
-                        <span style={{ 
-                          position: 'absolute', 
-                          left: 0, 
-                          top: '9px',
-                          width: '12px',
-                          height: '12px',
-                          backgroundColor: 'black',
-                          borderRadius: '50%'
-                        }}></span>
-                        Header information with # prefix, containing player names, date, and result
-                      </li>
-                      <li style={{ 
-                        padding: '8px 0 8px 25px', 
-                        position: 'relative' 
+                        <li style={{ 
+                          padding: '8px 0 8px 25px', 
+                          position: 'relative' 
+                        }}>
+                          <span style={{ 
+                            position: 'absolute', 
+                            left: 0, 
+                            top: '9px',
+                            width: '12px',
+                            height: '12px',
+                            backgroundColor: 'black',
+                            borderRadius: '50%'
+                          }}></span>
+                          Header information with # prefix, containing player names, date, and result
+                        </li>
+                        <li style={{ 
+                          padding: '8px 0 8px 25px', 
+                          position: 'relative' 
+                        }}>
+                          <span style={{ 
+                            position: 'absolute', 
+                            left: 0, 
+                            top: '9px',
+                            width: '12px',
+                            height: '12px',
+                            backgroundColor: 'white',
+                            borderRadius: '50%',
+                            border: '1px solid #ddd'
+                          }}></span>
+                          Moves are numbered sequentially, with color (黒/白 for black/white) and coordinates
+                        </li>
+                        <li style={{ 
+                          padding: '8px 0 8px 25px', 
+                          position: 'relative' 
+                        }}>
+                          <span style={{ 
+                            position: 'absolute', 
+                            left: 0, 
+                            top: '9px',
+                            width: '12px',
+                            height: '12px',
+                            backgroundColor: '#f0f0f0',
+                            borderRadius: '3px',
+                            border: '1px solid #ddd'
+                          }}></span>
+                          Coordinates use letters (A-T, excluding I) for columns and numbers (1-19) for rows
+                        </li>
+                      </ul>
+                      
+                      <p style={{ 
+                        padding: '12px', 
+                        background: 'rgba(220, 240, 255, 0.6)', 
+                        borderLeft: '4px solid #3498db',
+                        borderRadius: '8px',
+                        color: '#2a4a6a',
+                        marginTop: '15px',
+                        backdropFilter: 'blur(5px)'
                       }}>
-                        <span style={{ 
-                          position: 'absolute', 
-                          left: 0, 
-                          top: '9px',
-                          width: '12px',
-                          height: '12px',
-                          backgroundColor: 'white',
-                          borderRadius: '50%',
-                          border: '1px solid #ddd'
-                        }}></span>
-                        Moves are numbered sequentially, with color (黒/白 for black/white) and coordinates
-                      </li>
-                      <li style={{ 
-                        padding: '8px 0 8px 25px', 
-                        position: 'relative' 
-                      }}>
-                        <span style={{ 
-                          position: 'absolute', 
-                          left: 0, 
-                          top: '9px',
-                          width: '12px',
-                          height: '12px',
-                          backgroundColor: '#f0f0f0',
-                          borderRadius: '3px',
-                          border: '1px solid #ddd'
-                        }}></span>
-                        Coordinates use letters (A-T, excluding I) for columns and numbers (1-19) for rows
-                      </li>
-                    </ul>
-                    
-                    <p style={{ 
-                      padding: '12px', 
-                      background: 'rgba(220, 240, 255, 0.6)', 
-                      borderLeft: '4px solid #3498db',
-                      borderRadius: '8px',
-                      color: '#2a4a6a',
-                      marginTop: '15px',
-                      backdropFilter: 'blur(5px)'
-                    }}>
-                      Our parser automatically converts Japanese kifu format to SGF for rendering on the board.
-                    </p>
-                  </div>
-                )}
-                
-                <h2 style={{ 
-                  fontSize: '24px', 
-                  color: '#2a3f6a', 
-                  marginBottom: '20px', 
-                  marginTop: '40px',
-                  fontWeight: '600',
-                  textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
-                }}>
-                  Upload SGF File
-                </h2>
-                <SGFUploader onFileLoaded={handleFileLoaded} />
-                
-                {/* Go Game Instructions and History Section */}
-                <div style={{
-                  marginTop: '60px',
-                  borderTop: '1px solid rgba(200, 210, 230, 0.5)',
-                  paddingTop: '30px'
-                }}>
-                  <h2 style={{
-                    fontSize: '24px',
-                    color: '#2a3f6a',
-                    marginBottom: '20px',
+                        Our parser automatically converts Japanese kifu format to SGF for rendering on the board.
+                      </p>
+                    </div>
+                  )}
+                  
+                  <h2 style={{ 
+                    fontSize: '24px', 
+                    color: '#2a3f6a', 
+                    marginBottom: '20px', 
+                    marginTop: '40px',
                     fontWeight: '600',
                     textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
                   }}>
-                    About the Game of Go
+                    Upload SGF File
                   </h2>
+                  <SGFUploader onFileLoaded={handleFileLoaded} />
                   
+                  {/* Go Game Instructions and History Section */}
                   <div style={{
-                    display: 'flex',
-                    flexDirection: windowWidth <= 768 ? 'column' : 'row',
-                    gap: '30px',
-                    marginBottom: '40px'
+                    marginTop: '60px',
+                    borderTop: '1px solid rgba(200, 210, 230, 0.5)',
+                    paddingTop: '30px'
                   }}>
-                    <div style={{
-                      flex: '1',
-                      background: 'rgba(255, 255, 255, 0.7)',
-                      backdropFilter: 'blur(10px)',
-                      padding: '25px',
-                      borderRadius: '12px',
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
-                      border: '1px solid rgba(255, 255, 255, 0.6)'
+                    <h2 style={{
+                      fontSize: '24px',
+                      color: '#2a3f6a',
+                      marginBottom: '20px',
+                      fontWeight: '600',
+                      textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
                     }}>
-                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600', textAlign: 'center' }}>
-                        The Rules of Go
-                      </h3>
-                      
-                      <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333', textAlign: 'center' }}>
-                        Go is played on a grid of black lines (usually 19×19). Game pieces, called stones, are played on the intersections of the lines.
-                      </p>
-                      
-                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Basic Rules:</h4>
-                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
-                        <li>Players take turns placing stones on the board</li>
-                        <li>Black plays first, then White</li>
-                        <li>Stones cannot be moved once placed</li>
-                        <li>Stones are captured when completely surrounded by opponent's stones</li>
-                        <li>The goal is to control more territory than your opponent</li>
-                        <li>The game ends when both players pass their turn</li>
-                      </ul>
-                      
-                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Key Concepts:</h4>
-                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
-                        <li><strong>Liberty:</strong> An empty adjacent point next to a stone</li>
-                        <li><strong>Capture:</strong> Removing opponent's stones that have no liberties</li>
-                        <li><strong>Territory:</strong> Empty intersections surrounded by your stones</li>
-                        <li><strong>Ko rule:</strong> Prevents infinite capturing cycles</li>
-                      </ul>
-                      
-                      {/* Go Painting Image - moved to bottom */}
-                      <div className="go-image-container" style={{ 
-                        marginTop: '30px',
-                        borderRadius: '10px',
-                        overflow: 'hidden',
-                        boxShadow: windowWidth <= 768 ? '0 5px 15px rgba(0, 0, 0, 0.1)' : '0 10px 30px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.8)',
-                        transition: 'all 0.3s ease'
-                      }}>
-                        <img 
-                          src="/game-of-go-2.jpg" 
-                          alt="Traditional Go painting" 
-                          className="go-game-image"
-                          loading="lazy"
-                          width={windowWidth <= 768 ? "100%" : "600"}
-                          height={windowWidth <= 768 ? "auto" : "400"}
-                          style={{
-                            width: '100%',
-                            height: 'auto',
-                            display: 'block',
-                            maxWidth: windowWidth <= 768 ? '100%' : '600px'
-                          }}
-                          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                            e.currentTarget.src = "https://via.placeholder.com/600x400?text=Go+Painting";
-                          }}
-                        />
-                        <div style={{
-                          padding: '10px 15px',
-                          background: 'rgba(255, 255, 255, 0.9)',
-                          backdropFilter: 'blur(5px)',
-                          borderTop: '1px solid rgba(200, 210, 230, 0.5)',
-                          fontSize: '14px',
-                          color: '#444',
-                          textAlign: 'center'
-                        }}>
-                          Traditional Go painting showing players engaged in the ancient game
-                        </div>
-                      </div>
-                    </div>
+                      About the Game of Go
+                    </h2>
                     
                     <div style={{
-                      flex: '1',
-                      background: 'rgba(255, 255, 255, 0.7)',
-                      backdropFilter: 'blur(10px)',
-                      padding: '25px',
-                      borderRadius: '12px',
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
-                      border: '1px solid rgba(255, 255, 255, 0.6)'
+                      display: 'flex',
+                      flexDirection: windowWidth <= 768 ? 'column' : 'row',
+                      gap: '30px',
+                      marginBottom: '40px'
                     }}>
-                      <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600', textAlign: 'center' }}>
-                        History of Go
-                      </h3>
-                      
-                      <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333', textAlign: 'center' }}>
-                        Go originated in China more than 2,500 years ago and is believed to be the oldest board game continuously played today.
-                      </p>
-                      
-                      <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Historical Timeline:</h4>
-                      <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
-                        <li><strong>500-300 BCE:</strong> Earliest evidence of Go in China</li>
-                        <li><strong>7th Century:</strong> Introduced to Japan, where it flourished</li>
-                        <li><strong>17th Century:</strong> Development of the four major Go schools in Japan</li>
-                        <li><strong>1920s:</strong> First international Go tournaments</li>
-                        <li><strong>1990s:</strong> Growing popularity in Western countries</li>
-                        <li><strong>2016:</strong> AlphaGo defeats world champion Lee Sedol</li>
-                      </ul>
-                      
-                      <p style={{ lineHeight: '1.6', marginTop: '20px', color: '#333', textAlign: 'center' }}>
-                        Go has been considered not just a game, but an art form and martial art of the mind. It has been the subject of countless books, poems, and philosophical discussions throughout Asian history.
-                        The elegant simplicity of its rules contrasted with the profound strategic depth has made Go a metaphor for life in many Eastern philosophical traditions.
-                      </p>
-
-                      {/* Go Game Image - moved to bottom */}
-                      <div className="go-image-container" style={{ 
-                        marginTop: '30px',
-                        borderRadius: '10px',
-                        overflow: 'hidden',
-                        boxShadow: windowWidth <= 768 ? '0 5px 15px rgba(0, 0, 0, 0.1)' : '0 10px 30px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.8)',
-                        transition: 'all 0.3s ease'
+                      <div style={{
+                        flex: '1',
+                        background: 'rgba(255, 255, 255, 0.7)',
+                        backdropFilter: 'blur(10px)',
+                        padding: '25px',
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
+                        border: '1px solid rgba(255, 255, 255, 0.6)'
                       }}>
-                        <img 
-                          src="/game-of-go.jpg" 
-                          alt="Game of Go board with stones" 
-                          className="go-game-image"
-                          loading="lazy"
-                          width={windowWidth <= 768 ? "100%" : "600"}
-                          height={windowWidth <= 768 ? "auto" : "400"}
-                          style={{
-                            width: '100%',
-                            height: 'auto',
-                            display: 'block',
-                            maxWidth: windowWidth <= 768 ? '100%' : '600px'
-                          }}
-                          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                            e.currentTarget.src = "https://via.placeholder.com/600x400?text=Game+of+Go";
-                          }}
-                        />
-                        <div style={{
-                          padding: '10px 15px',
-                          background: 'rgba(255, 255, 255, 0.9)',
-                          backdropFilter: 'blur(5px)',
-                          borderTop: '1px solid rgba(200, 210, 230, 0.5)',
-                          fontSize: '14px',
-                          color: '#444',
-                          textAlign: 'center'
+                        <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600', textAlign: 'center' }}>
+                          The Rules of Go
+                        </h3>
+                        
+                        <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333', textAlign: 'center' }}>
+                          Go is played on a grid of black lines (usually 19×19). Game pieces, called stones, are played on the intersections of the lines.
+                        </p>
+                        
+                        <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Basic Rules:</h4>
+                        <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
+                          <li>Players take turns placing stones on the board</li>
+                          <li>Black plays first, then White</li>
+                          <li>Stones cannot be moved once placed</li>
+                          <li>Stones are captured when completely surrounded by opponent's stones</li>
+                          <li>The goal is to control more territory than your opponent</li>
+                          <li>The game ends when both players pass their turn</li>
+                        </ul>
+                        
+                        <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Key Concepts:</h4>
+                        <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
+                          <li><strong>Liberty:</strong> An empty adjacent point next to a stone</li>
+                          <li><strong>Capture:</strong> Removing opponent's stones that have no liberties</li>
+                          <li><strong>Territory:</strong> Empty intersections surrounded by your stones</li>
+                          <li><strong>Ko rule:</strong> Prevents infinite capturing cycles</li>
+                        </ul>
+                        
+                        {/* Go Painting Image - moved to bottom */}
+                        <div className="go-image-container" style={{ 
+                          marginTop: '30px',
+                          borderRadius: '10px',
+                          overflow: 'hidden',
+                          boxShadow: windowWidth <= 768 ? '0 5px 15px rgba(0, 0, 0, 0.1)' : '0 10px 30px rgba(0, 0, 0, 0.1)',
+                          border: '1px solid rgba(255, 255, 255, 0.8)',
+                          transition: 'all 0.3s ease'
                         }}>
-                          Game of Go - one of the oldest board games still played today
+                          <img 
+                            src="/game-of-go-2.jpg" 
+                            alt="Traditional Go painting" 
+                            className="go-game-image"
+                            loading="lazy"
+                            width={windowWidth <= 768 ? "100%" : "600"}
+                            height={windowWidth <= 768 ? "auto" : "400"}
+                            style={{
+                              width: '100%',
+                              height: 'auto',
+                              display: 'block',
+                              maxWidth: windowWidth <= 768 ? '100%' : '600px'
+                            }}
+                            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                              e.currentTarget.src = "https://via.placeholder.com/600x400?text=Go+Painting";
+                            }}
+                          />
+                          <div style={{
+                            padding: '10px 15px',
+                            background: 'rgba(255, 255, 255, 0.9)',
+                            backdropFilter: 'blur(5px)',
+                            borderTop: '1px solid rgba(200, 210, 230, 0.5)',
+                            fontSize: '14px',
+                            color: '#444',
+                            textAlign: 'center'
+                          }}>
+                            Traditional Go painting showing players engaged in the ancient game
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div style={{
+                        flex: '1',
+                        background: 'rgba(255, 255, 255, 0.7)',
+                        backdropFilter: 'blur(10px)',
+                        padding: '25px',
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
+                        border: '1px solid rgba(255, 255, 255, 0.6)'
+                      }}>
+                        <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600', textAlign: 'center' }}>
+                          History of Go
+                        </h3>
+                        
+                        <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333', textAlign: 'center' }}>
+                          Go originated in China more than 2,500 years ago and is believed to be the oldest board game continuously played today.
+                        </p>
+                        
+                        <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Historical Timeline:</h4>
+                        <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
+                          <li><strong>500-300 BCE:</strong> Earliest evidence of Go in China</li>
+                          <li><strong>7th Century:</strong> Introduced to Japan, where it flourished</li>
+                          <li><strong>17th Century:</strong> Development of the four major Go schools in Japan</li>
+                          <li><strong>1920s:</strong> First international Go tournaments</li>
+                          <li><strong>1990s:</strong> Growing popularity in Western countries</li>
+                          <li><strong>2016:</strong> AlphaGo defeats world champion Lee Sedol</li>
+                        </ul>
+                        
+                        <p style={{ lineHeight: '1.6', marginTop: '20px', color: '#333', textAlign: 'center' }}>
+                          Go has been considered not just a game, but an art form and martial art of the mind. It has been the subject of countless books, poems, and philosophical discussions throughout Asian history.
+                          The elegant simplicity of its rules contrasted with the profound strategic depth has made Go a metaphor for life in many Eastern philosophical traditions.
+                        </p>
+
+                        {/* Go Game Image - moved to bottom */}
+                        <div className="go-image-container" style={{ 
+                          marginTop: '30px',
+                          borderRadius: '10px',
+                          overflow: 'hidden',
+                          boxShadow: windowWidth <= 768 ? '0 5px 15px rgba(0, 0, 0, 0.1)' : '0 10px 30px rgba(0, 0, 0, 0.1)',
+                          border: '1px solid rgba(255, 255, 255, 0.8)',
+                          transition: 'all 0.3s ease'
+                        }}>
+                          <img 
+                            src="/game-of-go.jpg" 
+                            alt="Game of Go board with stones" 
+                            className="go-game-image"
+                            loading="lazy"
+                            width={windowWidth <= 768 ? "100%" : "600"}
+                            height={windowWidth <= 768 ? "auto" : "400"}
+                            style={{
+                              width: '100%',
+                              height: 'auto',
+                              display: 'block',
+                              maxWidth: windowWidth <= 768 ? '100%' : '600px'
+                            }}
+                            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                              e.currentTarget.src = "https://via.placeholder.com/600x400?text=Game+of+Go";
+                            }}
+                          />
+                          <div style={{
+                            padding: '10px 15px',
+                            background: 'rgba(255, 255, 255, 0.9)',
+                            backdropFilter: 'blur(5px)',
+                            borderTop: '1px solid rgba(200, 210, 230, 0.5)',
+                            fontSize: '14px',
+                            color: '#444',
+                            textAlign: 'center'
+                          }}>
+                            Game of Go - one of the oldest board games still played today
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -542,14 +582,6 @@ PW[White Player]PB[Black Player]
         )}
       </main>
       
-      {/* Game Viewer Modal - shows when a game is selected from library */}
-      {showGameViewer && (
-        <GameViewer 
-          sgfContent={gameViewerContent}
-          onClose={handleCloseGameViewer}
-        />
-      )}
-
       {/* Music Player floating button */}
       <MusicPlayer />
       

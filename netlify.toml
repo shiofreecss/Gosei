@@ -1,6 +1,18 @@
 [build]
-  command = "CI=false npm run build-with-copy"
+  command = "npm run build-netlify"
   publish = "build"
 
 [build.environment]
-  NODE_VERSION = "16" 
+  NODE_VERSION = "16"
+
+# Handle client-side routing and SPA redirects
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Cache PDF files for better performance
+[[headers]]
+  for = "/books/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000" 
