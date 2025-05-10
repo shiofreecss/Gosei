@@ -26,7 +26,6 @@ const BookLibrary: React.FC = () => {
         // In a production environment, we would use a server API call
         // For this demo, we'll hard-code the books we know exist
         const bookList: Book[] = [
-          { name: 'Learn to Play Go Volume 1', path: `${basePath}/books/00 - Learn-to-Play-Go-Volume-1-Masters-Guide.pdf`, size: '68MB' },
           { name: 'Nhap Mon Co Vay', path: `${basePath}/books/01 - Nhap Mon Co Vay.pdf`, size: '2.9MB' },
           { name: 'Beyond Forcing Move - Shoichi Takashi', path: `${basePath}/books/02 - Beyond Forcing Move - Shoichi Takashi.pdf`, size: '9.1MB' },
           { name: 'Go Game - Cho Chikun', path: `${basePath}/books/03 - Go Game -ChoChikun.pdf`, size: '828KB' },
