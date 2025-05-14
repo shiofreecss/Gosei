@@ -61,6 +61,12 @@ function App() {
     setShowBookLibrary(false);
   }, []);
 
+  const handleShowGameLibrary = useCallback(() => {
+    setShowLibrary(!showLibrary);
+    // Hide book library when showing game library
+    if (showBookLibrary) setShowBookLibrary(false);
+  }, [showLibrary, showBookLibrary]);
+
   // Memoize the sample SGF content since it never changes
   const sampleSGF = useMemo(() => `(;GM[1]FF[4]CA[UTF-8]AP[CGoban:3]ST[2]
 RU[Japanese]SZ[19]KM[6.50]
@@ -163,7 +169,10 @@ PW[White Player]PB[Black Player]
           </h1>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', gap: '10px' }}>
             <button 
-              onClick={() => setShowBookLibrary(!showBookLibrary)}
+              onClick={() => {
+                if (showLibrary) setShowLibrary(false);
+                setShowBookLibrary(!showBookLibrary);
+              }}
               style={{ 
                 backgroundColor: showBookLibrary ? 'rgba(100, 120, 180, 0.8)' : 'rgba(70, 90, 150, 0.6)',
                 backdropFilter: 'blur(5px)',
@@ -188,7 +197,10 @@ PW[White Player]PB[Black Player]
               {showBookLibrary ? 'Hide Books' : 'Book Library'}
             </button>
             <button 
-              onClick={() => setShowLibrary(!showLibrary)}
+              onClick={() => {
+                if (showBookLibrary) setShowBookLibrary(false);
+                setShowLibrary(!showLibrary);
+              }}
               style={{ 
                 backgroundColor: showLibrary ? 'rgba(100, 120, 180, 0.8)' : 'rgba(70, 90, 150, 0.6)',
                 backdropFilter: 'blur(5px)',
@@ -275,7 +287,10 @@ PW[White Player]PB[Black Player]
                       <li style={{ marginBottom: '10px' }}>Upload your SGF file using the form below</li>
                       <li style={{ marginBottom: '10px' }}>
                         Use the <button 
-                          onClick={() => setShowBookLibrary(true)}
+                          onClick={() => {
+                            if (showLibrary) setShowLibrary(false);
+                            setShowBookLibrary(true);
+                          }}
                           style={{
                             backgroundColor: 'rgba(70, 90, 150, 0.6)',
                             color: 'white',
@@ -291,7 +306,10 @@ PW[White Player]PB[Black Player]
                       </li>
                       <li style={{ marginBottom: '10px' }}>
                         Browse the <button 
-                          onClick={() => setShowLibrary(true)}
+                          onClick={() => {
+                            if (showBookLibrary) setShowBookLibrary(false);
+                            setShowLibrary(true);
+                          }}
                           style={{
                             backgroundColor: 'rgba(70, 90, 150, 0.6)',
                             color: 'white',
