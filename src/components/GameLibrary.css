@@ -37,6 +37,7 @@
   flex-direction: column;
   overflow: hidden;
   height: 100%;
+  scroll-margin-top: 20px;
 }
 
 /* Game list styles */
@@ -125,6 +126,10 @@
 
   .game-library-sidebar {
     max-height: 600px;
+  }
+
+  .game-library-content {
+    scroll-margin-top: 70px; /* Add more scroll margin on mobile to account for header */
   }
 
   .game-list {

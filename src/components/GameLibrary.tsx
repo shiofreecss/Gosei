@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   mainCategories, 
   Tournament, 
@@ -223,10 +223,26 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
     }
   };
   
+  // Add a reference to the game library content section
+  const gameListContentRef = useRef<HTMLDivElement>(null);
+  
+  // Scroll to games function for mobile
+  const scrollToGames = useCallback(() => {
+    if (window.innerWidth <= 768) {
+      setTimeout(() => {
+        gameListContentRef.current?.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+  }, []);
+  
   // Handle tournament selection
   const handleTournamentSelect = (tournament: Tournament) => {
     setSelectedTournament(tournament);
     setSearchTerm(''); // Clear search term when changing tournaments
+    scrollToGames();
   };
   
   // Handle game selection
@@ -267,6 +283,7 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
     setSelectedCategory(categoryId);
     setSelectedSubcategory(null);
     setSelectedTournament(null);
+    scrollToGames();
   };
   
   // Handle subcategory selection
@@ -274,6 +291,7 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
     setSelectedCategory(categoryId);
     setSelectedSubcategory(subcategoryId);
     setSelectedTournament(null);
+    scrollToGames();
   };
   
   // Filtered tournaments based on selected category and subcategory
@@ -902,7 +920,7 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
         </div>
         
         {/* Right panel: Games list */}
-        <div className="game-library-content">
+        <div className="game-library-content" ref={gameListContentRef}>
           {selectedTournament ? (
             <>
               <div style={{ 
