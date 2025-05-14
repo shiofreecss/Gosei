@@ -48,6 +48,20 @@
   transition: all 0.3s ease;
 }
 
+/* Fullscreen mode enhancements */
+.kifu-fullscreen .go-board-container {
+  padding: 0;
+  margin: 0 auto;
+  height: calc(100vh - 120px); /* Allow space for controls */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.kifu-fullscreen .go-board {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 -4px 8px rgba(0, 0, 0, 0.15);
+}
+
 /* Responsive styles */
 @media (max-width: 1024px) {
   .go-board-container {
@@ -64,6 +78,11 @@
   .go-board {
     --cell-size: 20px;
   }
+  
+  /* Improve fullscreen mode */
+  .kifu-fullscreen .go-board-container {
+    height: calc(100vh - 100px);
+  }
 }
 
 @media (max-width: 480px) {
@@ -74,6 +93,11 @@
   /* Further reduce cell size for mobile */
   .go-board {
     --cell-size: 15px;
+  }
+  
+  /* Improve fullscreen mode */
+  .kifu-fullscreen .go-board-container {
+    height: calc(100vh - 90px);
   }
 }
 
@@ -86,6 +110,11 @@
   /* Even smaller cell size for very small devices */
   .go-board {
     --cell-size: 13px;
+  }
+  
+  /* Improve fullscreen mode */
+  .kifu-fullscreen .go-board-container {
+    height: calc(100vh - 80px);
   }
 }
 

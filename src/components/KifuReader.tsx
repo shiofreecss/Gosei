@@ -47,6 +47,12 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   const [analysisType, setAnalysisType] = useState<'liberty' | 'influence'>('liberty');
   const [boardTheme, setBoardTheme] = useState<BoardTheme>('light-wood-3d');
   
+  // Add fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  
+  // Add engine settings panel state
+  const [showEngineSettings, setShowEngineSettings] = useState<boolean>(false);
+  
   // Reference for audio element
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -88,6 +94,20 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     };
   }, []);
 
+  // Toggle fullscreen mode
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+    // Close engine settings panel when exiting fullscreen
+    if (isFullscreen) {
+      setShowEngineSettings(false);
+    }
+  };
+  
+  // Toggle engine settings panel
+  const toggleEngineSettings = () => {
+    setShowEngineSettings(!showEngineSettings);
+  };
+  
   // Load saved theme preference if available
   useEffect(() => {
     const savedTheme = localStorage.getItem('gosei-board-theme');
@@ -601,7 +621,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   };
 
   return (
-    <div className={`kifu-reader ${isMobile ? 'kifu-reader-mobile' : ''}`}>
+    <div className={`kifu-reader ${isMobile ? 'kifu-reader-mobile' : ''} ${isFullscreen ? 'kifu-fullscreen' : ''}`}>
       {error && (
         <div className="error">
           <span>⚠️</span>
@@ -610,6 +630,122 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
       )}
       <div className="kifu-content">
         <div className="board-container">
+          {/* Fullscreen toggle button for mobile */}
+          {isMobile && (
+            <div className="fullscreen-controls">
+              <button
+                className="fullscreen-toggle"
+                onClick={toggleFullscreen}
+                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+              >
+                {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+              </button>
+              
+              {/* Engine settings button (only in fullscreen mode) */}
+              {isFullscreen && (
+                <button
+                  className="engine-settings-button"
+                  onClick={toggleEngineSettings}
+                  aria-label="Engine settings"
+                >
+                  ⚙️ Settings
+                </button>
+              )}
+            </div>
+          )}
+          
+          {/* Engine settings panel */}
+          {isFullscreen && showEngineSettings && (
+            <div className="engine-settings-panel">
+              <div className="engine-settings-header">
+                <h3>Game Settings</h3>
+                <button 
+                  className="close-settings"
+                  onClick={toggleEngineSettings}
+                  aria-label="Close settings"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="engine-settings-content">
+                <div className="settings-group">
+                  <label className="settings-label">
+                    <input
+                      type="checkbox"
+                      checked={showMoveNumbers}
+                      onChange={handleToggleMoveNumbers}
+                    />
+                    Show Move Numbers
+                  </label>
+                  
+                  <label className="settings-label">
+                    <input
+                      type="checkbox"
+                      checked={enableSound}
+                      onChange={handleToggleSound}
+                    />
+                    Stone Sound
+                  </label>
+                  
+                  <label className="settings-label">
+                    <input
+                      type="checkbox"
+                      checked={showHeatMap}
+                      onChange={handleToggleHeatMap}
+                    />
+                    Show Heat Map
+                  </label>
+                </div>
+                
+                <div className="settings-group">
+                  <div className="settings-label">Board Theme</div>
+                  <div className="theme-selector">
+                    <button 
+                      className={`theme-option ${boardTheme === 'default' ? 'active' : ''}`}
+                      onClick={() => handleBoardThemeChange('default')}
+                    >
+                      Default
+                    </button>
+                    <button 
+                      className={`theme-option ${boardTheme === 'light-wood-3d' ? 'active' : ''}`}
+                      onClick={() => handleBoardThemeChange('light-wood-3d')}
+                    >
+                      Light Wood
+                    </button>
+                    <button 
+                      className={`theme-option ${boardTheme === 'dark-wood-3d' ? 'active' : ''}`}
+                      onClick={() => handleBoardThemeChange('dark-wood-3d')}
+                    >
+                      Dark Wood
+                    </button>
+                    <button 
+                      className={`theme-option ${boardTheme === 'universe' ? 'active' : ''}`}
+                      onClick={() => handleBoardThemeChange('universe')}
+                    >
+                      Universe
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="settings-group">
+                  <div className="settings-label">Autoplay Speed</div>
+                  <input
+                    type="range"
+                    min="500"
+                    max="2500"
+                    value={3000 - autoplaySpeed}
+                    onChange={handleAutoplaySpeedChange}
+                    className="settings-slider"
+                  />
+                  <div className="slider-labels">
+                    <span>Fast</span>
+                    <span>Slow</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <GoBoard
             size={game?.info.size || 19}
             stones={getCurrentStones()}
@@ -675,7 +811,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             />
           )}
         </div>
-        <div className="controls-container">
+        <div className={`controls-container ${isFullscreen ? 'hidden-on-fullscreen' : ''}`}>
           <div className="game-info">
             <div className="game-info-header">
               <div className="game-info-player">
