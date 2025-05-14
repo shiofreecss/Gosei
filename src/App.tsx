@@ -15,7 +15,6 @@ function App() {
   const [showGameViewer, setShowGameViewer] = useState(false);
   const [gameViewerContent, setGameViewerContent] = useState('');
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [showHelp, setShowHelp] = useState<boolean>(false);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -56,8 +55,7 @@ function App() {
     // Hide other components when showing book library
     if (showLibrary) setShowLibrary(false);
     if (showGameViewer) setShowGameViewer(false);
-    if (showHelp) setShowHelp(false);
-  }, [showLibrary, showGameViewer, showHelp]);
+  }, [showLibrary, showGameViewer]);
   
   const handleCloseBookLibrary = useCallback(() => {
     setShowBookLibrary(false);
@@ -214,32 +212,6 @@ PW[White Player]PB[Black Player]
               </svg>
               {showLibrary ? 'Hide Library' : 'Game Library'}
             </button>
-            <button 
-              onClick={() => setShowHelp(!showHelp)}
-              style={{ 
-                backgroundColor: showHelp ? 'rgba(100, 120, 180, 0.8)' : 'rgba(70, 90, 150, 0.6)',
-                backdropFilter: 'blur(5px)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                color: 'white',
-                padding: '8px 15px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 17V17.01" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 13.5C11.9816 13.1754 12.0692 12.8536 12.2495 12.5833C12.4299 12.313 12.6933 12.1101 13 12C13.3759 11.8347 13.7132 11.598 13.9856 11.3052C14.2581 11.0123 14.4591 10.6698 14.5747 10.2987C14.6903 9.9276 14.7176 9.5366 14.6544 9.15353C14.5912 8.77046 14.4392 8.40481 14.2092 8.08481C13.9793 7.76482 13.6768 7.49816 13.3261 7.3025C12.9754 7.10684 12.5849 6.98639 12.1827 6.94994C11.7805 6.91348 11.3759 6.96198 10.9933 7.09204C10.6108 7.2221 10.2603 7.43064 9.96667 7.7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              {showHelp ? 'Hide Help' : 'Help'}
-            </button>
           </div>
         </div>
       </header>
@@ -276,122 +248,67 @@ PW[White Player]PB[Black Player]
                     Welcome to Gosei Kifu! An open-source application dedicated to the Go community. Upload a Go game record (SGF file), paste SGF content below, or browse the extensive game library to analyze and review games with our intuitive tools.
                   </p>
                   
-                  {showHelp && (
-                    <div style={{ 
-                      background: 'rgba(255, 255, 255, 0.8)',
-                      backdropFilter: 'blur(10px)',
-                      padding: '25px', 
-                      borderRadius: '12px',
-                      marginBottom: '30px',
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-                      border: '1px solid rgba(255, 255, 255, 0.6)',
-                      width: '100%'
+                  <div style={{
+                    padding: '20px',
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    borderRadius: '12px',
+                    marginBottom: '30px',
+                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)'
+                  }}>
+                    <h3 style={{ 
+                      color: '#2a3f6a',
+                      fontSize: '20px',
+                      marginTop: 0,
+                      marginBottom: '15px',
+                      fontWeight: 600
                     }}>
-                      <h2 style={{ 
-                        color: '#2a3f6a',
-                        fontSize: '22px',
-                        marginTop: 0,
-                        marginBottom: '15px',
-                        fontWeight: 600
-                      }}>
-                        How to Use Gosei Kifu
-                      </h2>
-                      <p style={{ marginBottom: '15px', lineHeight: '1.6' }}>
-                        Gosei Kifu supports both standard SGF files and traditional Japanese kifu format. Japanese kifu typically follow this structure:
-                      </p>
-                      
-                      <pre style={{ 
-                        background: 'rgba(245, 248, 255, 0.7)', 
-                        padding: '15px', 
-                        borderRadius: '10px',
-                        overflow: 'auto',
-                        fontFamily: 'monospace',
-                        fontSize: '14px',
-                        border: '1px solid rgba(200, 210, 230, 0.5)',
-                        backdropFilter: 'blur(5px)',
-                        boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.03)'
-                      }}>
-{`# 棋譜（Japanese Kifu Format）
-# 黒：Player Black
-# 白：Player White
-# 日付: 2023-04-06
-# 結果: 黒の中押し勝ち
-
-1. 黒: Q16
-2. 白: D4
-3. 黒: Q4
-...`}
-                      </pre>
-                      
-                      <h3 style={{ fontSize: '18px', marginTop: '20px', color: '#444' }}>Key elements of Japanese kifu:</h3>
-                      <ul style={{ 
-                        listStyleType: 'none', 
-                        padding: 0, 
-                        margin: '15px 0', 
-                        lineHeight: '1.6' 
-                      }}>
-                        <li style={{ 
-                          padding: '8px 0 8px 25px', 
-                          position: 'relative' 
-                        }}>
-                          <span style={{ 
-                            position: 'absolute', 
-                            left: 0, 
-                            top: '9px',
-                            width: '12px',
-                            height: '12px',
-                            backgroundColor: 'black',
-                            borderRadius: '50%'
-                          }}></span>
-                          Header information with # prefix, containing player names, date, and result
-                        </li>
-                        <li style={{ 
-                          padding: '8px 0 8px 25px', 
-                          position: 'relative' 
-                        }}>
-                          <span style={{ 
-                            position: 'absolute', 
-                            left: 0, 
-                            top: '9px',
-                            width: '12px',
-                            height: '12px',
-                            backgroundColor: 'white',
-                            borderRadius: '50%',
-                            border: '1px solid #ddd'
-                          }}></span>
-                          Moves are numbered sequentially, with color (黒/白 for black/white) and coordinates
-                        </li>
-                        <li style={{ 
-                          padding: '8px 0 8px 25px', 
-                          position: 'relative' 
-                        }}>
-                          <span style={{ 
-                            position: 'absolute', 
-                            left: 0, 
-                            top: '9px',
-                            width: '12px',
-                            height: '12px',
-                            backgroundColor: '#f0f0f0',
-                            borderRadius: '3px',
-                            border: '1px solid #ddd'
-                          }}></span>
-                          Coordinates use letters (A-T, excluding I) for columns and numbers (1-19) for rows
-                        </li>
-                      </ul>
-                      
-                      <p style={{ 
-                        padding: '12px', 
-                        background: 'rgba(220, 240, 255, 0.6)', 
-                        borderLeft: '4px solid #3498db',
-                        borderRadius: '8px',
-                        color: '#2a4a6a',
-                        marginTop: '15px',
-                        backdropFilter: 'blur(5px)'
-                      }}>
-                        Our parser automatically converts Japanese kifu format to SGF for rendering on the board.
-                      </p>
-                    </div>
-                  )}
+                      Instructions
+                    </h3>
+                    <ul style={{ 
+                      lineHeight: '1.6', 
+                      listStyleType: 'none',
+                      padding: 0, 
+                      margin: '0',
+                      color: '#333' 
+                    }}>
+                      <li style={{ marginBottom: '10px' }}>Upload your SGF file using the form below</li>
+                      <li style={{ marginBottom: '10px' }}>
+                        Use the <button 
+                          onClick={() => setShowBookLibrary(true)}
+                          style={{
+                            backgroundColor: 'rgba(70, 90, 150, 0.6)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '2px 8px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            display: 'inline-block'
+                          }}
+                        >Book Library</button> to access study materials
+                      </li>
+                      <li style={{ marginBottom: '10px' }}>
+                        Browse the <button 
+                          onClick={() => setShowLibrary(true)}
+                          style={{
+                            backgroundColor: 'rgba(70, 90, 150, 0.6)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '2px 8px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            display: 'inline-block'
+                          }}
+                        >Game Library</button> for professional games to study
+                      </li>
+                      <li style={{ marginBottom: '10px' }}>Navigate moves using arrow keys or the control panel</li>
+                      <li>View variations and comments when available</li>
+                    </ul>
+                  </div>
                   
                   <h2 style={{ 
                     fontSize: '24px', 
