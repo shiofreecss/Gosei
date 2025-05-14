@@ -637,7 +637,7 @@ PW[White Player]PB[Black Player]
                 © {new Date().getFullYear()} Gosei Kifu
               </p>
               <p style={{ margin: '0', opacity: '0.9' }}>
-                Powered by <a href="https://beaver.foundation" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>Beaver Foundation</a>
+                Developed by <a href="https://hello.shiodev.com" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>Shiodev</a>
               </p>
               <p style={{ margin: '0', opacity: '0.9', fontSize: '12px' }}>
                 Game data sourced from <a href="https://homepages.cwi.nl/~aeb/go/games/games/" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>homepages.cwi.nl/~aeb/go/games/games</a>
