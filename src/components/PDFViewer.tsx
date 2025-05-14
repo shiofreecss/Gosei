@@ -344,7 +344,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
           <button 
             onClick={goToPreviousPage} 
             disabled={currentPage <= 1}
-            className="pdf-nav-button"
+            className={`pdf-nav-button ${isMobile ? 'mobile-hidden' : ''}`}
           >
             ← Previous
           </button>
@@ -367,7 +367,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
           <button 
             onClick={goToNextPage} 
             disabled={!numPages || currentPage >= numPages}
-            className="pdf-nav-button"
+            className={`pdf-nav-button ${isMobile ? 'mobile-hidden' : ''}`}
           >
             Next →
           </button>
