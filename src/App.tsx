@@ -146,7 +146,13 @@ PW[White Player]PB[Black Player]
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)'
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
+            cursor: 'pointer'
+          }}
+          onClick={() => {
+            setShowBookLibrary(false);
+            setShowLibrary(false);
+            setShowGameViewer(false);
           }}>
             <span style={{ 
               display: 'inline-block', 
@@ -182,7 +188,7 @@ PW[White Player]PB[Black Player]
                 padding: '8px 15px',
                 borderRadius: '6px',
                 cursor: 'pointer',
-                display: 'flex',
+                display: windowWidth <= 768 ? 'none' : 'flex',
                 alignItems: 'center',
                 gap: '5px',
                 fontSize: '14px',
