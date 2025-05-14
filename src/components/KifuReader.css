@@ -701,7 +701,7 @@
 .fullscreen-controls {
   position: absolute;
   top: 10px;
-  right: 10px;
+  left: 10px;
   z-index: 10001;
   display: flex;
   gap: 8px;
@@ -731,7 +731,7 @@
 .engine-settings-panel {
   position: absolute;
   top: 50px;
-  right: 10px;
+  left: 10px;
   z-index: 10001;
   background-color: white;
   border-radius: 8px;
@@ -852,7 +852,7 @@
 @media (max-width: 768px) {
   .fullscreen-controls {
     top: 8px;
-    right: 8px;
+    left: 8px;
     gap: 6px;
   }
   
@@ -863,6 +863,7 @@
   
   .engine-settings-panel {
     top: 40px;
+    left: 8px;
     width: 260px;
   }
 }
@@ -870,7 +871,7 @@
 @media (max-width: 480px) {
   .fullscreen-controls {
     top: 5px;
-    right: 5px;
+    left: 5px;
     gap: 5px;
   }
   
@@ -880,6 +881,7 @@
   
   .engine-settings-panel {
     top: 35px;
+    left: 5px;
     width: 240px;
   }
   
