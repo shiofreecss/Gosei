@@ -170,6 +170,35 @@ PW[White Player]PB[Black Player]
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', gap: '10px' }}>
             <button 
               onClick={() => {
+                setShowBookLibrary(false);
+                setShowLibrary(false);
+                setShowGameViewer(false);
+              }}
+              style={{ 
+                backgroundColor: (!showBookLibrary && !showLibrary && !showGameViewer) ? 'rgba(100, 120, 180, 0.8)' : 'rgba(70, 90, 150, 0.6)',
+                backdropFilter: 'blur(5px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                color: 'white',
+                padding: '8px 15px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M9 22V12h6v10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Home
+            </button>
+            <button 
+              onClick={() => {
                 if (showLibrary) setShowLibrary(false);
                 setShowBookLibrary(!showBookLibrary);
               }}
@@ -194,7 +223,7 @@ PW[White Player]PB[Black Player]
                 <path d="M4 4H8V20H4V4Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M12 4H20C21.1046 4 22 4.89543 22 6V18C22 19.1046 21.1046 20 20 20H12V4Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              {showBookLibrary ? 'Hide Books' : 'Book Library'}
+              Book Library
             </button>
             <button 
               onClick={() => {
@@ -222,7 +251,7 @@ PW[White Player]PB[Black Player]
                 <path d="M4 19.5C4 18.837 4.26339 18.2011 4.73223 17.7322C5.20107 17.2634 5.83696 17 6.5 17H20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M6.5 2H20V22H6.5C5.83696 22 5.20107 21.7366 4.73223 21.2678C4.26339 20.7989 4 20.163 4 19.5V4.5C4 3.83696 4.26339 3.20107 4.73223 2.73223C5.20107 2.26339 5.83696 2 6.5 2Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              {showLibrary ? 'Hide Library' : 'Game Library'}
+              Game Library
             </button>
           </div>
         </div>
