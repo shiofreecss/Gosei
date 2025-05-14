@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, TouchEvent } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -20,8 +20,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth <= 768);
   const [scale, setScale] = useState<number>(1.0);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [pageInput, setPageInput] = useState<string>('');
+  const [displayMode, setDisplayMode] = useState<'single' | 'double'>('double');
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<HTMLDivElement>(null);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
   
   // Handle responsive layout
   useEffect(() => {
@@ -52,13 +56,15 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
         handleZoomOut();
       } else if (e.key === 'f') {
         toggleFullscreen();
+      } else if (e.key === 'd') {
+        toggleDisplayMode();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, numPages, isMobile, isFullscreen]);
+  }, [currentPage, numPages, isMobile, isFullscreen, displayMode]);
 
   // Handle fullscreen changes
   useEffect(() => {
@@ -69,6 +75,63 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
+
+  // Handle mouse wheel zoom
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        if (e.deltaY < 0) {
+          handleZoomIn();
+        } else {
+          handleZoomOut();
+        }
+      }
+    };
+
+    const containerElement = containerRef.current;
+    if (containerElement) {
+      containerElement.addEventListener('wheel', handleWheel, { passive: false });
+    }
+
+    return () => {
+      if (containerElement) {
+        containerElement.removeEventListener('wheel', handleWheel);
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Handle touch events for swipe navigation
+  const handleTouchStart = (e: TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+    setTouchStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    if (touchStartX === null || touchStartY === null) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+    
+    // Horizontal swipe if X movement is greater than Y movement
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // Minimum swipe distance threshold
+      if (Math.abs(deltaX) > 50) {
+        if (deltaX > 0) {
+          goToPreviousPage();
+        } else {
+          goToNextPage();
+        }
+      }
+    }
+    
+    setTouchStartX(null);
+    setTouchStartY(null);
+  };
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
@@ -84,7 +147,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
 
   function goToNextPage() {
     if (!numPages) return;
-    const increment = isMobile ? 1 : 2;
+    const increment = isMobile || displayMode === 'single' ? 1 : 2;
     // Ensure we don't exceed the total number of pages
     const nextPage = Math.min(currentPage + increment, numPages);
     if (nextPage !== currentPage) {
@@ -93,11 +156,28 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
   }
 
   function goToPreviousPage() {
-    const decrement = isMobile ? 1 : 2;
+    const decrement = isMobile || displayMode === 'single' ? 1 : 2;
     const prevPage = Math.max(currentPage - decrement, 1);
     if (prevPage !== currentPage) {
       handlePageChange(prevPage);
     }
+  }
+
+  function toggleDisplayMode() {
+    setDisplayMode(prev => prev === 'single' ? 'double' : 'single');
+  }
+
+  function handlePageInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setPageInput(e.target.value);
+  }
+
+  function handlePageInputSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const pageNumber = parseInt(pageInput);
+    if (!isNaN(pageNumber) && pageNumber >= 1 && numPages && pageNumber <= numPages) {
+      handlePageChange(pageNumber);
+    }
+    setPageInput('');
   }
 
   function handleZoomIn() {
@@ -132,8 +212,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
   function renderPages() {
     if (!numPages) return null;
     
-    if (isMobile) {
-      // Mobile view: Single page
+    if (isMobile || displayMode === 'single') {
+      // Mobile or single page view
       return (
         <div 
           className="pdf-page"
@@ -149,7 +229,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
         </div>
       );
     } else {
-      // Desktop view: Two pages side by side
+      // Desktop double page view
       const leftPage = currentPage;
       const rightPage = currentPage + 1;
       const containerWidth = containerRef.current?.clientWidth || 800;
@@ -190,7 +270,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
   function getPageInfo() {
     if (!numPages) return '';
     
-    if (isMobile) {
+    if (isMobile || displayMode === 'single') {
       return `Page ${currentPage} of ${numPages}`;
     } else {
       const rightPage = currentPage + 1;
@@ -216,6 +296,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
           <div className="pdf-header-controls">
             <button 
               className="header-button" 
+              onClick={toggleDisplayMode}
+              title={displayMode === 'single' ? "Switch to double page view" : "Switch to single page view"}
+            >
+              {displayMode === 'single' ? "⫸⫷" : "⫸"}
+            </button>
+            <button 
+              className="header-button" 
               onClick={toggleFullscreen} 
               title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
             >
@@ -225,7 +312,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
           </div>
         </div>
         
-        <div className="pdf-document-container">
+        <div 
+          className="pdf-document-container" 
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           {isLoading && (
             <div className="pdf-loading">
               <div className="pdf-loading-spinner"></div>
@@ -259,6 +350,19 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
           </button>
           
           <span className="pdf-page-info">{getPageInfo()}</span>
+          
+          <form onSubmit={handlePageInputSubmit} className="go-to-page-form">
+            <input
+              type="number"
+              placeholder="Page..."
+              value={pageInput}
+              onChange={handlePageInputChange}
+              min={1}
+              max={numPages || undefined}
+              className="page-input"
+            />
+            <button type="submit" className="go-button">Go</button>
+          </form>
           
           <button 
             onClick={goToNextPage} 

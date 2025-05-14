@@ -23,16 +23,23 @@ const BookLibrary: React.FC = () => {
         // Get base path - empty for relative paths, add PUBLIC_URL for Netlify
         const basePath = process.env.PUBLIC_URL || '';
         
-        // In a production environment, we would use a server API call
-        // For this demo, we'll hard-code the books we know exist
+        // Updated book list reflecting the current files in public/books
         const bookList: Book[] = [
-          { name: 'Nhap Mon Co Vay', path: `${basePath}/books/01 - Nhap Mon Co Vay.pdf`, size: '2.9MB' },
-          { name: 'Beyond Forcing Move - Shoichi Takashi', path: `${basePath}/books/02 - Beyond Forcing Move - Shoichi Takashi.pdf`, size: '9.1MB' },
-          { name: 'Go Game - Cho Chikun', path: `${basePath}/books/03 - Go Game -ChoChikun.pdf`, size: '828KB' },
-          { name: '501 Bai tap khai cuoc 1', path: `${basePath}/books/04 - 501 Bai tap khai cuoc 1.pdf`, size: '1.1MB' },
-          { name: '501 Bai tap khai cuoc 2', path: `${basePath}/books/04 - 501 Bai tap khai cuoc 2.pdf`, size: '1.6MB' },
-          { name: 'Shape Up', path: `${basePath}/books/05 - shape_up_v1.2.pdf`, size: '10MB' },
-          { name: 'Lessons in the Fundamentals of Go - Toshiro Kageyama', path: `${basePath}/books/06 - Toshiro Kageyama - Lessons in the Fundamentals of Go.pdf`, size: '4.6MB' },
+          { name: 'Shape Up', path: `${basePath}/books/01 - Shape_up_v1.2.pdf`, size: '10MB' },
+          { name: 'Lessons in the Fundamentals of Go - Toshiro Kageyama', path: `${basePath}/books/02 - Toshiro Kageyama - Lessons in the Fundamentals of Go.pdf`, size: '4.6MB' },
+          { name: 'Cho Chikun - All about life and death - Volume 1', path: `${basePath}/books/03.1 - Cho Chikun - All about life and death - Volume 1.pdf`, size: '1.7MB' },
+          { name: 'Cho Chikun - All about life and death - Volume 2', path: `${basePath}/books/03.2 - Cho Chikun - All about life and death - Volume 2.pdf`, size: '3.3MB' },
+          { name: 'Elementary Go Series Vol. 1 - In The Beginning', path: `${basePath}/books/04 - Elementary Go Series Vol. 1 - In The Beginning.pdf`, size: '8.5MB' },
+          { name: 'Elementary Go Series Vol. 2 - 38 Basic Joseki', path: `${basePath}/books/04 - Elementary Go Series Vol. 2 - 38 Basic Joseki.pdf`, size: '8.3MB' },
+          { name: 'Elementary Go Series Vol. 3 - Tesuji', path: `${basePath}/books/04 - Elementary Go Series Vol. 3 - Tesuji.pdf`, size: '15MB' },
+          { name: 'Elementary Go Series Vol. 5 - Attack And Defense', path: `${basePath}/books/04 - Elementary Go Series Vol. 5 - Attack And Defense.pdf`, size: '30MB' },
+          { name: 'Elementary Go Series Vol. 6 - Endgame', path: `${basePath}/books/04 - Elementary Go Series Vol. 6 - Endgame.pdf`, size: '4.8MB' },
+          { name: 'Elementary Go Series Vol. 7 - Handicap Go', path: `${basePath}/books/04 - Elementary Go Series Vol. 7 - Handicap Go.pdf`, size: '13MB' },
+          { name: 'Nhap Mon Co Vay', path: `${basePath}/books/V01 - Nhap Mon Co Vay.pdf`, size: '2.9MB' },
+          { name: 'Beyond Forcing Move - Shoichi Takashi', path: `${basePath}/books/V02 - Beyond Forcing Move - Shoichi Takashi.pdf`, size: '9.1MB' },
+          { name: 'Go Game - Cho Chikun', path: `${basePath}/books/V03 - Go Game -ChoChikun.pdf`, size: '828KB' },
+          { name: '501 Bai tap khai cuoc 1', path: `${basePath}/books/V04.1 - 501 Bai tap khai cuoc 1.pdf`, size: '1.1MB' },
+          { name: '501 Bai tap khai cuoc 2', path: `${basePath}/books/V04.2 - 501 Bai tap khai cuoc 2.pdf`, size: '1.6MB' },
         ];
         
         setBooks(bookList);

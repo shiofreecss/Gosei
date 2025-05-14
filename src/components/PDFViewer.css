@@ -118,6 +118,7 @@
   padding: 15px 20px;
   border-top: 1px solid #eee;
   background-color: #f8f9fa;
+  gap: 10px;
 }
 
 .pdf-nav-button {
@@ -143,6 +144,36 @@
 .pdf-page-info {
   font-size: 14px;
   color: #666;
+}
+
+/* Go to page form styling */
+.go-to-page-form {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.page-input {
+  width: 80px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.go-button {
+  background-color: #283246;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.go-button:hover {
+  background-color: #364c70;
 }
 
 .pdf-loading {
@@ -231,6 +262,16 @@
   .pdf-page-info {
     order: -1;
     margin-bottom: 10px;
+  }
+  
+  .go-to-page-form {
+    width: 100%;
+    margin: 5px 0;
+    justify-content: center;
+  }
+
+  .page-input {
+    width: 100px;
   }
   
   .pdf-nav-button {
