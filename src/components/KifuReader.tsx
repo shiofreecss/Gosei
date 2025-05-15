@@ -47,6 +47,10 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   const [analysisType, setAnalysisType] = useState<'liberty' | 'influence'>('liberty');
   const [boardTheme, setBoardTheme] = useState<BoardTheme>('light-wood-3d');
   
+  // Add test mode state
+  const [testMode, setTestMode] = useState<boolean>(false);
+  const [nextMoveColor, setNextMoveColor] = useState<'black' | 'white'>('black');
+  
   // Add fullscreen state
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   
@@ -71,6 +75,10 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
 
   // Add state for Ko explanation
   const [koExplanation, setKoExplanation] = useState<string | null>(null);
+
+  // Add a reference to the original game state
+  const [originalGame, setOriginalGame] = useState<ParsedGame | null>(null);
+  const [originalCurrentMove, setOriginalCurrentMove] = useState<number>(-1);
 
   useEffect(() => {
     // Create audio element for move sounds
@@ -293,7 +301,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     if (game && capturedStones.length > 0) {
       updateCaptureCount(currentMove);
     }
-  }, [currentMove, capturedStones]);
+  }, [currentMove, capturedStones, game]);
 
   const updateCaptureCount = (moveIndex: number) => {
     // Count captures up to the current move
@@ -415,12 +423,36 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     localStorage.setItem('gosei-board-theme', theme);
   };
 
+  // Get information about the current move
   const getCurrentMoveInfo = () => {
-    if (!game || currentMove < 0) return null;
-    return game.moves[currentMove];
+    if (!game || currentMove < 0 || currentMove >= game.moves.length) {
+      return null;
+    }
+    
+    const move = game.moves[currentMove];
+    
+    if (move.x < 0 || move.y < 0) {
+      return "Pass";
+    }
+    
+    // Convert coordinates to SGF letter format
+    const xLetter = String.fromCharCode(97 + move.x); // 'a' = 97 in ASCII
+    const yLetter = String.fromCharCode(97 + move.y);
+    
+    return `${move.color === 'black' ? 'Black' : 'White'} at ${xLetter}${yLetter}`;
   };
 
-  const currentMoveInfo = getCurrentMoveInfo();
+  // Get comments for the current move
+  const getCurrentMoveComment = () => {
+    if (!game || currentMove < 0 || currentMove >= game.moves.length) {
+      return null;
+    }
+    
+    const move = game.moves[currentMove];
+    
+    // Check if comment exists
+    return move.comment || null;
+  };
 
   const handleMoveChange = (newMoveIndex: number) => {
     setAutoplayActive(false);
@@ -620,6 +652,133 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     return board;
   };
 
+  // Toggle test mode
+  const handleToggleTestMode = () => {
+    if (!testMode) {
+      // Entering test mode - save the current state
+      setOriginalGame(game);
+      setOriginalCurrentMove(currentMove);
+      
+      // Initialize test mode with current board position
+      setNextMoveColor('black'); // Always start with black when entering test mode
+    } else {
+      // Exiting test mode - restore the original game
+      if (originalGame) {
+        setGame(originalGame);
+        setCurrentMove(originalCurrentMove);
+        
+        // Reset captured stones to original state
+        if (originalGame.moves.length > 0) {
+          calculateAllCaptures(originalGame);
+        }
+      }
+    }
+    
+    // Toggle test mode
+    setTestMode(!testMode);
+    
+    // Automatically disable autoplay when entering test mode
+    if (!testMode && autoplayActive) {
+      setAutoplayActive(false);
+    }
+  };
+  
+  // Handle stone placement in test mode
+  const handleBoardClick = (x: number, y: number) => {
+    if (!testMode || !game) return;
+    
+    // Get current board state
+    const currentBoard = getCurrentBoardState();
+    
+    // Check if the clicked position is empty
+    if (currentBoard[y][x] !== null) {
+      console.log("Position already occupied");
+      return;
+    }
+    
+    // Create new stone
+    const newStone: Stone = {
+      x,
+      y,
+      color: nextMoveColor
+    };
+    
+    // Check if move is valid (no suicide, no ko)
+    if (!isValidMove(currentBoard, newStone, boardHistory)) {
+      console.log("Invalid move (suicide or ko)");
+      return;
+    }
+    
+    // Find captures
+    const capturedPositions = findCapturedStones(currentBoard, newStone);
+    const capturedColor = nextMoveColor === 'black' ? 'white' : 'black';
+    
+    // Add to captured stones count
+    if (capturedColor === 'black') {
+      setCapturedBlack(prev => prev + capturedPositions.length);
+    } else {
+      setCapturedWhite(prev => prev + capturedPositions.length);
+    }
+    
+    // Add captured stones to the list with the current move number
+    const moveNumber = currentMove + 2; // +1 because currentMove is 0-indexed, +1 more because this is a new move
+    const newCapturedStones = [
+      ...capturedStones,
+      ...capturedPositions.map(pos => ({
+        x: pos.x,
+        y: pos.y,
+        color: capturedColor as 'black' | 'white', // Ensure correct type
+        moveNumber
+      }))
+    ];
+    setCapturedStones(newCapturedStones);
+    
+    // Add the new stone to the game
+    // Create a new move with required properties
+    const newMove = {
+      x,
+      y,
+      color: nextMoveColor,
+      captures: capturedPositions,
+      moveNumber: currentMove + 2, // Add the required moveNumber property
+      coord: `${String.fromCharCode(97 + x)}${String.fromCharCode(97 + y)}`, // Add required coord property
+      comments: [] // Add required comments property
+    };
+    
+    // Add the new move to the game
+    const updatedMoves = [...game.moves.slice(0, currentMove + 1), newMove];
+    
+    // Create a new game object
+    const updatedGame: ParsedGame = {
+      ...game,
+      moves: updatedMoves
+    };
+    
+    setGame(updatedGame);
+    
+    // Update current move index
+    setCurrentMove(currentMove + 1);
+    
+    // Play sound
+    if (enableSound) {
+      playStoneSound();
+    }
+    
+    // Save current board to history
+    const newBoard = currentBoard.map(row => [...row]);
+    newBoard[y][x] = nextMoveColor;
+    
+    // Remove captured stones
+    capturedPositions.forEach(pos => {
+      newBoard[pos.y][pos.x] = null;
+    });
+    
+    setBoardHistory(prev => [...prev, newBoard]);
+    
+    // Switch to next color
+    setNextMoveColor(nextMoveColor === 'black' ? 'white' : 'black');
+  };
+
   return (
     <div className={`kifu-reader ${isMobile ? 'kifu-reader-mobile' : ''} ${isFullscreen ? 'kifu-fullscreen' : ''}`}>
       {error && (
@@ -640,6 +799,17 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               >
                 {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
               </button>
+              
+              {/* Test mode button in fullscreen view */}
+              {isFullscreen && (
+                <button
+                  className={`test-mode-button ${testMode ? 'active' : ''}`}
+                  onClick={handleToggleTestMode}
+                  aria-label={testMode ? "Disable test mode" : "Enable test mode"}
+                >
+                  {testMode ? "Exit Test Mode" : "Test Mode"}
+                </button>
+              )}
               
               {/* Engine settings button (only in fullscreen mode) */}
               {isFullscreen && (
@@ -756,7 +926,24 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             showHeatMap={showHeatMap}
             koPosition={koPosition}
             game={game || undefined}
+            onClick={testMode ? handleBoardClick : undefined}
+            testMode={testMode}
           />
+          
+          {/* Mobile test mode toggle above navigation controls */}
+          {isMobile && !isFullscreen && (
+            <div className="mobile-test-mode-toggle">
+              <KifuSettings
+                showMoveNumbers={false}
+                enableSound={false}
+                testMode={testMode}
+                onToggleTestMode={handleToggleTestMode}
+                onToggleMoveNumbers={() => {}}
+                onToggleSound={() => {}}
+                simplifiedView={true}
+              />
+            </div>
+          )}
           
           {/* Play controls positioned right after the board on mobile */}
           {isMobile && (
@@ -853,10 +1040,41 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
                 </div>
               )}
             </div>
-            {currentMoveInfo?.comment && (
+            
+            {/* Comment Section (Fixed) */}
+            {getCurrentMoveComment() && (
               <div className="game-info-comment">
                 <div className="game-info-comment-title">Comment:</div>
-                {currentMoveInfo.comment}
+                {getCurrentMoveComment()}
+              </div>
+            )}
+            
+            {/* Game Metadata Section (Fixed) */}
+            {game && (
+              <div className="game-metadata">
+                {game.info.date && <div>Date: {game.info.date}</div>}
+                {game.info.result && <div>Result: {game.info.result}</div>}
+                {game.info.komi && <div>Komi: {game.info.komi}</div>}
+                {game.info.handicap && game.info.handicap > 1 && <div>Handicap: {game.info.handicap}</div>}
+                {'rules' in game.info && 'rules' in game.info && game.info.rules ? 
+                  <div>Rules: {String(game.info.rules)}</div> : null}
+              </div>
+            )}
+            
+            {/* Test Mode Indicator */}
+            {testMode && (
+              <div className="test-mode-indicator">
+                <div className="test-mode-label">Test Mode</div>
+                <div className="next-move">
+                  Next move: <div className={`stone-indicator ${nextMoveColor}`}></div>
+                </div>
+              </div>
+            )}
+            
+            {/* Current Move Info */}
+            {getCurrentMoveInfo() && (
+              <div className="current-move-info">
+                Move {currentMove + 1}: {getCurrentMoveInfo()}
               </div>
             )}
           </div>
@@ -913,6 +1131,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             onBoardThemeChange={handleBoardThemeChange}
             autoplaySpeed={autoplaySpeed}
             onAutoplaySpeedChange={handleAutoplaySpeedChange}
+            testMode={testMode}
+            onToggleTestMode={handleToggleTestMode}
           />
         </div>
       </div>

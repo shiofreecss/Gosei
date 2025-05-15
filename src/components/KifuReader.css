@@ -14,6 +14,100 @@
   margin-bottom: 20px;
 }
 
+/* Test Mode Indicator */
+.test-mode-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #e8f5e9;
+  border: 1px solid #4CAF50;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 12px 0;
+  width: 100%;
+  max-width: 300px;
+  align-self: center;
+}
+
+.go-board-wrapper .test-mode-indicator {
+  position: absolute;
+  bottom: 60px;
+  right: 10px;
+  width: auto;
+  padding: 8px 12px;
+  margin: 0;
+  background-color: rgba(232, 245, 233, 0.9);
+  border-radius: 6px;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.test-mode-label {
+  font-weight: 600;
+  color: #2E7D32;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.test-mode-label::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: #4CAF50;
+  border-radius: 50%;
+}
+
+.next-move {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.stone-indicator {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative; /* For the shine effect */
+}
+
+.stone-indicator.black {
+  background: radial-gradient(circle at 35% 35%, #555, #222 60%, #000);
+  border: 1px solid #111;
+}
+
+.stone-indicator.black::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.stone-indicator.white {
+  background: radial-gradient(circle at 35% 35%, #fff, #f0f0f0 60%, #ddd);
+  border: 1px solid #ccc;
+}
+
+.stone-indicator.white::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
 .kifu-content {
   display: flex;
   flex-direction: column;
@@ -891,6 +985,61 @@
   
   .settings-label,
   .theme-option {
+    font-size: 12px;
+  }
+}
+
+.go-board-wrapper {
+  position: relative;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+}
+
+/* Test mode visual indicator */
+.go-board-wrapper.test-mode {
+  /* Remove the box-shadow and animation */
+}
+
+/* Mobile test mode controls placement */
+.mobile-test-mode-toggle {
+  margin-bottom: 12px;
+  display: flex;
+  background-color: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Fullscreen mobile test mode button */
+.fullscreen-controls .test-mode-button {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.fullscreen-controls .test-mode-button:hover {
+  background-color: #f0f0f0;
+}
+
+.fullscreen-controls .test-mode-button.active {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #2E7D32;
+}
+
+/* Responsive styles for the test mode button */
+@media (max-width: 480px) {
+  .fullscreen-controls .test-mode-button {
+    padding: 5px 8px;
     font-size: 12px;
   }
 } 

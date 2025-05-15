@@ -27,6 +27,7 @@ interface GoBoardProps {
   theme?: BoardTheme;
   showHeatMap?: boolean;
   koPosition?: { x: number, y: number } | null;
+  testMode?: boolean;
   game?: { 
     moves: Array<{ x: number; y: number; color?: 'black' | 'white' }>;
     handicapStones?: Array<{ x: number; y: number }>;
@@ -108,6 +109,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
   theme = 'default',
   showHeatMap = false,
   koPosition = null,
+  testMode = false,
   game
 }) => {
   // Make cellSize responsive based on screen width
@@ -776,7 +778,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
   }, [stones, size, cellSize]);
   
   return (
-    <div className="go-board-container">
+    <div className={`go-board-container go-board-wrapper ${testMode ? 'test-mode' : ''}`}>
       <svg
         className="go-board"
         width={boardSize + boardPadding * 4}
