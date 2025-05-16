@@ -388,6 +388,23 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     }
   };
 
+  const handleNext20Moves = () => {
+    setAutoplayActive(false);
+    setKoPosition(null);
+    setKoExplanation(null);
+    if (game) {
+      const newMoveIndex = Math.min(game.moves.length - 1, currentMove + 20);
+      setCurrentMove(newMoveIndex);
+    }
+  };
+
+  const handlePrev20Moves = () => {
+    setAutoplayActive(false);
+    setKoPosition(null);
+    setKoExplanation(null);
+    setCurrentMove(prev => Math.max(-1, prev - 20));
+  };
+
   const toggleAutoplay = () => {
     setAutoplayActive(prev => !prev);
   };
@@ -985,7 +1002,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
           {isMobile && (
             <div className="navigation-container mobile-navigation">
               <div className="move-slider">
-                <button className="move-button" onClick={handleFirstMove} title="First move">
+                <button className="move-button" onClick={handlePrev20Moves} title="Previous 20 moves">
                   ⏮️
                 </button>
                 <button className="move-button" onClick={handlePrevMove} title="Previous move">
@@ -997,7 +1014,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
                 <button className="move-button" onClick={handleNextMove} title="Next move">
                   ⏩
                 </button>
-                <button className="move-button" onClick={handleLastMove} title="Last move">
+                <button className="move-button" onClick={handleNext20Moves} title="Next 20 moves">
                   ⏭️
                 </button>
               </div>
@@ -1119,7 +1136,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
           {!isMobile && (
             <div className="navigation-container">
               <div className="move-slider">
-                <button className="move-button" onClick={handleFirstMove} title="First move">
+                <button className="move-button" onClick={handlePrev20Moves} title="Previous 20 moves">
                   ⏮️
                 </button>
                 <button className="move-button" onClick={handlePrevMove} title="Previous move">
@@ -1131,7 +1148,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
                 <button className="move-button" onClick={handleNextMove} title="Next move">
                   ⏩
                 </button>
-                <button className="move-button" onClick={handleLastMove} title="Last move">
+                <button className="move-button" onClick={handleNext20Moves} title="Next 20 moves">
                   ⏭️
                 </button>
               </div>
