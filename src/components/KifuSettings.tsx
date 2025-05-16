@@ -11,6 +11,7 @@ interface KifuSettingsProps {
   boardTheme?: BoardTheme;
   analysisType?: 'liberty' | 'influence';
   testMode?: boolean;
+  showTestMoveNumbers?: boolean;
   onToggleMoveNumbers: () => void;
   onToggleSound: () => void;
   onToggleCapturedStones?: () => void;
@@ -21,6 +22,7 @@ interface KifuSettingsProps {
   onBoardThemeChange?: (theme: BoardTheme) => void;
   onAnalysisTypeChange?: (type: 'liberty' | 'influence') => void;
   onToggleTestMode?: () => void;
+  onToggleTestMoveNumbers?: () => void;
   autoplaySpeed?: number;
   onAutoplaySpeedChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   simplifiedView?: boolean;
@@ -36,6 +38,7 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
   boardTheme = 'default',
   analysisType = 'liberty',
   testMode = false,
+  showTestMoveNumbers = true,
   onToggleMoveNumbers, 
   onToggleSound,
   onToggleCapturedStones,
@@ -46,6 +49,7 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
   onBoardThemeChange,
   onAnalysisTypeChange,
   onToggleTestMode,
+  onToggleTestMoveNumbers,
   autoplaySpeed = 1000,
   onAutoplaySpeedChange,
   simplifiedView = false
@@ -176,6 +180,63 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
                 style={{
                   position: 'absolute',
                   left: testMode ? '26px' : '2px',
+                  width: '24px',
+                  height: '24px',
+                  backgroundColor: 'white',
+                  borderRadius: '50%',
+                  transition: 'left 0.3s',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                }}
+              />
+            </button>
+          </div>
+        )}
+
+        {/* Test Move Numbers Toggle (only show when test mode is enabled) */}
+        {testMode && onToggleTestMoveNumbers && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            padding: '12px 10px',
+            backgroundColor: '#f9f9f9',
+            borderRadius: '8px',
+            marginLeft: '20px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="4" width="16" height="16" rx="2" stroke="#444" strokeWidth="2"/>
+                <text x="12" y="16" textAnchor="middle" fill="#444" fontSize="12" fontWeight="bold">123</text>
+              </svg>
+              <div>
+                <span style={{ fontWeight: '500', color: '#333', fontSize: '16px' }}>Show Test Numbers</span>
+                <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#666' }}>Display move numbers in test mode</p>
+              </div>
+            </div>
+            
+            <button 
+              onClick={onToggleTestMoveNumbers}
+              style={{
+                position: 'relative',
+                width: '52px',
+                height: '28px',
+                backgroundColor: showTestMoveNumbers ? '#4CAF50' : '#ccc',
+                borderRadius: '14px',
+                border: 'none',
+                outline: 'none',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '2px'
+              }}
+              aria-pressed={showTestMoveNumbers}
+              aria-label={showTestMoveNumbers ? "Hide test move numbers" : "Show test move numbers"}
+            >
+              <span 
+                style={{
+                  position: 'absolute',
+                  left: showTestMoveNumbers ? '26px' : '2px',
                   width: '24px',
                   height: '24px',
                   backgroundColor: 'white',

@@ -6,6 +6,7 @@ import GameLibrary from './components/GameLibrary';
 import GameViewer from './components/GameViewer';
 import MusicPlayer from './components/MusicPlayer';
 import BookLibrary from './components/BookLibrary';
+import OptimizedImage from './components/OptimizedImage';
 
 function App() {
   const [showLibrary, setShowLibrary] = useState(false);
@@ -433,43 +434,13 @@ PW[White Player]PB[Black Player]
                         </ul>
                         
                         {/* Go Painting Image - moved to bottom */}
-                        <div className="go-image-container" style={{ 
-                          marginTop: '30px',
-                          borderRadius: '10px',
-                          overflow: 'hidden',
-                          boxShadow: windowWidth <= 768 ? '0 5px 15px rgba(0, 0, 0, 0.1)' : '0 10px 30px rgba(0, 0, 0, 0.1)',
-                          border: '1px solid rgba(255, 255, 255, 0.8)',
-                          transition: 'all 0.3s ease'
-                        }}>
-                          <img 
-                            src="/game-of-go-2.jpg" 
-                            alt="Traditional Go painting" 
-                            className="go-game-image"
-                            loading="lazy"
-                            width={windowWidth <= 768 ? "100%" : "600"}
-                            height={windowWidth <= 768 ? "auto" : "400"}
-                            style={{
-                              width: '100%',
-                              height: 'auto',
-                              display: 'block',
-                              maxWidth: windowWidth <= 768 ? '100%' : '600px'
-                            }}
-                            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                              e.currentTarget.src = "https://via.placeholder.com/600x400?text=Go+Painting";
-                            }}
-                          />
-                          <div style={{
-                            padding: '10px 15px',
-                            background: 'rgba(255, 255, 255, 0.9)',
-                            backdropFilter: 'blur(5px)',
-                            borderTop: '1px solid rgba(200, 210, 230, 0.5)',
-                            fontSize: '14px',
-                            color: '#444',
-                            textAlign: 'center'
-                          }}>
-                            Traditional Go painting showing players engaged in the ancient game
-                          </div>
-                        </div>
+                        <OptimizedImage 
+                          src="/game-of-go-2.jpg"
+                          alt="Traditional Go painting"
+                          caption="Traditional Go painting showing players engaged in the ancient game"
+                          isMobile={windowWidth <= 768}
+                          fallbackSrc="https://via.placeholder.com/600x400?text=Go+Painting"
+                        />
                       </div>
                       
                       <div style={{
@@ -505,43 +476,13 @@ PW[White Player]PB[Black Player]
                         </p>
 
                         {/* Go Game Image - moved to bottom */}
-                        <div className="go-image-container" style={{ 
-                          marginTop: '30px',
-                          borderRadius: '10px',
-                          overflow: 'hidden',
-                          boxShadow: windowWidth <= 768 ? '0 5px 15px rgba(0, 0, 0, 0.1)' : '0 10px 30px rgba(0, 0, 0, 0.1)',
-                          border: '1px solid rgba(255, 255, 255, 0.8)',
-                          transition: 'all 0.3s ease'
-                        }}>
-                          <img 
-                            src="/game-of-go.jpg" 
-                            alt="Game of Go board with stones" 
-                            className="go-game-image"
-                            loading="lazy"
-                            width={windowWidth <= 768 ? "100%" : "600"}
-                            height={windowWidth <= 768 ? "auto" : "400"}
-                            style={{
-                              width: '100%',
-                              height: 'auto',
-                              display: 'block',
-                              maxWidth: windowWidth <= 768 ? '100%' : '600px'
-                            }}
-                            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                              e.currentTarget.src = "https://via.placeholder.com/600x400?text=Game+of+Go";
-                            }}
-                          />
-                          <div style={{
-                            padding: '10px 15px',
-                            background: 'rgba(255, 255, 255, 0.9)',
-                            backdropFilter: 'blur(5px)',
-                            borderTop: '1px solid rgba(200, 210, 230, 0.5)',
-                            fontSize: '14px',
-                            color: '#444',
-                            textAlign: 'center'
-                          }}>
-                            Game of Go - one of the oldest board games still played today
-                          </div>
-                        </div>
+                        <OptimizedImage 
+                          src="/game-of-go.jpg"
+                          alt="Game of Go board with stones"
+                          caption="Game of Go - one of the oldest board games still played today"
+                          isMobile={windowWidth <= 768}
+                          fallbackSrc="https://via.placeholder.com/600x400?text=Game+of+Go"
+                        />
                       </div>
                     </div>
                   </div>

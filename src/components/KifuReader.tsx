@@ -50,6 +50,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   // Add test mode state
   const [testMode, setTestMode] = useState<boolean>(false);
   const [nextMoveColor, setNextMoveColor] = useState<'black' | 'white'>('black');
+  const [testMoveNumber, setTestMoveNumber] = useState<number>(1);
+  const [showTestMoveNumbers, setShowTestMoveNumbers] = useState<boolean>(true);
   
   // Add fullscreen state
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
@@ -660,7 +662,21 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
       setOriginalCurrentMove(currentMove);
       
       // Initialize test mode with current board position
-      setNextMoveColor('black'); // Always start with black when entering test mode
+      // Set next move color based on the last played move's color
+      if (game && game.moves.length > 0 && currentMove >= 0) {
+        const lastMove = game.moves[currentMove];
+        if (lastMove) {
+          // The next color should be the opposite of the last move
+          setNextMoveColor(lastMove.color === 'black' ? 'white' : 'black');
+        } else {
+          setNextMoveColor('black'); // Default to black if no move found
+        }
+      } else {
+        setNextMoveColor('black'); // Default to black if no moves yet
+      }
+      
+      // Reset test move number
+      setTestMoveNumber(1);
     } else {
       // Exiting test mode - restore the original game
       if (originalGame) {
@@ -694,6 +710,16 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     if (currentBoard[y][x] !== null) {
       console.log("Position already occupied");
       return;
+    }
+    
+    // If there are moves in the game, determine the actual next color based on the last move
+    if (game.moves.length > 0 && currentMove >= 0) {
+      const lastMove = game.moves[currentMove];
+      if (lastMove && lastMove.color === nextMoveColor) {
+        // Color should alternate, set to the opposite of last move
+        setNextMoveColor(nextMoveColor === 'black' ? 'white' : 'black');
+        return; // Don't place the stone, just update the next color
+      }
     }
     
     // Create new stone
@@ -742,7 +768,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
       captures: capturedPositions,
       moveNumber: currentMove + 2, // Add the required moveNumber property
       coord: `${String.fromCharCode(97 + x)}${String.fromCharCode(97 + y)}`, // Add required coord property
-      comments: [] // Add required comments property
+      comments: [], // Add required comments property
+      testMoveNumber // Add the test move number for display
     };
     
     // Add the new move to the game
@@ -777,6 +804,14 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     
     // Switch to next color
     setNextMoveColor(nextMoveColor === 'black' ? 'white' : 'black');
+    
+    // Increment test move number
+    setTestMoveNumber(prev => prev + 1);
+  };
+
+  // Handle toggle test move numbers
+  const handleToggleTestMoveNumbers = () => {
+    setShowTestMoveNumbers(prev => !prev);
   };
 
   return (
@@ -928,6 +963,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             game={game || undefined}
             onClick={testMode ? handleBoardClick : undefined}
             testMode={testMode}
+            showTestMoveNumbers={showTestMoveNumbers}
           />
           
           {/* Mobile test mode toggle above navigation controls */}
@@ -1133,6 +1169,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             onAutoplaySpeedChange={handleAutoplaySpeedChange}
             testMode={testMode}
             onToggleTestMode={handleToggleTestMode}
+            showTestMoveNumbers={showTestMoveNumbers}
+            onToggleTestMoveNumbers={handleToggleTestMoveNumbers}
           />
         </div>
       </div>

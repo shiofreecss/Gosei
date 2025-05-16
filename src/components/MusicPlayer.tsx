@@ -11,6 +11,8 @@ const MusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
   const [volume, setVolume] = useState(0.5);
+  const [isLooping, setIsLooping] = useState(false);
+  const [isRandom, setIsRandom] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // Music playlist - the files should be in public/music folder
@@ -28,6 +30,14 @@ const MusicPlayer: React.FC = () => {
     // Add event listeners
     if (audioRef.current) {
       audioRef.current.addEventListener('ended', handleTrackEnd);
+    }
+    
+    // If currently playing, play the new track
+    if (isPlaying) {
+      audioRef.current.play().catch(e => {
+        console.error("Error playing audio:", e);
+        setIsPlaying(false);
+      });
     }
     
     return () => {
@@ -59,11 +69,38 @@ const MusicPlayer: React.FC = () => {
     }
   }, [isPlaying]);
   
-  // Handle track end - play next track
+  // Get random track index
+  const getRandomTrack = () => {
+    if (playlist.length <= 1) return 0;
+    let newTrack;
+    do {
+      newTrack = Math.floor(Math.random() * playlist.length);
+    } while (newTrack === currentTrack);
+    return newTrack;
+  };
+  
+  // Handle track end - play next track based on settings
   const handleTrackEnd = () => {
-    const nextTrack = (currentTrack + 1) % playlist.length;
-    setCurrentTrack(nextTrack);
-    setIsPlaying(true);
+    if (isLooping) {
+      // Just replay the current track
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(e => {
+          console.error("Error playing audio:", e);
+          setIsPlaying(false);
+        });
+      }
+    } else if (isRandom) {
+      // Play a random track from the playlist
+      const randomTrack = getRandomTrack();
+      setCurrentTrack(randomTrack);
+      setIsPlaying(true);
+    } else {
+      // Play next track sequentially
+      const nextTrack = (currentTrack + 1) % playlist.length;
+      setCurrentTrack(nextTrack);
+      setIsPlaying(true);
+    }
   };
   
   // Play specific track
@@ -83,16 +120,36 @@ const MusicPlayer: React.FC = () => {
   
   // Play next track
   const nextTrack = () => {
-    const next = (currentTrack + 1) % playlist.length;
-    setCurrentTrack(next);
+    if (isRandom) {
+      const randomTrack = getRandomTrack();
+      setCurrentTrack(randomTrack);
+    } else {
+      const next = (currentTrack + 1) % playlist.length;
+      setCurrentTrack(next);
+    }
     setIsPlaying(true);
   };
   
   // Play previous track
   const prevTrack = () => {
-    const prev = (currentTrack - 1 + playlist.length) % playlist.length;
-    setCurrentTrack(prev);
+    if (isRandom) {
+      const randomTrack = getRandomTrack();
+      setCurrentTrack(randomTrack);
+    } else {
+      const prev = (currentTrack - 1 + playlist.length) % playlist.length;
+      setCurrentTrack(prev);
+    }
     setIsPlaying(true);
+  };
+  
+  // Toggle loop mode
+  const toggleLoop = () => {
+    setIsLooping(!isLooping);
+  };
+  
+  // Toggle random mode
+  const toggleRandom = () => {
+    setIsRandom(!isRandom);
   };
   
   // Handle volume change
@@ -292,6 +349,56 @@ const MusicPlayer: React.FC = () => {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M5 4L15 12L5 20V4Z" fill="#555" />
                 <path d="M19 4V20" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
+          
+          {/* Playback Controls: Loop and Random */}
+          <div style={{ 
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '20px',
+            marginBottom: '15px'
+          }}>
+            {/* Loop Button */}
+            <button
+              onClick={toggleLoop}
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '5px',
+                opacity: isLooping ? 1 : 0.5
+              }}
+              title="Loop current track"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17 2L21 6L17 10" stroke={isLooping ? "#3a3a3a" : "#777"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M3 11V9C3 7.89543 3.89543 7 5 7H21" stroke={isLooping ? "#3a3a3a" : "#777"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M7 22L3 18L7 14" stroke={isLooping ? "#3a3a3a" : "#777"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M21 13V15C21 16.1046 20.1046 17 19 17H3" stroke={isLooping ? "#3a3a3a" : "#777"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            
+            {/* Random Button */}
+            <button
+              onClick={toggleRandom}
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '5px',
+                opacity: isRandom ? 1 : 0.5
+              }}
+              title="Random play"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 3H21V8" stroke={isRandom ? "#3a3a3a" : "#777"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 20L21 3" stroke={isRandom ? "#3a3a3a" : "#777"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M21 16V21H16" stroke={isRandom ? "#3a3a3a" : "#777"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M15 15L21 21" stroke={isRandom ? "#3a3a3a" : "#777"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 4L9 9" stroke={isRandom ? "#3a3a3a" : "#777"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </div>

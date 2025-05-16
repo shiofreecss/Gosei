@@ -28,8 +28,14 @@ interface GoBoardProps {
   showHeatMap?: boolean;
   koPosition?: { x: number, y: number } | null;
   testMode?: boolean;
+  showTestMoveNumbers?: boolean;
   game?: { 
-    moves: Array<{ x: number; y: number; color?: 'black' | 'white' }>;
+    moves: Array<{ 
+      x: number; 
+      y: number; 
+      color?: 'black' | 'white';
+      testMoveNumber?: number; 
+    }>;
     handicapStones?: Array<{ x: number; y: number }>;
   };
 }
@@ -110,6 +116,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
   showHeatMap = false,
   koPosition = null,
   testMode = false,
+  showTestMoveNumbers = true,
   game
 }) => {
   // Make cellSize responsive based on screen width
@@ -250,12 +257,22 @@ const GoBoard: React.FC<GoBoardProps> = ({
       
       // Find move number for this stone
       let moveNumber = -1;
+      let testMoveNumber = -1;
       if (game && game.moves) {
-        moveNumber = game.moves.findIndex(move => 
+        // Find the move index in game history
+        const moveIndex = game.moves.findIndex(move => 
           move.x === stone.x && 
           move.y === stone.y &&
           (!move.color || move.color === stone.color)
         );
+        
+        if (moveIndex !== -1) {
+          moveNumber = moveIndex;
+          // Check if this move has a test move number
+          if (game.moves[moveIndex].testMoveNumber !== undefined) {
+            testMoveNumber = game.moves[moveIndex].testMoveNumber!;
+          }
+        }
         
         // Check if this is a handicap stone (black stones placed at the beginning)
         const isHandicapStone = 
@@ -332,7 +349,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
           )}
           
           {/* Latest move marker (only show if not showing move numbers) */}
-          {isLatestMove && !showMoveNumbers && (
+          {isLatestMove && !showMoveNumbers && !testMode && (
             <circle
               cx={stone.x * cellSize}
               cy={stone.y * cellSize}
@@ -361,10 +378,29 @@ const GoBoard: React.FC<GoBoardProps> = ({
               {moveNumber + 1}
             </text>
           )}
+          
+          {/* Test Mode Numbers */}
+          {testMode && showTestMoveNumbers && testMoveNumber > 0 && (
+            <text
+              x={stone.x * cellSize}
+              y={stone.y * cellSize}
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill={stone.color === 'black' ? 'white' : 'black'}
+              fontSize={cellSize <= 15 ? cellSize * 0.4 : cellSize * 0.35}
+              fontWeight="bold"
+              style={{
+                userSelect: 'none',
+                pointerEvents: 'none'
+              }}
+            >
+              {testMoveNumber}
+            </text>
+          )}
         </g>
       );
     });
-  }, [stones, showMoveNumbers, cellSize, themeConfig, latestStone, currentMove, game]);
+  }, [stones, showMoveNumbers, cellSize, themeConfig, latestStone, currentMove, game, showTestMoveNumbers]);
   
   // Render any captured stones with a special style
   const renderCapturedStones = useCallback(() => {
@@ -591,7 +627,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
     }
     
     return overlays;
-  }, [size, cellSize, stones, isStoneVisible, onClick, handleCellClick]);
+  }, [size, cellSize, stones, isStoneVisible, onClick, handleCellClick, testMode]);
   
   // Render heat map overlay
   const renderHeatMap = useCallback(() => {
