@@ -9,6 +9,7 @@ interface GameViewerProps {
 
 const GameViewer: React.FC<GameViewerProps> = ({ sgfContent, onClose }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   
   useEffect(() => {
     const checkMobile = () => {
@@ -22,17 +23,30 @@ const GameViewer: React.FC<GameViewerProps> = ({ sgfContent, onClose }) => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  const toggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen);
+  };
   
   return (
-    <div className="game-viewer">
+    <div className={`game-viewer ${isFullScreen ? 'fullscreen' : ''}`}>
       <div className="game-viewer-modal">
-        <button 
-          className="game-viewer-close"
-          onClick={onClose}
-          aria-label="Close game viewer"
-        >
-          &times;
-        </button>
+        <div className="game-viewer-actions">
+          <button 
+            className="game-viewer-fullscreen"
+            onClick={toggleFullScreen}
+            aria-label={isFullScreen ? "Exit fullscreen" : "Enter fullscreen"}
+          >
+            {isFullScreen ? '⤾' : '⤢'}
+          </button>
+          <button 
+            className="game-viewer-close"
+            onClick={onClose}
+            aria-label="Close game viewer"
+          >
+            &times;
+          </button>
+        </div>
         
         <h2 className="game-viewer-header">
           {isMobile ? "Game" : "Game Viewer"}

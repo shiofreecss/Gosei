@@ -53,8 +53,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   const [testMoveNumber, setTestMoveNumber] = useState<number>(1);
   const [showTestMoveNumbers, setShowTestMoveNumbers] = useState<boolean>(true);
   
-  // Add fullscreen state
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  // Add zen mode state
+  const [isZenMode, setIsZenMode] = useState<boolean>(false);
   
   // Add engine settings panel state
   const [showEngineSettings, setShowEngineSettings] = useState<boolean>(false);
@@ -106,9 +106,9 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
 
   // Toggle fullscreen mode
   const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
+    setIsZenMode(!isZenMode);
     // Close engine settings panel when exiting fullscreen
-    if (isFullscreen) {
+    if (isZenMode) {
       setShowEngineSettings(false);
     }
   };
@@ -832,7 +832,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   };
 
   return (
-    <div className={`kifu-reader ${isMobile ? 'kifu-reader-mobile' : ''} ${isFullscreen ? 'kifu-fullscreen' : ''}`}>
+    <div className={`kifu-reader ${isMobile ? 'kifu-reader-mobile' : ''} ${isZenMode ? 'kifu-fullscreen' : ''}`}>
       {error && (
         <div className="error">
           <span>⚠️</span>
@@ -847,13 +847,13 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               <button
                 className="fullscreen-toggle"
                 onClick={toggleFullscreen}
-                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                aria-label={isZenMode ? "Exit Zen Mode" : "Enter Zen Mode"}
               >
-                {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                {isZenMode ? "Exit Zen Mode" : "Zen Mode"}
               </button>
               
               {/* Test mode button in fullscreen view */}
-              {isFullscreen && (
+              {isZenMode && (
                 <button
                   className={`test-mode-button ${testMode ? 'active' : ''}`}
                   onClick={handleToggleTestMode}
@@ -864,7 +864,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               )}
               
               {/* Engine settings button (only in fullscreen mode) */}
-              {isFullscreen && (
+              {isZenMode && (
                 <button
                   className="engine-settings-button"
                   onClick={toggleEngineSettings}
@@ -877,7 +877,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
           )}
           
           {/* Engine settings panel */}
-          {isFullscreen && showEngineSettings && (
+          {isZenMode && showEngineSettings && (
             <div className="engine-settings-panel">
               <div className="engine-settings-header">
                 <h3>Game Settings</h3>
@@ -984,7 +984,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
           />
           
           {/* Mobile test mode toggle above navigation controls */}
-          {isMobile && !isFullscreen && (
+          {isMobile && !isZenMode && (
             <div className="mobile-test-mode-toggle">
               <KifuSettings
                 showMoveNumbers={false}
@@ -1051,7 +1051,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             />
           )}
         </div>
-        <div className={`controls-container ${isFullscreen ? 'hidden-on-fullscreen' : ''}`}>
+        <div className={`controls-container ${isZenMode ? 'hidden-on-fullscreen' : ''}`}>
           <div className="game-info">
             <div className="game-info-header">
               <div className="game-info-player">
