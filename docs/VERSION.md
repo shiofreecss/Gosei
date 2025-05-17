@@ -1,5 +1,21 @@
 # GoSei AI-Kifu Version History
 
+## v1.0.6 - 2025-05-28
+
+### Game Viewing Improvements
+- Added dedicated Game Viewer modal for viewing SGF files without navigating away from the current page
+- Modified SGF file loading behavior to open files in the Game Viewer overlay instead of replacing main page content
+- Enhanced Game Viewer with responsive loading animation and improved fullscreen controls
+- Added keyboard shortcuts for easier navigation (ESC to close or exit fullscreen)
+- Improved transitions and visual feedback in the Game Viewer for a smoother experience
+
+### Interactive Mode Enhancements 
+- Added clear visual indicators for all interactive modes
+- Improved visibility of the Zen Mode button for distraction-free game viewing
+- Enhanced Test Mode with clearer move numbering and color indicators
+- Optimized Fullscreen Mode with improved controls and transition animations
+- Added helpful tooltips and instructions for all interactive modes
+
 ## v1.0.5 - 2025-05-22
 
 ### AI Analysis Features

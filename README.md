@@ -43,6 +43,11 @@ The project is powered by the [Beaver Foundation](https://beaver.foundation), su
   - Optimized UI for small screens with appropriate game results pagination
   - Mobile-friendly navigation and hidden UI elements to save space
 - ⚡ Optimized performance with caching and React memoization
+- 🖥️ Interactive viewing modes:
+  - **Game Viewer Mode** - Dedicated modal viewer for browsing SGF files without leaving the main page
+  - **Zen Mode** - Distraction-free viewing with minimized UI elements
+  - **Test Mode** - Practice mode for trying variations on existing game positions
+  - **Fullscreen Mode** - Expanded view for optimal game analysis
 
 ## Screenshots
 
@@ -176,7 +181,7 @@ The build artifacts will be stored in the `build/` directory.
 ### Uploading SGF Files
 
 1. Click on the drop area or use the file browser to select an SGF file
-2. The game will be loaded and displayed on the board
+2. The game will be loaded and displayed in the Game Viewer
 
 ### Browsing the Game Library
 
@@ -184,7 +189,31 @@ The build artifacts will be stored in the `build/` directory.
 2. Browse games by category, subcategory, or tournament
 3. Use pagination controls to navigate through multiple games
 4. Search for specific games using the search bar
-5. Click on a game to load and display it in the viewer
+5. Click on a game to load and display it in the Game Viewer
+
+### Using Interactive Viewing Modes
+
+#### Game Viewer Mode
+- Games open in a modal overlay, allowing you to view games without leaving the current page
+- Close the viewer with the ESC key or the close button to return to where you were
+- Game Viewer automatically opens when selecting games from the library or uploading SGF files
+
+#### Zen Mode
+- Click the "Zen Mode" button in the controls to enter a distraction-free viewing experience
+- UI elements are minimized to focus on the board and game
+- Click "Exit Zen Mode" or press ESC to return to normal view
+
+#### Test Mode
+- Click the "Test Mode" button to practice variations on the current game position
+- Place stones on the board to test strategic ideas and variations
+- The next move color alternates automatically
+- Test moves show separate numbering to distinguish them from the original game
+- Exit Test Mode to return to the original game state
+
+#### Fullscreen Mode
+- Click the fullscreen icon in the Game Viewer to expand to full browser window
+- Provides maximum screen space for game analysis
+- Press ESC or click the exit fullscreen button to return to normal size
 
 ### Using AI Analysis Features
 

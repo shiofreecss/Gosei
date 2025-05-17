@@ -35,12 +35,15 @@ function App() {
   }, []);
 
   const handleFileLoaded = useCallback((content: string) => {
-    setSgfContent(content);
-    setIsFromUpload(true);
-    if (showLibrary) {
-      setShowLibrary(false);
-    }
-  }, [showLibrary]);
+    // When a file is loaded, open it in the GameViewer and store the content
+    setGameViewerContent(content);
+    setSgfContent(content); // Store the content for potential future use
+    setShowGameViewer(true); // Show the game viewer immediately
+    setIsFromUpload(true);   // Mark that this content came from an upload
+    
+    // If user is viewing the library, keep it open behind the GameViewer
+    // This allows them to go back to the library after closing the viewer
+  }, []);
 
   const handleGameSelected = useCallback((content: string) => {
     setGameViewerContent(content);
@@ -279,216 +282,210 @@ PW[White Player]PB[Black Player]
           />
         )}
         
-        {!showLibrary && !showGameViewer && !showBookLibrary && (
+        {!showLibrary && !showBookLibrary && (
           <>
-            {sgfContent && isFromUpload ? (
-              <KifuReader sgfContent={sgfContent} />
-            ) : (
-              <>
-                <div className="uploader-section" style={{ marginBottom: '40px' }}>
-                  <p style={{ 
-                    fontSize: '17px', 
-                    marginBottom: '30px',
-                    color: '#333',
-                    lineHeight: '1.6',
-                    textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
-                  }}>
-                    Welcome to Gosei Kifu! An open-source application dedicated to the Go community. Upload a Go game record (SGF file), paste SGF content below, or browse the extensive game library to analyze and review games with our intuitive tools.
-                  </p>
-                  
+            <div className="uploader-section" style={{ marginBottom: '40px' }}>
+              <p style={{ 
+                fontSize: '17px', 
+                marginBottom: '30px',
+                color: '#333',
+                lineHeight: '1.6',
+                textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
+              }}>
+                Welcome to Gosei Kifu! An open-source application dedicated to the Go community. Upload a Go game record (SGF file), paste SGF content below, or browse the extensive game library to analyze and review games with our intuitive tools.
+              </p>
+              
+              <div style={{
+                padding: '20px',
+                background: 'rgba(255, 255, 255, 0.8)',
+                borderRadius: '12px',
+                marginBottom: '30px',
+                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.6)'
+              }}>
+                <h3 style={{ 
+                  color: '#2a3f6a',
+                  fontSize: '20px',
+                  marginTop: 0,
+                  marginBottom: '15px',
+                  fontWeight: 600
+                }}>
+                  Instructions
+                </h3>
+                <ul style={{ 
+                  lineHeight: '1.6', 
+                  listStyleType: 'none',
+                  padding: 0, 
+                  margin: '0',
+                  color: '#333' 
+                }}>
+                  <li style={{ marginBottom: '10px' }}>Upload your SGF file using the form below</li>
+                  <li style={{ marginBottom: '10px' }}>
+                    Use the <button 
+                      onClick={() => {
+                        if (showLibrary) setShowLibrary(false);
+                        setShowBookLibrary(true);
+                      }}
+                      style={{
+                        backgroundColor: 'rgba(70, 90, 150, 0.6)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        padding: '2px 8px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        display: 'inline-block'
+                      }}
+                    >Book Library</button> to access study materials
+                  </li>
+                  <li style={{ marginBottom: '10px' }}>
+                    Browse the <button 
+                      onClick={() => {
+                        if (showBookLibrary) setShowBookLibrary(false);
+                        setShowLibrary(true);
+                      }}
+                      style={{
+                        backgroundColor: 'rgba(70, 90, 150, 0.6)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        padding: '2px 8px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        display: 'inline-block'
+                      }}
+                    >Game Library</button> for professional games to study
+                  </li>
+                  <li style={{ marginBottom: '10px' }}>Navigate moves using arrow keys or the control panel</li>
+                  <li>View variations and comments when available</li>
+                </ul>
+              </div>
+              
+              <h2 style={{ 
+                fontSize: '24px', 
+                color: '#2a3f6a', 
+                marginBottom: '20px', 
+                marginTop: '40px',
+                fontWeight: '600',
+                textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
+              }}>
+                Upload SGF File
+              </h2>
+              <SGFUploader onFileLoaded={handleFileLoaded} />
+              
+              {/* Go Game Instructions and History Section */}
+              <div style={{
+                marginTop: '60px',
+                borderTop: '1px solid rgba(200, 210, 230, 0.5)',
+                paddingTop: '30px'
+              }}>
+                <h2 style={{
+                  fontSize: '24px',
+                  color: '#2a3f6a',
+                  marginBottom: '20px',
+                  fontWeight: '600',
+                  textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
+                }}>
+                  About the Game of Go
+                </h2>
+                
+                <div style={{
+                  display: 'flex',
+                  flexDirection: windowWidth <= 768 ? 'column' : 'row',
+                  gap: '30px',
+                  marginBottom: '40px'
+                }}>
                   <div style={{
-                    padding: '20px',
-                    background: 'rgba(255, 255, 255, 0.8)',
+                    flex: '1',
+                    background: 'rgba(255, 255, 255, 0.7)',
+                    backdropFilter: 'blur(10px)',
+                    padding: '25px',
                     borderRadius: '12px',
-                    marginBottom: '30px',
-                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.06)',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
                     border: '1px solid rgba(255, 255, 255, 0.6)'
                   }}>
-                    <h3 style={{ 
-                      color: '#2a3f6a',
-                      fontSize: '20px',
-                      marginTop: 0,
-                      marginBottom: '15px',
-                      fontWeight: 600
-                    }}>
-                      Instructions
+                    <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600', textAlign: 'center' }}>
+                      The Rules of Go
                     </h3>
-                    <ul style={{ 
-                      lineHeight: '1.6', 
-                      listStyleType: 'none',
-                      padding: 0, 
-                      margin: '0',
-                      color: '#333' 
-                    }}>
-                      <li style={{ marginBottom: '10px' }}>Upload your SGF file using the form below</li>
-                      <li style={{ marginBottom: '10px' }}>
-                        Use the <button 
-                          onClick={() => {
-                            if (showLibrary) setShowLibrary(false);
-                            setShowBookLibrary(true);
-                          }}
-                          style={{
-                            backgroundColor: 'rgba(70, 90, 150, 0.6)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            padding: '2px 8px',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            display: 'inline-block'
-                          }}
-                        >Book Library</button> to access study materials
-                      </li>
-                      <li style={{ marginBottom: '10px' }}>
-                        Browse the <button 
-                          onClick={() => {
-                            if (showBookLibrary) setShowBookLibrary(false);
-                            setShowLibrary(true);
-                          }}
-                          style={{
-                            backgroundColor: 'rgba(70, 90, 150, 0.6)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            padding: '2px 8px',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            display: 'inline-block'
-                          }}
-                        >Game Library</button> for professional games to study
-                      </li>
-                      <li style={{ marginBottom: '10px' }}>Navigate moves using arrow keys or the control panel</li>
-                      <li>View variations and comments when available</li>
+                    
+                    <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333', textAlign: 'center' }}>
+                      Go is played on a grid of black lines (usually 19×19). Game pieces, called stones, are played on the intersections of the lines.
+                    </p>
+                    
+                    <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Basic Rules:</h4>
+                    <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
+                      <li>Players take turns placing stones on the board</li>
+                      <li>Black plays first, then White</li>
+                      <li>Stones cannot be moved once placed</li>
+                      <li>Stones are captured when completely surrounded by opponent's stones</li>
+                      <li>The goal is to control more territory than your opponent</li>
+                      <li>The game ends when both players pass their turn</li>
                     </ul>
+                    
+                    <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Key Concepts:</h4>
+                    <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
+                      <li><strong>Liberty:</strong> An empty adjacent point next to a stone</li>
+                      <li><strong>Capture:</strong> Removing opponent's stones that have no liberties</li>
+                      <li><strong>Territory:</strong> Empty intersections surrounded by your stones</li>
+                      <li><strong>Ko rule:</strong> Prevents infinite capturing cycles</li>
+                    </ul>
+                    
+                    {/* Go Painting Image - moved to bottom */}
+                    <OptimizedImage 
+                      src="/game-of-go-2.jpg"
+                      alt="Traditional Go painting"
+                      caption="Traditional Go painting showing players engaged in the ancient game"
+                      isMobile={windowWidth <= 768}
+                      fallbackSrc="https://via.placeholder.com/600x400?text=Go+Painting"
+                    />
                   </div>
                   
-                  <h2 style={{ 
-                    fontSize: '24px', 
-                    color: '#2a3f6a', 
-                    marginBottom: '20px', 
-                    marginTop: '40px',
-                    fontWeight: '600',
-                    textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
-                  }}>
-                    Upload SGF File
-                  </h2>
-                  <SGFUploader onFileLoaded={handleFileLoaded} />
-                  
-                  {/* Go Game Instructions and History Section */}
                   <div style={{
-                    marginTop: '60px',
-                    borderTop: '1px solid rgba(200, 210, 230, 0.5)',
-                    paddingTop: '30px'
+                    flex: '1',
+                    background: 'rgba(255, 255, 255, 0.7)',
+                    backdropFilter: 'blur(10px)',
+                    padding: '25px',
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)'
                   }}>
-                    <h2 style={{
-                      fontSize: '24px',
-                      color: '#2a3f6a',
-                      marginBottom: '20px',
-                      fontWeight: '600',
-                      textShadow: '0 1px 1px rgba(255, 255, 255, 0.8)'
-                    }}>
-                      About the Game of Go
-                    </h2>
+                    <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600', textAlign: 'center' }}>
+                      History of Go
+                    </h3>
                     
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: windowWidth <= 768 ? 'column' : 'row',
-                      gap: '30px',
-                      marginBottom: '40px'
-                    }}>
-                      <div style={{
-                        flex: '1',
-                        background: 'rgba(255, 255, 255, 0.7)',
-                        backdropFilter: 'blur(10px)',
-                        padding: '25px',
-                        borderRadius: '12px',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
-                        border: '1px solid rgba(255, 255, 255, 0.6)'
-                      }}>
-                        <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600', textAlign: 'center' }}>
-                          The Rules of Go
-                        </h3>
-                        
-                        <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333', textAlign: 'center' }}>
-                          Go is played on a grid of black lines (usually 19×19). Game pieces, called stones, are played on the intersections of the lines.
-                        </p>
-                        
-                        <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Basic Rules:</h4>
-                        <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
-                          <li>Players take turns placing stones on the board</li>
-                          <li>Black plays first, then White</li>
-                          <li>Stones cannot be moved once placed</li>
-                          <li>Stones are captured when completely surrounded by opponent's stones</li>
-                          <li>The goal is to control more territory than your opponent</li>
-                          <li>The game ends when both players pass their turn</li>
-                        </ul>
-                        
-                        <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Key Concepts:</h4>
-                        <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
-                          <li><strong>Liberty:</strong> An empty adjacent point next to a stone</li>
-                          <li><strong>Capture:</strong> Removing opponent's stones that have no liberties</li>
-                          <li><strong>Territory:</strong> Empty intersections surrounded by your stones</li>
-                          <li><strong>Ko rule:</strong> Prevents infinite capturing cycles</li>
-                        </ul>
-                        
-                        {/* Go Painting Image - moved to bottom */}
-                        <OptimizedImage 
-                          src="/game-of-go-2.jpg"
-                          alt="Traditional Go painting"
-                          caption="Traditional Go painting showing players engaged in the ancient game"
-                          isMobile={windowWidth <= 768}
-                          fallbackSrc="https://via.placeholder.com/600x400?text=Go+Painting"
-                        />
-                      </div>
-                      
-                      <div style={{
-                        flex: '1',
-                        background: 'rgba(255, 255, 255, 0.7)',
-                        backdropFilter: 'blur(10px)',
-                        padding: '25px',
-                        borderRadius: '12px',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
-                        border: '1px solid rgba(255, 255, 255, 0.6)'
-                      }}>
-                        <h3 style={{ fontSize: '20px', marginTop: 0, marginBottom: '15px', color: '#2a3f6a', fontWeight: '600', textAlign: 'center' }}>
-                          History of Go
-                        </h3>
-                        
-                        <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333', textAlign: 'center' }}>
-                          Go originated in China more than 2,500 years ago and is believed to be the oldest board game continuously played today.
-                        </p>
-                        
-                        <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Historical Timeline:</h4>
-                        <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
-                          <li><strong>500-300 BCE:</strong> Earliest evidence of Go in China</li>
-                          <li><strong>7th Century:</strong> Introduced to Japan, where it flourished</li>
-                          <li><strong>17th Century:</strong> Development of the four major Go schools in Japan</li>
-                          <li><strong>1920s:</strong> First international Go tournaments</li>
-                          <li><strong>1990s:</strong> Growing popularity in Western countries</li>
-                          <li><strong>2016:</strong> AlphaGo defeats world champion Lee Sedol</li>
-                        </ul>
-                        
-                        <p style={{ lineHeight: '1.6', marginTop: '20px', color: '#333', textAlign: 'center' }}>
-                          Go has been considered not just a game, but an art form and martial art of the mind. It has been the subject of countless books, poems, and philosophical discussions throughout Asian history.
-                          The elegant simplicity of its rules contrasted with the profound strategic depth has made Go a metaphor for life in many Eastern philosophical traditions.
-                        </p>
+                    <p style={{ lineHeight: '1.6', marginBottom: '15px', color: '#333', textAlign: 'center' }}>
+                      Go originated in China more than 2,500 years ago and is believed to be the oldest board game continuously played today.
+                    </p>
+                    
+                    <h4 style={{ fontSize: '17px', marginBottom: '10px', marginTop: '20px', color: '#2a3f6a', textAlign: 'center' }}>Historical Timeline:</h4>
+                    <ul style={{ lineHeight: '1.6', paddingLeft: '20px', color: '#333', textAlign: 'left' }}>
+                      <li><strong>500-300 BCE:</strong> Earliest evidence of Go in China</li>
+                      <li><strong>7th Century:</strong> Introduced to Japan, where it flourished</li>
+                      <li><strong>17th Century:</strong> Development of the four major Go schools in Japan</li>
+                      <li><strong>1920s:</strong> First international Go tournaments</li>
+                      <li><strong>1990s:</strong> Growing popularity in Western countries</li>
+                      <li><strong>2016:</strong> AlphaGo defeats world champion Lee Sedol</li>
+                    </ul>
+                    
+                    <p style={{ lineHeight: '1.6', marginTop: '20px', color: '#333', textAlign: 'center' }}>
+                      Go has been considered not just a game, but an art form and martial art of the mind. It has been the subject of countless books, poems, and philosophical discussions throughout Asian history.
+                      The elegant simplicity of its rules contrasted with the profound strategic depth has made Go a metaphor for life in many Eastern philosophical traditions.
+                    </p>
 
-                        {/* Go Game Image - moved to bottom */}
-                        <OptimizedImage 
-                          src="/game-of-go.jpg"
-                          alt="Game of Go board with stones"
-                          caption="Game of Go - one of the oldest board games still played today"
-                          isMobile={windowWidth <= 768}
-                          fallbackSrc="https://via.placeholder.com/600x400?text=Game+of+Go"
-                        />
-                      </div>
-                    </div>
+                    {/* Go Game Image - moved to bottom */}
+                    <OptimizedImage 
+                      src="/game-of-go.jpg"
+                      alt="Game of Go board with stones"
+                      caption="Game of Go - one of the oldest board games still played today"
+                      isMobile={windowWidth <= 768}
+                      fallbackSrc="https://via.placeholder.com/600x400?text=Game+of+Go"
+                    />
                   </div>
                 </div>
-              </>
-            )}
+              </div>
+            </div>
           </>
         )}
       </main>

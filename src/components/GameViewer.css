@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(0, 0, 0, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,6 +12,12 @@
   padding: 20px;
   box-sizing: border-box;
   transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .game-viewer.fullscreen {
@@ -28,7 +34,7 @@
 
 .game-viewer-modal {
   background-color: white;
-  border-radius: 8px;
+  border-radius: 12px;
   max-width: 1250px;
   width: 90%;
   max-height: 90vh;
@@ -37,6 +43,7 @@
   padding: 25px;
   box-sizing: border-box;
   transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .game-viewer-actions {
@@ -45,11 +52,12 @@
   right: 15px;
   display: flex;
   gap: 10px;
+  z-index: 10;
 }
 
 .game-viewer-fullscreen,
 .game-viewer-close {
-  background: none;
+  background: rgba(255, 255, 255, 0.9);
   border: none;
   font-size: 24px;
   cursor: pointer;
@@ -60,12 +68,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .game-viewer-fullscreen:hover,
 .game-viewer-close:hover {
-  background-color: #f5f5f5;
+  background-color: #f0f0f0;
+  transform: scale(1.05);
 }
 
 .game-viewer-close {
@@ -75,6 +85,49 @@
 .game-viewer-header {
   margin-top: 0;
   margin-bottom: 20px;
+  color: #2a3f6a;
+  font-size: 24px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.header-tip {
+  font-size: 14px;
+  color: #777;
+  font-weight: normal;
+  opacity: 0.8;
+}
+
+/* Loading spinner */
+.game-viewer-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-top: 5px solid #2a3f6a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.game-viewer-loading p {
+  font-size: 16px;
+  color: #555;
 }
 
 .game-viewer-content {
@@ -232,4 +285,16 @@
     font-size: 16px;
     margin-bottom: 8px;
   }
+}
+
+.game-viewer-close {
+  font-size: 32px;
+  color: #d32f2f;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.game-viewer-close:hover {
+  background-color: #ffebee;
+  transform: scale(1.05);
+  color: #b71c1c;
 }

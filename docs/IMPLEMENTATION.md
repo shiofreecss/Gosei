@@ -36,7 +36,19 @@ src/
    - History management
    - State persistence
 
-4. **UI Components**
+4. **Game Viewer Modal**
+   - Overlay presentation system
+   - Fullscreen management
+   - Loading state handling
+   - Keyboard navigation shortcuts
+
+5. **Interactive Modes**
+   - **Game Viewer Mode**: Dedicated modal overlay for viewing games
+   - **Zen Mode**: Distraction-free viewing with minimized UI
+   - **Test Mode**: Interactive variation testing on existing games
+   - **Fullscreen Mode**: Expanded view for optimal analysis
+
+6. **UI Components**
    - Theme system
    - Responsive layout
    - Accessibility features
@@ -135,7 +147,165 @@ interface BoardState {
 - Resource cleanup
 - Memory leak prevention
 
-### 5. Theme System
+### 5. Game Viewer Implementation
+
+#### Modal System
+```typescript
+interface GameViewerProps {
+  sgfContent: string;
+  onClose: () => void;
+}
+
+// Modal state management
+const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
+const [isLoading, setIsLoading] = useState<boolean>(true);
+
+// Keyboard navigation
+useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      if (isFullScreen) {
+        setIsFullScreen(false);
+      } else {
+        onClose();
+      }
+    }
+  };
+  
+  window.addEventListener('keydown', handleKeyDown);
+  return () => window.removeEventListener('keydown', handleKeyDown);
+}, [isFullScreen, onClose]);
+```
+
+#### Loading State
+```typescript
+// Loading state management
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setIsLoading(false);
+  }, 300);
+  
+  return () => clearTimeout(timer);
+}, []);
+
+// Loading UI rendering
+{isLoading ? (
+  <div className="game-viewer-loading">
+    <div className="loading-spinner"></div>
+    <p>Loading game...</p>
+  </div>
+) : (
+  <KifuReader sgfContent={sgfContent} />
+)}
+```
+
+### 6. Interactive Modes
+
+#### Game Viewer Mode
+```typescript
+// App component state
+const [showGameViewer, setShowGameViewer] = useState<boolean>(false);
+const [gameViewerContent, setGameViewerContent] = useState<string>('');
+
+// Handler for opening the Game Viewer
+const handleGameSelected = useCallback((content: string) => {
+  setGameViewerContent(content);
+  setShowGameViewer(true);
+}, []);
+
+// Handler for closing the Game Viewer
+const handleCloseGameViewer = useCallback(() => {
+  setShowGameViewer(false);
+}, []);
+
+// Conditional rendering
+{showGameViewer && (
+  <GameViewer 
+    sgfContent={gameViewerContent} 
+    onClose={handleCloseGameViewer} 
+  />
+)}
+```
+
+#### Zen Mode
+```typescript
+// Zen Mode state management
+const [isZenMode, setIsZenMode] = useState<boolean>(false);
+
+// Toggle Zen Mode
+const toggleZenMode = () => {
+  setIsZenMode(!isZenMode);
+};
+
+// Apply Zen Mode class
+<div className={`kifu-reader ${isZenMode ? 'kifu-fullscreen' : ''}`}>
+  {/* Board and controls */}
+</div>
+```
+
+#### Test Mode
+```typescript
+// Test Mode state management
+const [testMode, setTestMode] = useState<boolean>(false);
+const [nextMoveColor, setNextMoveColor] = useState<'black' | 'white'>('black');
+const [testMoveNumber, setTestMoveNumber] = useState<number>(1);
+
+// Toggle Test Mode
+const handleToggleTestMode = () => {
+  if (!testMode) {
+    // Save original game state
+    setOriginalGame(game);
+    setOriginalCurrentMove(currentMove);
+    
+    // Initialize test mode
+    setNextMoveColor(lastMove?.color === 'black' ? 'white' : 'black');
+    setTestMoveNumber(1);
+  } else {
+    // Restore original game
+    if (originalGame) {
+      setGame(originalGame);
+      setCurrentMove(originalCurrentMove);
+    }
+  }
+  
+  setTestMode(!testMode);
+};
+
+// Handle stone placement in Test Mode
+const handleBoardClick = (x: number, y: number) => {
+  if (!testMode) return;
+  
+  // Create new stone and add to game
+  const newStone = { x, y, color: nextMoveColor };
+  
+  // Add move to game with captures
+  // Switch to next color
+  setNextMoveColor(nextMoveColor === 'black' ? 'white' : 'black');
+  
+  // Increment test move number
+  setTestMoveNumber(prev => prev + 1);
+};
+```
+
+#### Fullscreen Mode
+```typescript
+// Fullscreen state in Game Viewer
+const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
+
+// Toggle fullscreen
+const toggleFullScreen = () => {
+  setIsFullScreen(!isFullScreen);
+};
+
+// Apply fullscreen class
+<div className={`game-viewer ${isFullScreen ? 'fullscreen' : ''}`}>
+  <div className="game-viewer-modal">
+    {/* Content */}
+  </div>
+</div>
+```
+
+### 7. Theme System
 
 #### Theme Configuration
 ```typescript

@@ -10,6 +10,7 @@ interface GameViewerProps {
 const GameViewer: React.FC<GameViewerProps> = ({ sgfContent, onClose }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     const checkMobile = () => {
@@ -21,12 +22,36 @@ const GameViewer: React.FC<GameViewerProps> = ({ sgfContent, onClose }) => {
     
     // Add resize listener
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    
+    // Set loading false after a short delay to ensure the component is rendered
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      clearTimeout(timer);
+    };
   }, []);
 
   const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen);
   };
+  
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && isFullScreen) {
+      setIsFullScreen(false);
+    } else if (e.key === 'Escape' && !isFullScreen) {
+      onClose();
+    }
+  };
+  
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFullScreen]);
   
   return (
     <div className={`game-viewer ${isFullScreen ? 'fullscreen' : ''}`}>
@@ -36,6 +61,7 @@ const GameViewer: React.FC<GameViewerProps> = ({ sgfContent, onClose }) => {
             className="game-viewer-fullscreen"
             onClick={toggleFullScreen}
             aria-label={isFullScreen ? "Exit fullscreen" : "Enter fullscreen"}
+            title={isFullScreen ? "Exit fullscreen" : "Enter fullscreen"}
           >
             {isFullScreen ? '⤾' : '⤢'}
           </button>
@@ -43,16 +69,25 @@ const GameViewer: React.FC<GameViewerProps> = ({ sgfContent, onClose }) => {
             className="game-viewer-close"
             onClick={onClose}
             aria-label="Close game viewer"
+            title="Close game viewer"
           >
             &times;
           </button>
         </div>
         
         <h2 className="game-viewer-header">
-          {isMobile ? "Game" : "Game Viewer"}
+          {isMobile ? "Game Viewer" : "Professional Game Viewer"}
+          <span className="header-tip">(Press ESC to close)</span>
         </h2>
         
-        <KifuReader sgfContent={sgfContent} />
+        {isLoading ? (
+          <div className="game-viewer-loading">
+            <div className="loading-spinner"></div>
+            <p>Loading game...</p>
+          </div>
+        ) : (
+          <KifuReader sgfContent={sgfContent} />
+        )}
       </div>
     </div>
   );
