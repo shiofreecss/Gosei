@@ -212,6 +212,12 @@
   .game-info, .game-controls {
     padding: 12px;
   }
+
+  /* Mobile-specific header styling */
+  .game-viewer-header {
+    justify-content: center;
+    text-align: center;
+  }
 }
 
 @media (max-width: 480px) {

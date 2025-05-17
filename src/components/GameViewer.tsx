@@ -77,7 +77,7 @@ const GameViewer: React.FC<GameViewerProps> = ({ sgfContent, onClose }) => {
         
         <h2 className="game-viewer-header">
           {isMobile ? "Game Viewer" : "Professional Game Viewer"}
-          <span className="header-tip">(Press ESC to close)</span>
+          {!isMobile && <span className="header-tip">(Press ESC to close)</span>}
         </h2>
         
         {isLoading ? (

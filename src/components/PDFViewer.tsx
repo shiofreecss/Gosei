@@ -306,7 +306,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
               onClick={toggleFullscreen} 
               title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
             >
-              {isFullscreen ? "⤦" : "⤢"}
+              {isFullscreen ? "⤾" : "⤢"}
             </button>
             <button className="close-button" onClick={onClose}>×</button>
           </div>
