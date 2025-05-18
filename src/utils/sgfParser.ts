@@ -16,6 +16,7 @@ export interface Move {
   comment?: string;
   captures?: { x: number, y: number }[];  // Stores positions of captured stones
   isKoSituation?: boolean;  // Indicates if this move creates a Ko situation
+  testMoveNumber?: number;  // Used for test mode move numbering
 }
 
 export interface ParsedGame {

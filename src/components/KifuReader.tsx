@@ -5,6 +5,7 @@ import LibertyAnalysis from './LibertyAnalysis';
 import WinRateChart from './WinRateChart';
 import { ParsedGame, parseSGF, movesToStones } from '../utils/sgfParser';
 import { applyMove, createBoardFromStones, getHandicapPositions, findCapturedStones, Position, Stone, isValidMove, isKoSituation } from '../utils/goRules';
+import { Move } from '../utils/sgfParser';
 import './KifuReader.css';
 
 interface KifuReaderProps {
@@ -29,6 +30,8 @@ interface KifuSettingsProps {
   onAutoplaySpeedChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   boardTheme?: BoardTheme;
   onBoardThemeChange?: (theme: BoardTheme) => void;
+  userPlacementMode: boolean;
+  onToggleUserPlacementMode: () => void;
 }
 
 const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
@@ -55,6 +58,9 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   
   // Add zen mode state
   const [isZenMode, setIsZenMode] = useState<boolean>(false);
+  
+  // Add user placement mode state
+  const [userPlacementMode, setUserPlacementMode] = useState<boolean>(false);
   
   // Add engine settings panel state
   const [showEngineSettings, setShowEngineSettings] = useState<boolean>(false);
@@ -671,165 +677,284 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     return board;
   };
 
-  // Toggle test mode
-  const handleToggleTestMode = () => {
-    if (!testMode) {
-      // Entering test mode - save the current state
-      setOriginalGame(game);
+  // Save original game state when entering test mode
+  useEffect(() => {
+    if (game && !originalGame) {
+      setOriginalGame(JSON.parse(JSON.stringify(game)));
       setOriginalCurrentMove(currentMove);
+    }
+  }, [game, originalGame, currentMove]);
+
+  // Toggle user placement mode
+  const toggleUserPlacementMode = () => {
+    // Don't allow toggling if there's no game
+    if (!game) return;
+    
+    // When enabling user placement mode
+    if (!userPlacementMode) {
+      // Disable autoplay
+      if (autoplayActive) {
+        setAutoplayActive(false);
+      }
       
-      // Initialize test mode with current board position
-      // Set next move color based on the last played move's color
+      // Save audio settings for stone sound and ensure it's enabled for placement
+      if (!enableSound) {
+        setEnableSound(true);
+      }
+    }
+    
+    setUserPlacementMode(prev => !prev);
+  };
+
+  // Handle toggle test mode
+  const handleToggleTestMode = () => {
+    const newTestMode = !testMode;
+    setTestMode(newTestMode);
+    
+    // When enabling test mode, initialize next move color and save original game state
+    if (newTestMode) {
+      // Save original game state if not already saved
+      if (!originalGame && game) {
+        setOriginalGame(JSON.parse(JSON.stringify(game)));
+        setOriginalCurrentMove(currentMove);
+      }
+      
+      // Determine the next color based on current move
       if (game && game.moves.length > 0 && currentMove >= 0) {
         const lastMove = game.moves[currentMove];
-        if (lastMove) {
-          // The next color should be the opposite of the last move
-          setNextMoveColor(lastMove.color === 'black' ? 'white' : 'black');
-        } else {
-          setNextMoveColor('black'); // Default to black if no move found
-        }
+        setNextMoveColor(lastMove.color === 'black' ? 'white' : 'black');
       } else {
-        setNextMoveColor('black'); // Default to black if no moves yet
+        setNextMoveColor('black'); // Start with black if no moves yet
       }
-      
-      // Reset test move number
       setTestMoveNumber(1);
-    } else {
-      // Exiting test mode - restore the original game
-      if (originalGame) {
-        setGame(originalGame);
-        setCurrentMove(originalCurrentMove);
-        
-        // Reset captured stones to original state
-        if (originalGame.moves.length > 0) {
-          calculateAllCaptures(originalGame);
-        }
+      
+      // Disable autoplay when entering test mode
+      if (autoplayActive) {
+        setAutoplayActive(false);
       }
-    }
-    
-    // Toggle test mode
-    setTestMode(!testMode);
-    
-    // Automatically disable autoplay when entering test mode
-    if (!testMode && autoplayActive) {
-      setAutoplayActive(false);
+    } else {
+      // When disabling test mode, always restore to the original game to ensure continuation
+      if (originalGame && game) {
+        // Always restore to the original game state
+        setGame(JSON.parse(JSON.stringify(originalGame)));
+        
+        // If in practice mode, set move to furthest practice move reached
+        if (userPlacementMode) {
+          // Find the furthest point in the original game sequence we've reached
+          const furthestMove = Math.min(currentMove, originalGame.moves.length - 1);
+          setCurrentMove(furthestMove);
+        } else {
+          // Just restore to where we were in the original game
+          setCurrentMove(originalCurrentMove);
+        }
+        
+        // Reset captured stones to match original game state
+        setCapturedStones([...capturedStones.filter(stone => 
+          stone.moveNumber <= originalCurrentMove + 1
+        )]);
+      }
     }
   };
-  
-  // Handle stone placement in test mode
+
   const handleBoardClick = (x: number, y: number) => {
-    if (!testMode || !game) return;
-    
-    // Get current board state
-    const currentBoard = getCurrentBoardState();
-    
-    // Check if the clicked position is empty
-    if (currentBoard[y][x] !== null) {
-      console.log("Position already occupied");
-      return;
-    }
-    
-    // If there are moves in the game, determine the actual next color based on the last move
-    if (game.moves.length > 0 && currentMove >= 0) {
-      const lastMove = game.moves[currentMove];
-      if (lastMove && lastMove.color === nextMoveColor) {
-        // Color should alternate, set to the opposite of last move
-        setNextMoveColor(nextMoveColor === 'black' ? 'white' : 'black');
-        return; // Don't place the stone, just update the next color
+    // Handle user placement mode (Practice Mode)
+    if (userPlacementMode && game) {
+      // Get next move to check if user clicked on the correct spot
+      if (currentMove < game.moves.length - 1) {
+        const nextMoveIndex = currentMove + 1;
+        const nextMove = game.moves[nextMoveIndex];
+        
+        // Only proceed if the clicked position matches the next move 
+        // and it's not a test move (we want to follow the original game sequence)
+        if (nextMove.x === x && nextMove.y === y && !(nextMove as any).testMoveNumber) {
+          setCurrentMove(nextMoveIndex);
+          
+          // Play sound if enabled
+          if (enableSound) {
+            playStoneSound();
+          }
+          
+          // Update the capture count
+          updateCaptureCount(nextMoveIndex);
+          
+          // If we're in Test Mode too, update the next color
+          if (testMode) {
+            setNextMoveColor(nextMove.color === 'black' ? 'white' : 'black');
+          }
+          
+          return; // Exit early after handling practice mode move
+        }
+      }
+      
+      // If in Test Mode AND Practice Mode but the click doesn't match the next move,
+      // treat it as a test move if the position is empty
+      if (testMode) {
+        // The click didn't match practice move. Continue below to handle it as a test move.
+        console.log("Practice move not matched, handling as test move");
+      } else {
+        // Practice mode only, but click is not on the next move position
+        return; // Ignore the click
       }
     }
     
-    // Create new stone
-    const newStone: Stone = {
-      x,
-      y,
-      color: nextMoveColor
-    };
-    
-    // Check if move is valid (no suicide, no ko)
-    if (!isValidMove(currentBoard, newStone, boardHistory)) {
-      console.log("Invalid move (suicide or ko)");
-      return;
+    // Handle test mode - only proceed with test move if we're not handling a practice mode move
+    if (testMode && game) {
+      // Get current board state
+      const currentBoard = getCurrentBoardState();
+      
+      // Check if the clicked position is empty
+      if (currentBoard[y][x] !== null) {
+        console.log("Position already occupied");
+        return;
+      }
+      
+      // Create new stone
+      const newStone: Stone = {
+        x,
+        y,
+        color: nextMoveColor
+      };
+      
+      // Check if move is valid (no suicide, no ko)
+      if (!isValidMove(currentBoard, newStone, boardHistory)) {
+        console.log("Invalid move (suicide or ko)");
+        return;
+      }
+      
+      // Find captures
+      const capturedPositions = findCapturedStones(currentBoard, newStone);
+      const capturedColor = nextMoveColor === 'black' ? 'white' : 'black';
+      
+      // Add to captured stones count
+      if (capturedColor === 'black') {
+        setCapturedBlack(prev => prev + capturedPositions.length);
+      } else {
+        setCapturedWhite(prev => prev + capturedPositions.length);
+      }
+      
+      // Add captured stones to the list with the current move number
+      const moveNumber = currentMove + 2; // +1 because currentMove is 0-indexed, +1 more because this is a new move
+      const newCapturedStones = [
+        ...capturedStones,
+        ...capturedPositions.map(pos => ({
+          x: pos.x,
+          y: pos.y,
+          color: capturedColor as 'black' | 'white', // Ensure correct type
+          moveNumber
+        }))
+      ];
+      setCapturedStones(newCapturedStones);
+      
+      // Add the new stone to the game
+      // Create a new move with required properties
+      const newMove = {
+        x,
+        y,
+        color: nextMoveColor,
+        captures: capturedPositions,
+        moveNumber: currentMove + 2, // Add the required moveNumber property
+        coord: `${String.fromCharCode(97 + x)}${String.fromCharCode(97 + y)}`, // Add required coord property
+        comments: [], // Add required comments property
+        testMoveNumber // Add the test move number to identify test moves
+      };
+      
+      // Add the new move to the game
+      const updatedMoves = [...game.moves.slice(0, currentMove + 1), newMove];
+      
+      // Create a new game object
+      const updatedGame: ParsedGame = {
+        ...game,
+        moves: updatedMoves
+      };
+      
+      setGame(updatedGame);
+      
+      // Update current move index
+      setCurrentMove(currentMove + 1);
+      
+      // Play sound
+      if (enableSound) {
+        playStoneSound();
+      }
+      
+      // Save current board to history
+      const newBoard = currentBoard.map(row => [...row]);
+      newBoard[y][x] = nextMoveColor;
+      
+      // Remove captured stones
+      capturedPositions.forEach(pos => {
+        newBoard[pos.y][pos.x] = null;
+      });
+      
+      setBoardHistory(prev => [...prev, newBoard]);
+      
+      // Switch to next color
+      setNextMoveColor(nextMoveColor === 'black' ? 'white' : 'black');
+      
+      // Increment test move number
+      setTestMoveNumber(prev => prev + 1);
     }
-    
-    // Find captures
-    const capturedPositions = findCapturedStones(currentBoard, newStone);
-    const capturedColor = nextMoveColor === 'black' ? 'white' : 'black';
-    
-    // Add to captured stones count
-    if (capturedColor === 'black') {
-      setCapturedBlack(prev => prev + capturedPositions.length);
-    } else {
-      setCapturedWhite(prev => prev + capturedPositions.length);
-    }
-    
-    // Add captured stones to the list with the current move number
-    const moveNumber = currentMove + 2; // +1 because currentMove is 0-indexed, +1 more because this is a new move
-    const newCapturedStones = [
-      ...capturedStones,
-      ...capturedPositions.map(pos => ({
-        x: pos.x,
-        y: pos.y,
-        color: capturedColor as 'black' | 'white', // Ensure correct type
-        moveNumber
-      }))
-    ];
-    setCapturedStones(newCapturedStones);
-    
-    // Add the new stone to the game
-    // Create a new move with required properties
-    const newMove = {
-      x,
-      y,
-      color: nextMoveColor,
-      captures: capturedPositions,
-      moveNumber: currentMove + 2, // Add the required moveNumber property
-      coord: `${String.fromCharCode(97 + x)}${String.fromCharCode(97 + y)}`, // Add required coord property
-      comments: [], // Add required comments property
-      testMoveNumber // Add the test move number for display
-    };
-    
-    // Add the new move to the game
-    const updatedMoves = [...game.moves.slice(0, currentMove + 1), newMove];
-    
-    // Create a new game object
-    const updatedGame: ParsedGame = {
-      ...game,
-      moves: updatedMoves
-    };
-    
-    setGame(updatedGame);
-    
-    // Update current move index
-    setCurrentMove(currentMove + 1);
-    
-    // Play sound
-    if (enableSound) {
-      playStoneSound();
-    }
-    
-    // Save current board to history
-    const newBoard = currentBoard.map(row => [...row]);
-    newBoard[y][x] = nextMoveColor;
-    
-    // Remove captured stones
-    capturedPositions.forEach(pos => {
-      newBoard[pos.y][pos.x] = null;
-    });
-    
-    setBoardHistory(prev => [...prev, newBoard]);
-    
-    // Switch to next color
-    setNextMoveColor(nextMoveColor === 'black' ? 'white' : 'black');
-    
-    // Increment test move number
-    setTestMoveNumber(prev => prev + 1);
   };
 
   // Handle toggle test move numbers
   const handleToggleTestMoveNumbers = () => {
     setShowTestMoveNumbers(prev => !prev);
   };
+
+  // Add visual indication for Test Mode
+  useEffect(() => {
+    // When exiting Test Mode, make sure we restore the original game state
+    if (!testMode && originalGame && game) {
+      // Check if the game has been modified (more moves than the original)
+      const currentGameHasExtraMoves = game.moves.length > originalGame.moves.length;
+        
+      if (currentGameHasExtraMoves) {
+        console.log("Restoring original game state after exiting Test Mode");
+        
+        // Create a deep copy of the original game
+        const restoredGame = JSON.parse(JSON.stringify(originalGame));
+        
+        // Always restore to the original game state to ensure user can continue with the original sequence
+        setGame(restoredGame);
+        
+        // If we were in practice mode and had progressed past original game point,
+        // we should keep that progress in the original game sequence
+        if (userPlacementMode && currentMove > originalCurrentMove) {
+          // Find how far along the original sequence we've progressed
+          let lastOriginalMoveIndex = currentMove;
+          // Go backwards until we find the last non-test move
+          for (let i = currentMove; i > originalCurrentMove; i--) {
+            if (i < game.moves.length && !(game.moves[i] as any).testMoveNumber) {
+              lastOriginalMoveIndex = i;
+              break;
+            } else if (i === originalCurrentMove + 1) {
+              // We found no non-test moves, so use the original current move
+              lastOriginalMoveIndex = originalCurrentMove;
+            }
+          }
+          
+          // Restore to the furthest we got in the original sequence
+          setCurrentMove(Math.min(lastOriginalMoveIndex, originalGame.moves.length - 1));
+        } else {
+          // If we weren't in practice mode, restore to original position
+          setCurrentMove(originalCurrentMove);
+        }
+        
+        // Reset captured stones to match original game state
+        setCapturedStones(prevStones => 
+          prevStones.filter(stone => 
+            stone.moveNumber <= originalCurrentMove + 1 ||
+            (userPlacementMode && stone.moveNumber <= currentMove + 1 && 
+             !game.moves.some(m => 
+               (m as any).testMoveNumber && 
+               m.captures && 
+               m.captures.some(c => c.x === stone.x && c.y === stone.y)
+             ))
+          )
+        );
+      }
+    }
+  }, [testMode, originalGame, originalCurrentMove, game, userPlacementMode, currentMove]);
 
   return (
     <div className={`kifu-reader ${isMobile ? 'kifu-reader-mobile' : ''} ${isZenMode ? 'kifu-fullscreen' : ''}`}>
@@ -851,17 +976,6 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               >
                 {isZenMode ? "Exit Zen Mode" : "Zen Mode"}
               </button>
-              
-              {/* Test mode button in fullscreen view */}
-              {isZenMode && (
-                <button
-                  className={`test-mode-button ${testMode ? 'active' : ''}`}
-                  onClick={handleToggleTestMode}
-                  aria-label={testMode ? "Disable test mode" : "Enable test mode"}
-                >
-                  {testMode ? "Exit Test Mode" : "Test Mode"}
-                </button>
-              )}
               
               {/* Engine settings button (only in fullscreen mode) */}
               {isZenMode && (
@@ -891,6 +1005,25 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               </div>
               <div className="engine-settings-content">
                 <div className="settings-group">
+                  {/* Practice and Test Mode buttons */}
+                  <div className="settings-mode-buttons">
+                    <button
+                      className={`settings-mode-button ${userPlacementMode ? 'active' : ''}`}
+                      onClick={toggleUserPlacementMode}
+                      disabled={!game}
+                    >
+                      {userPlacementMode ? "Exit Practice Mode" : "Practice Mode"}
+                    </button>
+                    
+                    <button
+                      className={`settings-mode-button ${testMode ? 'active' : ''}`}
+                      onClick={handleToggleTestMode}
+                      disabled={!game}
+                    >
+                      {testMode ? "Exit Test Mode" : "Test Mode"}
+                    </button>
+                  </div>
+                  
                   <label className="settings-label">
                     <input
                       type="checkbox"
@@ -968,35 +1101,57 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             </div>
           )}
           
-          <GoBoard
-            size={game?.info.size || 19}
-            stones={getCurrentStones()}
-            currentMove={currentMove}
-            showMoveNumbers={showMoveNumbers}
-            capturedStones={visibleCapturedStones}
-            theme={boardTheme}
-            showHeatMap={showHeatMap}
-            koPosition={koPosition}
-            game={game || undefined}
-            onClick={testMode ? handleBoardClick : undefined}
-            testMode={testMode}
-            showTestMoveNumbers={showTestMoveNumbers}
-          />
-          
-          {/* Mobile test mode toggle above navigation controls */}
-          {isMobile && !isZenMode && (
-            <div className="mobile-test-mode-toggle">
-              <KifuSettings
-                showMoveNumbers={false}
-                enableSound={false}
-                testMode={testMode}
-                onToggleTestMode={handleToggleTestMode}
-                onToggleMoveNumbers={() => {}}
-                onToggleSound={() => {}}
-                simplifiedView={true}
-              />
+          <div className="board-wrapper">
+            <GoBoard
+              size={game ? game.info.size : 19}
+              stones={getCurrentStones()}
+              currentMove={currentMove}
+              showMoveNumbers={showMoveNumbers}
+              capturedStones={capturedStones}
+              onClick={handleBoardClick}
+              theme={boardTheme}
+              showHeatMap={showHeatMap}
+              koPosition={koPosition}
+              testMode={testMode}
+              showTestMoveNumbers={showTestMoveNumbers}
+              game={game || undefined}
+              highlightNextMove={userPlacementMode}
+            />
+            
+            {/* Mode indicators when both are active */}
+            {testMode && userPlacementMode && (
+              <div className="dual-mode-indicator">
+                <div className="dual-mode-text">
+                  <span className="practice-mode-text">Practice Mode</span> +
+                  <span className="test-mode-text">Test Mode</span>
+                </div>
+                <div className="dual-mode-hint">
+                  Follow the game or create variations!
+                </div>
+              </div>
+            )}
+            
+            {/* Mode toggle buttons */}
+            <div className="buttons-row mode-buttons">
+              <button
+                className={`mode-button ${userPlacementMode ? 'active' : ''}`}
+                onClick={toggleUserPlacementMode}
+                disabled={!game}
+                title="Practice Mode: Learn by following along with the game sequence - click on the green highlighted spot to place the next move. Can be used with Test Mode."
+              >
+                {userPlacementMode ? "Exit Practice Mode" : "Practice Mode"}
+              </button>
+              
+              <button
+                className={`mode-button ${testMode ? 'active' : ''}`}
+                onClick={handleToggleTestMode}
+                disabled={!game}
+                title="Test Mode: Create and try your own variations - you can freely place alternating black and white stones. Can be used with Practice Mode."
+              >
+                {testMode ? "Exit Test Mode" : "Test Mode"}
+              </button>
             </div>
-          )}
+          </div>
           
           {/* Play controls positioned right after the board on mobile */}
           {isMobile && (
@@ -1114,16 +1269,6 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               </div>
             )}
             
-            {/* Test Mode Indicator */}
-            {testMode && (
-              <div className="test-mode-indicator">
-                <div className="test-mode-label">Test Mode</div>
-                <div className="next-move">
-                  Next move: <div className={`stone-indicator ${nextMoveColor}`}></div>
-                </div>
-              </div>
-            )}
-            
             {/* Current Move Info */}
             {getCurrentMoveInfo() && (
               <div className="current-move-info">
@@ -1184,10 +1329,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             onBoardThemeChange={handleBoardThemeChange}
             autoplaySpeed={autoplaySpeed}
             onAutoplaySpeedChange={handleAutoplaySpeedChange}
-            testMode={testMode}
-            onToggleTestMode={handleToggleTestMode}
-            showTestMoveNumbers={showTestMoveNumbers}
-            onToggleTestMoveNumbers={handleToggleTestMoveNumbers}
+            userPlacementMode={userPlacementMode}
+            onToggleUserPlacementMode={toggleUserPlacementMode}
           />
         </div>
       </div>
@@ -1195,4 +1338,4 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   );
 };
 
-export default KifuReader; 
+export default KifuReader;

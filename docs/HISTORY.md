@@ -1,6 +1,35 @@
 # Version History
 
-## Version 1.0.4 (Current)
+## Version 1.0.5 (Current)
+**Release Date:** 2024-06
+
+### New Features
+- Added Zen mode and improved fullscreen mode functionality
+- Implemented home button for easier navigation
+- Enhanced mobile experience with responsive design improvements
+- Added first and last move navigation functions
+- Improved dual mode functionality with Test and Practice modes working together seamlessly
+- Added Practice Mode and Test Mode buttons to Zen Mode settings panel
+- Improved mobile UI by removing redundant toggle panels
+
+### Technical Improvements
+- Updated app core functionality
+- Improved test mode capabilities
+- Enhanced information display and documentation
+- Updated logo functionality
+- Fixed state management for combined Test and Practice modes
+- Ensured original game continuity when exiting Test mode
+- Streamlined mobile interface with cleaner design
+- Simplified settings panel with dedicated mode control buttons
+
+### Bug Fixes
+- Fixed fullscreen button issues
+- Resolved mobile interface glitches
+- Improved navigation controls
+- Fixed issue where exiting Test mode would disrupt Practice mode progress
+- Ensured proper move visualization when combining different interactive modes
+
+## Version 1.0.4
 **Release Date:** 2024-03
 
 ### New Features
@@ -102,7 +131,7 @@
 
 ## Future Plans
 
-### Version 1.0.5 (Planned)
+### Version 1.0.6 (Planned)
 - Advanced AI analysis integration
 - Enhanced game commentary features
 - Improved game library organization
@@ -129,6 +158,17 @@
 - Simple game navigation (to be enhanced with new features)
 
 ## Migration Guides
+
+### Upgrading to 1.0.5
+1. Update application to latest version
+2. Clear browser cache for optimal experience
+3. Review fullscreen and Zen mode settings
+4. Test navigation with new controls
+5. Try the improved Test and Practice modes:
+   - Enable both modes simultaneously to create variations while learning
+   - When exiting Test mode, your progress in the original game sequence is preserved
+   - Use Practice mode to follow the original game moves
+   - Use Test mode to experiment with alternative variations
 
 ### Upgrading to 1.0.4
 1. Update dependencies

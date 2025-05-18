@@ -38,6 +38,7 @@ interface GoBoardProps {
     }>;
     handicapStones?: Array<{ x: number; y: number }>;
   };
+  highlightNextMove?: boolean;
 }
 
 // Theme configurations for different board styles
@@ -117,7 +118,8 @@ const GoBoard: React.FC<GoBoardProps> = ({
   koPosition = null,
   testMode = false,
   showTestMoveNumbers = true,
-  game
+  game,
+  highlightNextMove = false
 }) => {
   // Make cellSize responsive based on screen width
   const [cellSize, setCellSize] = useState(32);
@@ -221,6 +223,41 @@ const GoBoard: React.FC<GoBoardProps> = ({
     
     return null;
   }, [stones, currentMove, game?.moves]);
+  
+  // Create a map of stones for easier lookup
+  const stonesMap = useMemo(() => {
+    const map = new Map<string, Stone>();
+    stones.forEach(stone => {
+      map.set(`${stone.x},${stone.y}`, stone);
+    });
+    return map;
+  }, [stones]);
+
+  // Find the next move to highlight (if enabled)
+  const nextMove = useMemo(() => {
+    if (!game || !highlightNextMove || currentMove >= game.moves.length - 1) {
+      return null;
+    }
+    
+    // Get the next move after current move
+    const next = game.moves[currentMove + 1];
+    
+    // Check if this is a test move - if so, don't highlight it in practice mode
+    // unless we're explicitly in test mode
+    if (next?.testMoveNumber && !testMode) {
+      return null;
+    }
+    
+    if (!next || next.x < 0 || next.y < 0) {
+      return null; // Invalid move or pass
+    }
+    
+    return {
+      x: next.x,
+      y: next.y,
+      color: next.color || (currentMove % 2 === 0 ? 'white' : 'black') // Fallback logic
+    };
+  }, [game, currentMove, highlightNextMove, testMode]);
   
   const renderStones = useCallback(() => {
     const visibleStones = stones;
@@ -889,6 +926,24 @@ const GoBoard: React.FC<GoBoardProps> = ({
         
         {/* Interactive overlays */}
         {onClick && <g>{renderCellOverlays()}</g>}
+
+        {/* Highlight the next move if enabled */}
+        {nextMove && (
+          <g className="next-move-highlight">
+            <circle
+              key={`next-move-${nextMove.x}-${nextMove.y}`}
+              cx={nextMove.x * cellSize}
+              cy={nextMove.y * cellSize}
+              r={cellSize * 0.45}
+              fill="rgba(0, 220, 0, 0.4)"
+              stroke="rgba(0, 180, 0, 0.8)"
+              strokeWidth={2}
+              onClick={() => onClick && onClick(nextMove.x, nextMove.y)}
+              style={{ cursor: 'pointer' }}
+              className="highlighted-move"
+            />
+          </g>
+        )}
       </svg>
     </div>
   );

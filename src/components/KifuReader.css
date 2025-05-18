@@ -1042,4 +1042,146 @@
     padding: 5px 8px;
     font-size: 12px;
   }
+}
+
+/* Mode buttons - enhanced styling */
+.buttons-row.mode-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mode-button {
+  padding: 10px 16px;
+  min-width: 140px;
+  border-radius: 6px;
+  background-color: #f0f0f0;
+  border: 2px solid #ccc;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  color: #444;
+}
+
+.mode-button.active {
+  background-color: #4a6fa5;
+  color: white;
+  border-color: #385d8a;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.mode-button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.mode-button.active:hover:not(:disabled) {
+  background-color: #385d8a;
+}
+
+.mode-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Add styling for highlighted next move */
+.highlighted-move {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+/* Dual mode indicator when both Practice and Test modes are active */
+.dual-mode-indicator {
+  background: linear-gradient(135deg, rgba(74, 111, 165, 0.1), rgba(76, 175, 80, 0.1));
+  border: 2px solid;
+  border-image: linear-gradient(135deg, #4a6fa5, #4CAF50) 1;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 10px 0;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.dual-mode-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.practice-mode-text {
+  color: #4a6fa5;
+}
+
+.test-mode-text {
+  color: #4CAF50;
+}
+
+.dual-mode-hint {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.settings-mode-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.settings-mode-button {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-mode-button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.settings-mode-button.active {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #388E3C;
+}
+
+.settings-mode-button.active:hover:not(:disabled) {
+  background-color: #388E3C;
+}
+
+.settings-mode-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .settings-mode-buttons {
+    flex-direction: column;
+  }
 } 
