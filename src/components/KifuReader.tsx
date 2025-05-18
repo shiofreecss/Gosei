@@ -1214,6 +1214,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
                 <div className="game-info-player-name">
                   <div className="player-name" title={game?.info.playerBlack || 'Unknown'}>
                     {game?.info.playerBlack ? shortenPlayerName(game.info.playerBlack, 20) : 'Unknown'}
+                    {game?.info.handicap && game.info.handicap > 1 && ` (H${game.info.handicap})`}
                   </div>
                   <span className="game-info-player-captures">
                     Captures: {capturedWhite}
@@ -1235,9 +1236,6 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             <div className="game-info-details">
               <span className="game-info-detail">Komi: {game?.info.komi || 6.5}</span>
               <span className="game-info-detail">Size: {game?.info.size || 19}×{game?.info.size || 19}</span>
-              {game?.info.handicap && game.info.handicap > 1 && (
-                <span className="game-info-detail">Handicap: {game.info.handicap}</span>
-              )}
               {game?.info.result && (
                 <span className="game-info-detail">Result: {game.info.result}</span>
               )}
@@ -1263,7 +1261,6 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
                 {game.info.date && <div>Date: {game.info.date}</div>}
                 {game.info.result && <div>Result: {game.info.result}</div>}
                 {game.info.komi && <div>Komi: {game.info.komi}</div>}
-                {game.info.handicap && game.info.handicap > 1 && <div>Handicap: {game.info.handicap}</div>}
                 {'rules' in game.info && 'rules' in game.info && game.info.rules ? 
                   <div>Rules: {String(game.info.rules)}</div> : null}
               </div>

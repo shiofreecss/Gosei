@@ -2,14 +2,15 @@
 
 GoSei | AI-Kifu is an open-source web application dedicated to the Go community for reading, visualizing, and analyzing Go game records (kifu) in both SGF (Smart Game Format) and traditional Japanese kifu format.
 
-## Latest Updates (v1.0.5)
+## Latest Updates (v1.0.7)
 
-- Added advanced game analysis features with AI-powered insights:
-  - **Liberty Analysis**: Shows stone liberties and group counts with win probability estimation
-  - **Win Rate Chart**: Visualizes game progression with analysis based on either liberties or influence
-  - **Influence Heatmap**: Displays territorial influence with a color-coded heatmap
-- Improved player information display with stone icons and optimized for all screen sizes
-- Enhanced responsive design for mobile devices
+- Improved player information display:
+  - Handicap information now displayed directly with Black player name (e.g., "Player (H5)" for 5-stone handicap)
+  - Enhanced game metadata presentation for better readability
+- Technical improvements:
+  - Fixed TypeScript interface syntax in SGF parser module
+  - Streamlined game details presentation
+  - Optimized metadata display for better user experience
 - See [VERSION.md](VERSION.md) for complete version history
 
 ## Live Demo

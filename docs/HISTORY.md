@@ -1,7 +1,24 @@
 # Version History
 
-## Version 1.0.5 (Current)
-**Release Date:** 2024-06
+## Version 1.0.6 (Current)
+**Release Date:** 2025-05
+
+### New Features
+- Improved player information display with handicap information directly integrated with Black player name
+- Enhanced game metadata presentation for better readability
+
+### Technical Improvements
+- Fixed TypeScript interface syntax in SGF parser module
+- Improved code structure and organization
+- Optimized metadata display for better user experience
+
+### Bug Fixes
+- Fixed handicap information display to show directly with Black player name as "(H5)" for 5-stone handicap
+- Resolved TypeScript errors in the SGF parser file
+- Streamlined game details presentation to avoid redundant information
+
+## Version 1.0.5
+**Release Date:** 2025-04
 
 ### New Features
 - Added Zen mode and improved fullscreen mode functionality
@@ -30,7 +47,7 @@
 - Ensured proper move visualization when combining different interactive modes
 
 ## Version 1.0.4
-**Release Date:** 2024-03
+**Release Date:** 2025-03
 
 ### New Features
 - Added modern high-resolution noise background with dynamic gradient overlay
@@ -52,7 +69,7 @@
 - Corrected board scaling on high DPI displays
 
 ## Version 1.0.3
-**Release Date:** 2024-02
+**Release Date:** 2025-02
 
 ### New Features
 - Implemented game library search functionality
@@ -73,7 +90,7 @@
 - Corrected game state persistence bugs
 
 ## Version 1.0.2
-**Release Date:** 2024-01
+**Release Date:** 2025-01
 
 ### New Features
 - Added support for traditional Japanese kifu format
@@ -94,7 +111,7 @@
 - Corrected move number display
 
 ## Version 1.0.1
-**Release Date:** 2023-12
+**Release Date:** 2024-12
 
 ### New Features
 - Basic SGF file support
@@ -115,7 +132,7 @@
 - Corrected basic game logic issues
 
 ## Version 1.0.0
-**Release Date:** 2023-11
+**Release Date:** 2024-11
 
 ### Initial Release Features
 - Basic Go board implementation
@@ -158,6 +175,12 @@
 - Simple game navigation (to be enhanced with new features)
 
 ## Migration Guides
+
+### Upgrading to 1.0.6
+1. Update application to latest version
+2. Clear browser cache for optimal experience
+3. Note the improved player information display with handicap information
+4. No configuration changes required - all improvements apply automatically
 
 ### Upgrading to 1.0.5
 1. Update application to latest version

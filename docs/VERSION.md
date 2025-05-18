@@ -1,6 +1,18 @@
 # GoSei AI-Kifu Version History
 
-## v1.0.6 - 2025-05-28
+## v1.0.7 - 2025-05-18
+
+### Player Information Improvements
+- Enhanced player information display:
+  - Added handicap information directly with Black player name (e.g., "Player (H5)" for 5-stone handicap)
+  - Removed redundant handicap display in game metadata section
+  - Streamlined game details presentation for better readability
+- Technical improvements:
+  - Fixed TypeScript interface syntax in SGF parser module
+  - Improved code organization for better maintainability
+  - Enhanced error handling in game metadata processing
+
+## v1.0.6 - 2025-04-28
 
 ### Game Viewing Improvements
 - Added dedicated Game Viewer modal for viewing SGF files without navigating away from the current page
@@ -16,7 +28,7 @@
 - Optimized Fullscreen Mode with improved controls and transition animations
 - Added helpful tooltips and instructions for all interactive modes
 
-## v1.0.5 - 2025-05-22
+## v1.0.5 - 2025-04-22
 
 ### AI Analysis Features
 - Added Liberty Analysis component showing:
@@ -40,7 +52,7 @@
   - Improved responsive design for player names
   - Better handling of long player names
 
-## v1.0.4 - 2025-05-15
+## v1.0.4 - 2025-04-15
 
 ### Board Visualization Improvements
 - Added customizable board themes with dropdown selector
@@ -52,7 +64,7 @@
 - Fixed issues with stone placement and coordinate visibility
 - Improved visual accessibility with semi-transparent coordinates
 
-## v1.0.3 - 2025-05-10
+## v1.0.3 - 2025-04-10
 
 ### UI/UX Improvements
 - Modernized the application theme with transparent glass-morphism design
@@ -66,7 +78,7 @@
 - Improved layout with centered headings and left-aligned bullet points
 - Repositioned images to bottom of their respective sections for better content flow
 
-## v1.0.2 - 2025-05-06
+## v1.0.2 - 2025-04-06
 
 ### UI/UX Improvements
 - Changed category selection buttons from green to dark grey for better visual clarity
@@ -74,7 +86,7 @@
 - Set Game Library to show 5 results per page on mobile devices (width ≤ 768px) for better mobile experience
 - Hidden the "Games per page" text on mobile screens to save space while preserving the dropdown functionality
 
-## v1.0.1 - 2025-05-01
+## v1.0.1 - 2025-04-01
 
 ### Initial Release
 - First public release of GoSei AI-Kifu

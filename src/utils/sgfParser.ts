@@ -6,7 +6,7 @@ export interface GameInfo {
   komi: number;
   size: number;
   handicap: number;
-}
+};
 
 export interface Move {
   color: 'black' | 'white';
@@ -17,13 +17,13 @@ export interface Move {
   captures?: { x: number, y: number }[];  // Stores positions of captured stones
   isKoSituation?: boolean;  // Indicates if this move creates a Ko situation
   testMoveNumber?: number;  // Used for test mode move numbering
-}
+};
 
 export interface ParsedGame {
   info: GameInfo;
   moves: Move[];
   handicapStones?: { x: number, y: number }[];
-}
+};
 
 // Convert SGF coordinates to board coordinates
 // SGF uses letters starting from 'a' for coordinates (a=0, b=1, etc.)
