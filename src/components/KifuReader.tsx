@@ -972,9 +972,9 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               <button
                 className="fullscreen-toggle"
                 onClick={toggleFullscreen}
-                aria-label={isZenMode ? "Exit Zen Mode" : "Enter Zen Mode"}
+                aria-label={isZenMode ? "Exit" : "Zen Mode"}
               >
-                {isZenMode ? "Exit Zen Mode" : "Zen Mode"}
+                {isZenMode ? "Exit" : "Zen Mode"}
               </button>
               
               {/* Engine settings button (only in fullscreen mode) */}
