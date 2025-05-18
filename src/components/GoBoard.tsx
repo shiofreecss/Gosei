@@ -131,13 +131,17 @@ const GoBoard: React.FC<GoBoardProps> = ({
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      if (width <= 360) {
+      const height = window.innerHeight;
+      // Use the smaller dimension to ensure square sizing
+      const minDimension = Math.min(width, height);
+      
+      if (minDimension <= 360) {
         setCellSize(13); // Very small screens
-      } else if (width <= 480) {
+      } else if (minDimension <= 480) {
         setCellSize(15); // Small mobile
-      } else if (width <= 768) {
+      } else if (minDimension <= 768) {
         setCellSize(20); // Tablets
-      } else if (width <= 1024) {
+      } else if (minDimension <= 1024) {
         setCellSize(28); // Small laptops
       } else {
         setCellSize(32); // Default size
@@ -857,6 +861,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
         width={boardSize + boardPadding * 4}
         height={boardSize + boardPadding * 4}
         viewBox={`${-boardPadding * 2} ${-boardPadding *2} ${boardSize + boardPadding * 4} ${boardSize + boardPadding * 4}`}
+        preserveAspectRatio="xMidYMid meet"
         style={{ 
           backgroundColor: themeConfig.boardColor,
           backgroundImage: themeConfig.woodTexture ? WOOD_TEXTURES[themeConfig.woodTexture] : 'none',

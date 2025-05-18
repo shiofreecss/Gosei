@@ -73,11 +73,12 @@
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
-  padding: 4px 8px;
+  font-size: 10px;
+  padding: 3px 6px;
   cursor: pointer;
   border-radius: 3px;
   transition: all 0.2s ease;
+  width: 55px;
 }
 
 .mode-button:hover {
@@ -114,7 +115,9 @@
 }
 
 .black-indicator {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 14px;
   height: 14px;
   background: #333;
@@ -123,7 +126,9 @@
 }
 
 .white-indicator {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 14px;
   height: 14px;
   background: #fff;
@@ -240,9 +245,10 @@
   }
   
   .mode-button {
-    font-size: 10px;
-    padding: 2px 5px;
-    min-width: 40px;
+    font-size: 9px;
+    padding: 2px 4px;
+    min-width: 35px;
+    width: 45px;
   }
 }
 

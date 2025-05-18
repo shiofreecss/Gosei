@@ -568,11 +568,15 @@ const WinRateChart: React.FC<WinRateChartProps> = ({
         
         <div className="current-win-rate">
           <div className={`win-rate-indicator ${previousMove !== currentMove ? 'win-rate-updating' : ''}`}>
-            <span className="black-indicator"></span>
+            <span className="black-indicator">
+              <span style={{ width: '4px', height: '4px', backgroundColor: 'white', borderRadius: '50%' }}></span>
+            </span>
             <span>{(currentWinRate?.blackWinRate * 100 || 0).toFixed(1)}%</span>
           </div>
           <div className={`win-rate-indicator ${previousMove !== currentMove ? 'win-rate-updating' : ''}`}>
-            <span className="white-indicator"></span>
+            <span className="white-indicator">
+              <span style={{ width: '4px', height: '4px', backgroundColor: 'black', borderRadius: '50%' }}></span>
+            </span>
             <span>{(currentWinRate?.whiteWinRate * 100 || 0).toFixed(1)}%</span>
           </div>
         </div>
