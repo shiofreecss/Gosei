@@ -547,23 +547,25 @@ const WinRateChart: React.FC<WinRateChartProps> = ({
           >
             {isExpanded ? '▼' : '▲'}
           </button>
-          <div className="analysis-mode-toggle">
-            <button
-              className={`mode-button ${analysisMode === 'liberty' ? 'active' : ''}`}
-              onClick={() => analysisMode !== 'liberty' && toggleAnalysisMode('liberty')}
-              title="Liberty-based analysis"
-            >
-              Liberty
-            </button>
-            <button
-              className={`mode-button ${analysisMode === 'influence' ? 'active' : ''}`}
-              onClick={() => analysisMode !== 'influence' && toggleAnalysisMode('influence')}
-              title="Influence-based analysis"
-            >
-              Influence
-            </button>
-          </div>
         </div>
+        
+        <div className="analysis-mode-toggle">
+          <button
+            className={`mode-button ${analysisMode === 'liberty' ? 'active' : ''}`}
+            onClick={() => analysisMode !== 'liberty' && toggleAnalysisMode('liberty')}
+            title="Liberty-based analysis"
+          >
+            Liberty
+          </button>
+          <button
+            className={`mode-button ${analysisMode === 'influence' ? 'active' : ''}`}
+            onClick={() => analysisMode !== 'influence' && toggleAnalysisMode('influence')}
+            title="Influence-based analysis"
+          >
+            Influence
+          </button>
+        </div>
+        
         <div className="current-win-rate">
           <div className={`win-rate-indicator ${previousMove !== currentMove ? 'win-rate-updating' : ''}`}>
             <span className="black-indicator"></span>
