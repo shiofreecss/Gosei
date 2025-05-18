@@ -734,6 +734,7 @@
   z-index: 9999;
   background-color: #f9f9f9;
   padding: 20px;
+  padding-bottom: 80px; /* Reduced padding since we no longer have buttons at the bottom */
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -758,6 +759,7 @@
   border-top: 1px solid #ddd;
   border-radius: 12px 12px 0 0;
   padding: 15px;
+  padding-bottom: 20px;
   margin: 0;
   z-index: 10000;
 }
@@ -796,9 +798,11 @@
   position: absolute;
   top: 10px;
   left: 10px;
+  right: 10px; /* Add right constraint for better alignment */
   z-index: 10001;
   display: flex;
   gap: 8px;
+  flex-wrap: wrap; /* Allow wrapping on very small screens */
 }
 
 /* Engine settings button styling */
@@ -819,6 +823,52 @@
 
 .engine-settings-button:hover {
   background-color: #f0f0f0;
+}
+
+/* Fullscreen mode buttons styling */
+.fullscreen-mode-button {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.fullscreen-mode-button:hover {
+  background-color: #f0f0f0;
+}
+
+.fullscreen-mode-button.active {
+  background-color: #4a6fa5;
+  color: white;
+  border-color: #385d8a;
+}
+
+.fullscreen-mode-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .fullscreen-mode-button {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fullscreen-mode-button {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
 }
 
 /* Engine settings panel */

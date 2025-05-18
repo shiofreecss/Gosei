@@ -6,16 +6,21 @@
 ### New Features
 - Improved player information display with handicap information directly integrated with Black player name
 - Enhanced game metadata presentation for better readability
+- Improved Zen mode UI with optimized control placement and button layout
+- Relocated Practice Mode and Test Mode buttons to header area in Zen mode
 
 ### Technical Improvements
 - Fixed TypeScript interface syntax in SGF parser module
 - Improved code structure and organization
 - Optimized metadata display for better user experience
+- Streamlined Zen mode settings panel by removing redundant mode buttons
+- Corrected Autoplay speed slider labels for better user understanding
 
 ### Bug Fixes
 - Fixed handicap information display to show directly with Black player name as "(H5)" for 5-stone handicap
 - Resolved TypeScript errors in the SGF parser file
 - Streamlined game details presentation to avoid redundant information
+- Fixed mode buttons visibility issue in Zen mode where buttons were hidden behind control panel
 
 ## Version 1.0.5
 **Release Date:** 2025-04

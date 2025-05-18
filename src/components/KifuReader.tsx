@@ -987,6 +987,29 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
                   ⚙️ Settings
                 </button>
               )}
+              
+              {/* Mode buttons in Zen mode */}
+              {isZenMode && (
+                <>
+                  <button
+                    className={`fullscreen-mode-button ${userPlacementMode ? 'active' : ''}`}
+                    onClick={toggleUserPlacementMode}
+                    disabled={!game}
+                    title="Practice Mode: Learn by following along with the game sequence - click on the green highlighted spot to place the next move."
+                  >
+                    {userPlacementMode ? "Exit Practice Mode" : "Practice Mode"}
+                  </button>
+                  
+                  <button
+                    className={`fullscreen-mode-button ${testMode ? 'active' : ''}`}
+                    onClick={handleToggleTestMode}
+                    disabled={!game}
+                    title="Test Mode: Create and try your own variations - you can freely place alternating black and white stones."
+                  >
+                    {testMode ? "Exit Test Mode" : "Test Mode"}
+                  </button>
+                </>
+              )}
             </div>
           )}
           
@@ -1005,24 +1028,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               </div>
               <div className="engine-settings-content">
                 <div className="settings-group">
-                  {/* Practice and Test Mode buttons */}
-                  <div className="settings-mode-buttons">
-                    <button
-                      className={`settings-mode-button ${userPlacementMode ? 'active' : ''}`}
-                      onClick={toggleUserPlacementMode}
-                      disabled={!game}
-                    >
-                      {userPlacementMode ? "Exit Practice Mode" : "Practice Mode"}
-                    </button>
-                    
-                    <button
-                      className={`settings-mode-button ${testMode ? 'active' : ''}`}
-                      onClick={handleToggleTestMode}
-                      disabled={!game}
-                    >
-                      {testMode ? "Exit Test Mode" : "Test Mode"}
-                    </button>
-                  </div>
+                  {/* Practice and Test Mode buttons - removed */}
                   
                   <label className="settings-label">
                     <input
@@ -1093,8 +1099,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
                     className="settings-slider"
                   />
                   <div className="slider-labels">
-                    <span>Fast</span>
                     <span>Slow</span>
+                    <span>Fast</span>
                   </div>
                 </div>
               </div>
@@ -1119,7 +1125,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             />
             
             {/* Mode indicators when both are active */}
-            {testMode && userPlacementMode && (
+            {testMode && userPlacementMode && !isZenMode && (
               <div className="dual-mode-indicator">
                 <div className="dual-mode-text">
                   <span className="practice-mode-text">Practice Mode</span> +
@@ -1131,26 +1137,28 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               </div>
             )}
             
-            {/* Mode toggle buttons */}
-            <div className="buttons-row mode-buttons">
-              <button
-                className={`mode-button ${userPlacementMode ? 'active' : ''}`}
-                onClick={toggleUserPlacementMode}
-                disabled={!game}
-                title="Practice Mode: Learn by following along with the game sequence - click on the green highlighted spot to place the next move. Can be used with Test Mode."
-              >
-                {userPlacementMode ? "Exit Practice Mode" : "Practice Mode"}
-              </button>
-              
-              <button
-                className={`mode-button ${testMode ? 'active' : ''}`}
-                onClick={handleToggleTestMode}
-                disabled={!game}
-                title="Test Mode: Create and try your own variations - you can freely place alternating black and white stones. Can be used with Practice Mode."
-              >
-                {testMode ? "Exit Test Mode" : "Test Mode"}
-              </button>
-            </div>
+            {/* Mode toggle buttons - display only for non-mobile or when not in Zen mode */}
+            {(!isMobile || !isZenMode) && (
+              <div className="buttons-row mode-buttons">
+                <button
+                  className={`mode-button ${userPlacementMode ? 'active' : ''}`}
+                  onClick={toggleUserPlacementMode}
+                  disabled={!game}
+                  title="Practice Mode: Learn by following along with the game sequence - click on the green highlighted spot to place the next move. Can be used with Test Mode."
+                >
+                  {userPlacementMode ? "Exit Practice Mode" : "Practice Mode"}
+                </button>
+                
+                <button
+                  className={`mode-button ${testMode ? 'active' : ''}`}
+                  onClick={handleToggleTestMode}
+                  disabled={!game}
+                  title="Test Mode: Create and try your own variations - you can freely place alternating black and white stones. Can be used with Practice Mode."
+                >
+                  {testMode ? "Exit Test Mode" : "Test Mode"}
+                </button>
+              </div>
+            )}
           </div>
           
           {/* Play controls positioned right after the board on mobile */}
@@ -1203,6 +1211,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
               currentMove={currentMove}
               boardSize={game.info.size}
               analysisType={analysisType}
+              onAnalysisTypeChange={handleAnalysisTypeChange}
             />
           )}
         </div>

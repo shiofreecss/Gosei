@@ -9,6 +9,7 @@ interface WinRateChartProps {
   currentMove: number;
   boardSize: number;
   analysisType?: 'liberty' | 'influence';
+  onAnalysisTypeChange?: (type: 'liberty' | 'influence') => void;
 }
 
 // Liberty-based win rates
@@ -143,7 +144,13 @@ interface PointData {
 
 type AnalysisMode = 'liberty' | 'influence';
 
-const WinRateChart: React.FC<WinRateChartProps> = ({ moveHistory, currentMove, boardSize, analysisType: propAnalysisType }) => {
+const WinRateChart: React.FC<WinRateChartProps> = ({ 
+  moveHistory, 
+  currentMove, 
+  boardSize, 
+  analysisType: propAnalysisType,
+  onAnalysisTypeChange
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -517,9 +524,15 @@ const WinRateChart: React.FC<WinRateChartProps> = ({ moveHistory, currentMove, b
     : dataWithSignificantMoves[dataWithSignificantMoves.length - 1];
   
   // Toggle between analysis modes
-  const toggleAnalysisMode = () => {
-    setIsLoading(true);
-    setLocalAnalysisMode(prev => prev === 'liberty' ? 'influence' : 'liberty');
+  const toggleAnalysisMode = (newMode: 'liberty' | 'influence') => {
+    if (onAnalysisTypeChange) {
+      // If the parent provided a handler, use it
+      onAnalysisTypeChange(newMode);
+    } else {
+      // Otherwise fall back to local state
+      setIsLoading(true);
+      setLocalAnalysisMode(newMode);
+    }
   };
   
   return (
@@ -537,14 +550,14 @@ const WinRateChart: React.FC<WinRateChartProps> = ({ moveHistory, currentMove, b
           <div className="analysis-mode-toggle">
             <button
               className={`mode-button ${analysisMode === 'liberty' ? 'active' : ''}`}
-              onClick={() => analysisMode !== 'liberty' && toggleAnalysisMode()}
+              onClick={() => analysisMode !== 'liberty' && toggleAnalysisMode('liberty')}
               title="Liberty-based analysis"
             >
               Liberty
             </button>
             <button
               className={`mode-button ${analysisMode === 'influence' ? 'active' : ''}`}
-              onClick={() => analysisMode !== 'influence' && toggleAnalysisMode()}
+              onClick={() => analysisMode !== 'influence' && toggleAnalysisMode('influence')}
               title="Influence-based analysis"
             >
               Influence

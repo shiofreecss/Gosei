@@ -202,6 +202,8 @@ The build artifacts will be stored in the `build/` directory.
 #### Zen Mode
 - Click the "Zen Mode" button in the controls to enter a distraction-free viewing experience
 - UI elements are minimized to focus on the board and game
+- Practice Mode and Test Mode buttons are conveniently located in the header area
+- Settings panel provides streamlined options for board theme and move display
 - Click "Exit Zen Mode" or press ESC to return to normal view
 
 #### Test Mode
