@@ -127,7 +127,19 @@ const GoBoard: React.FC<GoBoardProps> = ({
   // Get the theme configuration
   const themeConfig = BOARD_THEMES[theme] || BOARD_THEMES.default;
   
-  // Add effect to adjust cell size based on screen width
+  // Calculate positions for star points (hoshi)
+  const getHoshiPoints = useCallback((boardSize: number) => {
+    if (size === 21) return [3, 10, 17];
+    if (size === 19) return [3, 9, 15];
+    if (size === 15) return [3, 7, 11];
+    if (size === 13) return [3, 6, 9];
+    if (size === 9) return [2, 4, 6];
+    return [];
+  }, [size]);
+  
+  const hoshiPoints = useMemo(() => getHoshiPoints(size), [getHoshiPoints, size]);
+  
+  // Add effect to adjust cell size based on screen width and board size
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -135,17 +147,33 @@ const GoBoard: React.FC<GoBoardProps> = ({
       // Use the smaller dimension to ensure square sizing
       const minDimension = Math.min(width, height);
       
+      // Base cell size on screen dimensions
+      let baseCellSize;
       if (minDimension <= 360) {
-        setCellSize(13); // Very small screens
+        baseCellSize = 13; // Very small screens
       } else if (minDimension <= 480) {
-        setCellSize(15); // Small mobile
+        baseCellSize = 15; // Small mobile
       } else if (minDimension <= 768) {
-        setCellSize(20); // Tablets
+        baseCellSize = 20; // Tablets
       } else if (minDimension <= 1024) {
-        setCellSize(28); // Small laptops
+        baseCellSize = 28; // Small laptops
       } else {
-        setCellSize(32); // Default size
+        baseCellSize = 32; // Default size
       }
+      
+      // Adjust cell size based on board size to make smaller boards appear larger
+      let adjustedCellSize = baseCellSize;
+      if (size === 9) {
+        adjustedCellSize = baseCellSize * 1.5; // 50% larger for 9x9
+      } else if (size === 13) {
+        adjustedCellSize = baseCellSize * 1.2; // 20% larger for 13x13
+      } else if (size === 15) {
+        adjustedCellSize = baseCellSize * 1.1; // 10% larger for 15x15
+      } else if (size === 21) {
+        adjustedCellSize = baseCellSize * 0.9; // 10% smaller for 21x21
+      }
+      
+      setCellSize(adjustedCellSize);
     };
     
     // Initial size
@@ -154,20 +182,10 @@ const GoBoard: React.FC<GoBoardProps> = ({
     // Add resize listener
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [size]);
   
   const boardSize = (size - 1) * cellSize;
   const boardPadding = cellSize / 2;
-  
-  // Calculate positions for star points (hoshi)
-  const getHoshiPoints = useCallback((boardSize: number) => {
-    if (size === 19) return [3, 9, 15];
-    if (size === 13) return [3, 6, 9];
-    if (size === 9) return [2, 4, 6];
-    return [];
-  }, [size]);
-  
-  const hoshiPoints = useMemo(() => getHoshiPoints(size), [getHoshiPoints, size]);
   
   const handleCellClick = useCallback((x: number, y: number) => {
     if (onClick) onClick(x, y);

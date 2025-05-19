@@ -9,6 +9,7 @@ interface KifuSettingsProps {
   showLibertyAnalysis?: boolean;
   showWinRateChart?: boolean;
   boardTheme?: BoardTheme;
+  boardSize?: number;
   analysisType?: 'liberty' | 'influence';
   testMode?: boolean;
   showTestMoveNumbers?: boolean;
@@ -21,6 +22,7 @@ interface KifuSettingsProps {
   onToggleWinRateChart?: () => void;
   onShowHandicapSettings?: () => void;
   onBoardThemeChange?: (theme: BoardTheme) => void;
+  onBoardSizeChange?: (size: number) => void;
   onAnalysisTypeChange?: (type: 'liberty' | 'influence') => void;
   onToggleTestMode?: () => void;
   onToggleTestMoveNumbers?: () => void;
@@ -37,6 +39,7 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
   showLibertyAnalysis = false,
   showWinRateChart = false,
   boardTheme = 'default',
+  boardSize = 19,
   analysisType = 'liberty',
   testMode = false,
   showTestMoveNumbers = true,
@@ -49,6 +52,7 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
   onToggleWinRateChart,
   onShowHandicapSettings,
   onBoardThemeChange,
+  onBoardSizeChange,
   onAnalysisTypeChange,
   onToggleTestMode,
   onToggleTestMoveNumbers,
@@ -190,6 +194,63 @@ const KifuSettings: React.FC<KifuSettingsProps> = ({
           </div>
         )}
       
+        {/* Board Size Selector */}
+        {/* Temporarily hidden as per requirement
+        {onBoardSizeChange && (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            padding: '12px 10px',
+            backgroundColor: '#f9f9f9',
+            borderRadius: '8px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="3" y1="7" x2="21" y2="7" stroke="#444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="3" y1="11" x2="21" y2="11" stroke="#444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="3" y1="15" x2="21" y2="15" stroke="#444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="3" y1="19" x2="21" y2="19" stroke="#444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="7" y1="3" x2="7" y2="21" stroke="#444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="11" y1="3" x2="11" y2="21" stroke="#444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="15" y1="3" x2="15" y2="21" stroke="#444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="19" y1="3" x2="19" y2="21" stroke="#444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ fontWeight: '500', color: '#333', fontSize: '16px' }}>Board Size</span>
+            </div>
+            
+            <select
+              value={boardSize}
+              onChange={(e) => onBoardSizeChange(parseInt(e.target.value))}
+              style={{
+                appearance: 'none',
+                padding: '8px 30px 8px 12px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#333',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                backgroundColor: 'white',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 8px center',
+                backgroundSize: '16px',
+                cursor: 'pointer',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                width: '160px'
+              }}
+              aria-label="Select board size"
+            >
+              <option value="9">9×9 (Small)</option>
+              <option value="13">13×13 (Medium)</option>
+              <option value="15">15×15 (Medium+)</option>
+              <option value="19">19×19 (Standard)</option>
+              <option value="21">21×21 (Large)</option>
+            </select>
+          </div>
+        )} */}
+        
         {/* Win Rate Chart Toggle (new) */}
         {onToggleWinRateChart && (
           <div style={{ 

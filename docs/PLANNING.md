@@ -5,9 +5,8 @@
 ### Phase 1: Core Features Enhancement (Current)
 - Board visualization improvements
   - [x] Add more board themes
-  - [ ] Implement stone placement animations
   - [x] Enhanced shadow and lighting effects
-  - [ ] Custom board size support
+  - [x] Custom board size support (implemented but hidden in UI)
 
 - Viewing Experience Improvements
   - [x] Game Viewer modal for overlay viewing

@@ -298,11 +298,23 @@ export const getHandicapPositions = (boardSize: number, handicap: number): Posit
   if (handicap < 2 || handicap > 9) return [];
   
   // Only standard board sizes support handicap stones
-  if (boardSize !== 19 && boardSize !== 13 && boardSize !== 9) return [];
+  if (boardSize !== 21 && boardSize !== 19 && boardSize !== 15 && boardSize !== 13 && boardSize !== 9) return [];
   
   let starPoints: Position[] = [];
   
-  if (boardSize === 19) {
+  if (boardSize === 21) {
+    starPoints = [
+      { x: 3, y: 3 },    // bottom left
+      { x: 17, y: 17 },  // top right
+      { x: 17, y: 3 },   // bottom right
+      { x: 3, y: 17 },   // top left
+      { x: 10, y: 10 },  // center
+      { x: 3, y: 10 },   // left middle
+      { x: 17, y: 10 },  // right middle
+      { x: 10, y: 3 },   // bottom middle
+      { x: 10, y: 17 }   // top middle
+    ];
+  } else if (boardSize === 19) {
     starPoints = [
       { x: 3, y: 3 },   // bottom left
       { x: 15, y: 15 }, // top right
@@ -313,6 +325,18 @@ export const getHandicapPositions = (boardSize: number, handicap: number): Posit
       { x: 15, y: 9 },  // right middle
       { x: 9, y: 3 },   // bottom middle
       { x: 9, y: 15 }   // top middle
+    ];
+  } else if (boardSize === 15) {
+    starPoints = [
+      { x: 3, y: 3 },   // bottom left
+      { x: 11, y: 11 }, // top right
+      { x: 11, y: 3 },  // bottom right
+      { x: 3, y: 11 },  // top left
+      { x: 7, y: 7 },   // center
+      { x: 3, y: 7 },   // left middle
+      { x: 11, y: 7 },  // right middle
+      { x: 7, y: 3 },   // bottom middle
+      { x: 7, y: 11 }   // top middle
     ];
   } else if (boardSize === 13) {
     starPoints = [

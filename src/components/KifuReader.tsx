@@ -30,6 +30,8 @@ interface KifuSettingsProps {
   onAutoplaySpeedChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   boardTheme?: BoardTheme;
   onBoardThemeChange?: (theme: BoardTheme) => void;
+  boardSize?: number;
+  onBoardSizeChange?: (size: number) => void;
   userPlacementMode: boolean;
   onToggleUserPlacementMode: () => void;
 }
@@ -49,6 +51,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   const [showWinRateChart, setShowWinRateChart] = useState<boolean>(false);
   const [analysisType, setAnalysisType] = useState<'liberty' | 'influence'>('liberty');
   const [boardTheme, setBoardTheme] = useState<BoardTheme>('light-wood-3d');
+  const [boardSize, setBoardSize] = useState<number>(19);
   
   // Add test mode state
   const [testMode, setTestMode] = useState<boolean>(false);
@@ -130,6 +133,15 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     if (savedTheme) {
       setBoardTheme(savedTheme as BoardTheme);
     }
+    
+    // Load saved board size preference if available
+    const savedSize = localStorage.getItem('gosei-board-size');
+    if (savedSize) {
+      const size = parseInt(savedSize, 10);
+      if ([9, 13, 15, 19, 21].includes(size)) {
+        setBoardSize(size);
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -141,6 +153,11 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
       setCapturedBlack(0);
       setCapturedWhite(0);
       setCapturedStones([]);
+      
+      // Set board size from the parsed game
+      if (parsed.info.size) {
+        setBoardSize(parsed.info.size);
+      }
       
       // If the game has handicap but no explicit handicap stones, generate them
       if (parsed.info.handicap > 1 && 
@@ -446,6 +463,32 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
   const handleBoardThemeChange = (theme: BoardTheme) => {
     setBoardTheme(theme);
     localStorage.setItem('gosei-board-theme', theme);
+  };
+
+  const handleBoardSizeChange = (size: number) => {
+    setBoardSize(size);
+    localStorage.setItem('gosei-board-size', size.toString());
+    
+    // If we have a game, update its size property
+    if (game) {
+      const updatedGame = { ...game };
+      updatedGame.info.size = size;
+      setGame(updatedGame);
+      
+      // Reset handicap stones if present to ensure they're correctly positioned
+      if (updatedGame.info.handicap > 1) {
+        updatedGame.handicapStones = getHandicapPositions(
+          size,
+          updatedGame.info.handicap
+        );
+      }
+      
+      // Reset the game state to apply changes
+      setCurrentMove(-1);
+      setCapturedBlack(0);
+      setCapturedWhite(0);
+      setCapturedStones([]);
+    }
   };
 
   // Get information about the current move
@@ -1109,7 +1152,7 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
           
           <div className="board-wrapper">
             <GoBoard
-              size={game ? game.info.size : 19}
+              size={boardSize}
               stones={getCurrentStones()}
               currentMove={currentMove}
               showMoveNumbers={showMoveNumbers}
@@ -1333,6 +1376,8 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
             onAnalysisTypeChange={handleAnalysisTypeChange}
             boardTheme={boardTheme}
             onBoardThemeChange={handleBoardThemeChange}
+            boardSize={boardSize}
+            onBoardSizeChange={handleBoardSizeChange}
             autoplaySpeed={autoplaySpeed}
             onAutoplaySpeedChange={handleAutoplaySpeedChange}
             userPlacementMode={userPlacementMode}
