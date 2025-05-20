@@ -240,6 +240,13 @@
     width: 100%;
     justify-content: flex-end;
   }
+  
+  /* Center the "Select a tournament" panel in mobile view */
+  .game-library-content > div {
+    margin: 0 auto;
+    max-width: 90%;
+    text-align: center;
+  }
 }
 
 @media (max-width: 480px) {
@@ -249,7 +256,27 @@
   }
   
   .game-item {
-    padding: 10px;
+    padding: 8px;
+  }
+  
+  /* Improve "Select a tournament" panel on mobile */
+  .game-library-content > div {
+    width: 90%;
+    padding: 15px 10px;
+  }
+  
+  .game-library-content > div svg {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .game-library-content > div h3 {
+    font-size: 16px;
+    margin: 10px 0 8px;
+  }
+  
+  .game-library-content > div p {
+    font-size: 14px;
   }
   
   .pagination {
