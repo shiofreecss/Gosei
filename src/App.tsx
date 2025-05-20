@@ -142,7 +142,13 @@ PW[White Player]PB[Black Player]
         position: 'relative',
         zIndex: 10
       }}>
-        <div style={containerStyle}>
+        <div style={{
+          ...containerStyle,
+          display: 'flex',
+          flexDirection: windowWidth <= 768 ? 'column' : 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
           <h1 style={{ 
             margin: 0, 
             fontSize: '32px',
@@ -177,7 +183,13 @@ PW[White Player]PB[Black Player]
               Go Game Analysis Tool
             </span>
           </h1>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', gap: '10px' }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'flex-end', 
+            gap: '10px',
+            marginTop: windowWidth <= 768 ? '10px' : '0',
+            flexWrap: 'wrap' 
+          }}>
             <button 
               onClick={() => {
                 setShowBookLibrary(false);
