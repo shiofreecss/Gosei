@@ -19,6 +19,13 @@ interface GameLibraryProps {
   onSelectGame: (sgfContent: string) => void;
 }
 
+// Sort options type
+type SortOption = {
+  id: string;
+  label: string;
+  sortFn: (a: GameInfo, b: GameInfo) => number;
+};
+
 const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
@@ -38,6 +45,80 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [gamesPerPage, setGamesPerPage] = useState(20);
   const [cachedGamesByTournament, setCachedGamesByTournament] = useState<Record<string, GameInfo[]>>({});
+  
+  // Sorting state
+  const [sortOption, setSortOption] = useState<string>('default');
+  
+  // Available sort options
+  const sortOptions: SortOption[] = [
+    { 
+      id: 'default', 
+      label: 'Default Order', 
+      sortFn: (a, b) => 0 
+    },
+    { 
+      id: 'name_asc', 
+      label: 'Name (A-Z)', 
+      sortFn: (a, b) => a.title.localeCompare(b.title) 
+    },
+    { 
+      id: 'name_desc', 
+      label: 'Name (Z-A)', 
+      sortFn: (a, b) => b.title.localeCompare(a.title) 
+    },
+    { 
+      id: 'date_newest', 
+      label: 'Date (Newest)', 
+      sortFn: (a, b) => {
+        // Handle empty dates or invalid formats
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        
+        // Try to parse dates - if they're in a standard format
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        
+        // If dates are valid, compare them
+        if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+          return dateB.getTime() - dateA.getTime();
+        }
+        
+        // Fallback to string comparison
+        return b.date.localeCompare(a.date);
+      }
+    },
+    { 
+      id: 'date_oldest', 
+      label: 'Date (Oldest)', 
+      sortFn: (a, b) => {
+        // Handle empty dates or invalid formats
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        
+        // Try to parse dates - if they're in a standard format
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        
+        // If dates are valid, compare them
+        if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+          return dateA.getTime() - dateB.getTime();
+        }
+        
+        // Fallback to string comparison
+        return a.date.localeCompare(b.date);
+      }
+    },
+    { 
+      id: 'player_black', 
+      label: 'Black Player (A-Z)', 
+      sortFn: (a, b) => (a.players[0] || '').localeCompare(b.players[0] || '') 
+    },
+    { 
+      id: 'player_white', 
+      label: 'White Player (A-Z)', 
+      sortFn: (a, b) => (a.players[1] || '').localeCompare(b.players[1] || '') 
+    }
+  ];
   
   // Add this effect to handle mobile screen size for games per page
   useEffect(() => {
@@ -194,6 +275,35 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
     setCurrentPage(1);
   }, [searchTerm, games]);
   
+  // Sort games when sort option changes
+  useEffect(() => {
+    if (sortOption === 'default') {
+      // If 'default', just apply the current search filter without sorting
+      if (searchTerm.trim() === '') {
+        setFilteredGames([...games]);
+      } else {
+        const search = searchTerm.toLowerCase();
+        const filtered = games.filter(game => 
+          game.title.toLowerCase().includes(search) ||
+          game.players.some(player => player.toLowerCase().includes(search)) ||
+          game.date.toLowerCase().includes(search) ||
+          game.result.toLowerCase().includes(search)
+        );
+        setFilteredGames(filtered);
+      }
+    } else {
+      // Get the sort function from sortOptions
+      const sortFn = sortOptions.find(option => option.id === sortOption)?.sortFn;
+      
+      if (sortFn) {
+        // Apply current search filter and sort
+        let newFilteredGames = [...filteredGames];
+        newFilteredGames.sort(sortFn);
+        setFilteredGames(newFilteredGames);
+      }
+    }
+  }, [sortOption]);
+  
   // Get current games to display based on pagination
   const getCurrentPageGames = () => {
     const indexOfLastGame = currentPage * gamesPerPage;
@@ -309,14 +419,7 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
     if (totalPages <= 1) return null;
     
     return (
-      <div className="pagination" style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: '20px',
-        marginBottom: '15px',
-        gap: '10px'
-      }}>
+      <div className="pagination">
         <button
           onClick={goToPreviousPage}
           disabled={currentPage === 1}
@@ -335,24 +438,13 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
           Next &raquo;
         </button>
         
-        <div style={{
-          marginLeft: '15px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '5px'
-        }}>
-          <span className="games-per-page-text" style={{ fontSize: '14px' }}>Games per page:</span>
+        <div className="games-per-page">
+          <span className="games-per-page-text">Games per page:</span>
           <select
             value={gamesPerPage}
             onChange={(e) => {
               setGamesPerPage(Number(e.target.value));
               setCurrentPage(1); // Reset to first page when changing items per page
-            }}
-            style={{
-              padding: '4px 8px',
-              borderRadius: '4px',
-              border: '1px solid #ddd',
-              fontSize: '14px'
             }}
           >
             <option value={5}>5</option>
@@ -928,7 +1020,8 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
                 justifyContent: 'space-between', 
                 alignItems: 'center',
                 marginBottom: '15px',
-                flexWrap: 'wrap'
+                flexWrap: 'wrap',
+                gap: '10px'
               }}>
                 <h3 style={{ 
                   fontSize: '16px', 
@@ -938,33 +1031,38 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
                   Games - {selectedTournament.name}
                 </h3>
                 
-                <div className="search-container" style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  backgroundColor: 'white',
-                  borderRadius: '6px',
-                  padding: '6px 12px',
-                  border: '1px solid #e0e0e0',
-                  width: '250px'
-                }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#777" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  </svg>
-                  <input
-                    type="text"
-                    placeholder="Search games..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{
-                      border: 'none',
-                      outline: 'none',
-                      padding: '0 10px',
-                      width: '90%',
-                      backgroundColor: 'transparent',
-                      fontSize: '14px'
-                    }}
-                  />
+                <div className="game-list-controls">
+                  {/* Sort dropdown */}
+                  <div className="sort-control">
+                    <label htmlFor="sort-games">
+                      Sort:
+                    </label>
+                    <select 
+                      id="sort-games"
+                      value={sortOption}
+                      onChange={(e) => setSortOption(e.target.value)}
+                    >
+                      {sortOptions.map(option => (
+                        <option key={option.id} value={option.id}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {/* Search input */}
+                  <div className="search-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#777" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input
+                      type="text"
+                      placeholder="Search games..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
               

@@ -42,46 +42,123 @@
 
 /* Game list styles */
 .game-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 600px;
 }
 
 .game-item {
-  background-color: white;
-  border-radius: 8px;
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
   padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid #eee;
+  background-color: #f9f9f9;
 }
 
 .game-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  border-color: #d0d7e8;
+  border-color: #90caf9;
+  background-color: #e3f2fd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.game-item:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+/* Game list controls */
+.game-list-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.sort-control {
+  display: flex;
+  align-items: center;
+}
+
+.sort-control label {
+  font-size: 14px;
+  margin-right: 5px;
+  color: #555;
+}
+
+.sort-control select {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  background-color: white;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 6px;
+  padding: 6px 12px;
+  border: 1px solid #e0e0e0;
+  width: 250px;
+}
+
+.search-container input {
+  border: none;
+  outline: none;
+  padding: 0 10px;
+  width: 90%;
+  background-color: transparent;
+  font-size: 14px;
 }
 
 /* Pagination button styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0 15px;
+  gap: 10px;
+}
+
 .pagination button {
-  padding: 5px 10px;
-  background-color: #555555 !important; /* Dark grey color for buttons */
-  color: white !important;
-  border: none;
+  padding: 6px 12px;
+  border: 1px solid #e0e0e0;
+  background-color: white;
   border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #e3f2fd;
+  border-color: #90caf9;
 }
 
 .pagination button:disabled {
-  background-color: #f0f0f0 !important;
-  color: #999 !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.games-per-page {
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.games-per-page-text {
+  font-size: 14px;
+}
+
+.games-per-page select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  background-color: white;
 }
 
 /* Category buttons styles */
@@ -107,107 +184,84 @@
 @media (max-width: 1024px) {
   .game-library-container {
     flex-direction: column;
-    height: auto;
   }
-
+  
   .game-library-sidebar {
     width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #eaeaea;
-    padding-right: 0;
-    padding-bottom: 20px;
+    max-width: 100%;
     margin-bottom: 20px;
-    height: auto;
-    max-height: 600px;
   }
-
+  
   .game-library-content {
-    padding-left: 0;
-    height: auto;
+    width: 100%;
   }
-
+  
   .game-list {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    max-height: 500px;
   }
 }
 
 @media (max-width: 768px) {
-  .game-library {
-    padding: 15px;
+  .game-list-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
-
-  .game-library-sidebar {
-    max-height: 600px;
+  
+  .search-container {
+    width: 100%;
   }
-
-  .game-library-content {
-    scroll-margin-top: 70px; /* Add more scroll margin on mobile to account for header */
+  
+  .sort-control {
+    width: 100%;
   }
-
+  
+  .sort-control select {
+    width: 100%;
+  }
+  
   .game-list {
-    grid-template-columns: 1fr;
+    padding: 15px;
+    max-height: 400px;
   }
-
+  
   .game-item {
     padding: 12px;
   }
-
-  /* Adjust category buttons for mobile */
-  .category-buttons {
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .category-buttons button {
-    width: 100%;
-  }
-
-  /* Adjust tournament list for mobile */
-  .tournament-list {
-    font-size: 14px;
-  }
-
-  /* Adjust search bar for mobile */
-  .search-container {
-    width: 100%;
-    margin-top: 10px;
+  
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: space-between;
   }
   
-  /* Hide "Games per page" text on mobile */
-  .pagination .games-per-page-text {
-    display: none;
+  .games-per-page {
+    margin-left: 0;
+    margin-top: 10px;
+    width: 100%;
+    justify-content: flex-end;
   }
 }
 
 @media (max-width: 480px) {
-  .game-library {
+  .game-list {
     padding: 10px;
+    max-height: 350px;
   }
-
-  .game-library-sidebar {
-    max-height: 600px;
-  }
-
+  
   .game-item {
     padding: 10px;
   }
-
-  .game-item h3 {
-    font-size: 14px;
-  }
-
-  .game-item .player-info {
-    font-size: 12px;
-  }
-
-  /* Make pagination more compact on mobile */
+  
   .pagination {
-    flex-wrap: wrap;
     gap: 5px;
   }
-
+  
   .pagination button {
     padding: 4px 8px;
     font-size: 12px;
+  }
+  
+  .games-per-page-text {
+    display: none;
   }
 } 
