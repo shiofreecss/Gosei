@@ -156,19 +156,21 @@ const GoBoard: React.FC<GoBoardProps> = ({
       } else if (minDimension <= 768) {
         baseCellSize = 20; // Tablets
       } else if (minDimension <= 1024) {
-        baseCellSize = 28; // Small laptops
+        baseCellSize = 32; // Small laptops
+      } else if (minDimension <= 1366) {
+        baseCellSize = 36; // Medium laptops
       } else {
-        baseCellSize = 32; // Default size
+        baseCellSize = 40; // Large screens
       }
       
       // Adjust cell size based on board size to make smaller boards appear larger
       let adjustedCellSize = baseCellSize;
       if (size === 9) {
-        adjustedCellSize = baseCellSize * 1.5; // 50% larger for 9x9
+        adjustedCellSize = baseCellSize * 1.6; // 60% larger for 9x9
       } else if (size === 13) {
-        adjustedCellSize = baseCellSize * 1.2; // 20% larger for 13x13
+        adjustedCellSize = baseCellSize * 1.3; // 30% larger for 13x13
       } else if (size === 15) {
-        adjustedCellSize = baseCellSize * 1.1; // 10% larger for 15x15
+        adjustedCellSize = baseCellSize * 1.2; // 20% larger for 15x15
       } else if (size === 21) {
         adjustedCellSize = baseCellSize * 0.9; // 10% smaller for 21x21
       }
