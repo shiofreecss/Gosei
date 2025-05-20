@@ -186,10 +186,10 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
         
         setSubcategoryTournaments(subcategoryTours);
         
-        // Initialize all categories as expanded
+        // Initialize all categories as collapsed (changed from expanded to collapsed)
         const initialExpandedState: Record<string, boolean> = {};
         mainCategories.forEach(category => {
-          initialExpandedState[category.id] = true;
+          initialExpandedState[category.id] = false; // Changed from true to false
         });
         setExpandedCategories(initialExpandedState);
         
@@ -372,20 +372,51 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
     }
   };
   
-  // Toggle category expansion
+  // Toggle category expansion - modified to collapse other categories when one is expanded
   const toggleCategoryExpansion = (categoryId: string) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [categoryId]: !prev[categoryId]
-    }));
+    setExpandedCategories(prev => {
+      const newState: Record<string, boolean> = {};
+      
+      // Set all categories to collapsed
+      mainCategories.forEach(category => {
+        newState[category.id] = false;
+      });
+      
+      // Toggle the selected category (if it was expanded, it will remain collapsed)
+      // If it was collapsed, it will be the only one expanded
+      if (!prev[categoryId]) {
+        newState[categoryId] = true;
+      }
+      
+      return newState;
+    });
   };
   
   // Toggle subcategory expansion
   const toggleSubcategoryExpansion = (subcategoryId: string) => {
-    setExpandedSubcategories(prev => ({
-      ...prev,
-      [subcategoryId]: !prev[subcategoryId]
-    }));
+    setExpandedSubcategories(prev => {
+      const newState = { ...prev };
+      
+      // Extract the category ID from the subcategory ID (format: "categoryId_subcategoryId")
+      const [categoryId] = subcategoryId.split('_');
+      
+      // Find all subcategories in this category
+      const category = mainCategories.find(cat => cat.id === categoryId);
+      if (category && category.subcategories) {
+        // Collapse all subcategories in this category
+        category.subcategories.forEach(subcat => {
+          const subId = `${categoryId}_${subcat.id}`;
+          newState[subId] = false;
+        });
+      }
+      
+      // Toggle the selected subcategory
+      if (!prev[subcategoryId]) {
+        newState[subcategoryId] = true;
+      }
+      
+      return newState;
+    });
   };
   
   // Handle category selection
@@ -393,6 +424,23 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
     setSelectedCategory(categoryId);
     setSelectedSubcategory(null);
     setSelectedTournament(null);
+    
+    // Collapse all subcategories when changing categories
+    if (categoryId !== 'all') {
+      const category = mainCategories.find(cat => cat.id === categoryId);
+      if (category && category.subcategories) {
+        const newSubcatState = { ...expandedSubcategories };
+        
+        // Set all subcategories in this category to collapsed
+        category.subcategories.forEach(subcat => {
+          const subcatId = `${categoryId}_${subcat.id}`;
+          newSubcatState[subcatId] = false;
+        });
+        
+        setExpandedSubcategories(newSubcatState);
+      }
+    }
+    
     scrollToGames();
   };
   
