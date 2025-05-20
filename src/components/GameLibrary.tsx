@@ -1164,9 +1164,7 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
               textAlign: 'center',
               backgroundColor: 'white',
               borderRadius: '8px',
-              border: '1px dashed #ddd',
-              margin: '0 auto',
-              maxWidth: '100%'
+              border: '1px dashed #ddd'
             }}>
               <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
@@ -1179,7 +1177,7 @@ const GameLibrary: React.FC<GameLibraryProps> = ({ onSelectGame }) => {
                 Select a tournament
               </h3>
               <p style={{ margin: 0 }}>
-                Choose a tournament to view available games
+                Choose a tournament from the left panel to view available games
               </p>
             </div>
           )}
