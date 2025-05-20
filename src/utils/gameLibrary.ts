@@ -419,7 +419,9 @@ export const loadSgfByPath = async (path: string): Promise<string> => {
         // Fix double slashes
         path.replace(/\/\//g, '/'),
         // Try with absolute path from root
-        `/${path.split('/').filter(Boolean).join('/')}`
+        `/${path.split('/').filter(Boolean).join('/')}`,
+        // Try using just the filename from the path with common parent directories
+        ...getCommonParentPathVariations(path)
       ];
       
       // Try each path variation
@@ -461,147 +463,410 @@ export const loadSgfByPath = async (path: string): Promise<string> => {
   }
 };
 
+// Helper function to generate common parent path variations for a file
+const getCommonParentPathVariations = (path: string): string[] => {
+  const filename = path.split('/').pop() || '';
+  if (!filename.endsWith('.sgf')) return [];
+  
+  const parentDirs = [
+    'games',
+    ...path.split('/').filter(part => part.length > 0 && !part.endsWith('.sgf'))
+  ];
+  
+  const variations: string[] = [];
+  
+  // Try with just the filename in common directories
+  variations.push(`/public/games/${filename}`);
+  variations.push(`/games/${filename}`);
+  
+  // Try variations with the last directory + filename
+  if (parentDirs.length > 0) {
+    const lastDir = parentDirs[parentDirs.length - 1];
+    variations.push(`/public/games/${lastDir}/${filename}`);
+    variations.push(`/games/${lastDir}/${filename}`);
+  }
+  
+  // Try with the last two directories + filename if available
+  if (parentDirs.length > 1) {
+    const lastDir = parentDirs[parentDirs.length - 1];
+    const secondLastDir = parentDirs[parentDirs.length - 2];
+    variations.push(`/public/games/${secondLastDir}/${lastDir}/${filename}`);
+    variations.push(`/games/${secondLastDir}/${lastDir}/${filename}`);
+  }
+  
+  return variations;
+};
+
 // Parse tournament index HTML to extract games
 export const parseGameIndex = async (tournamentPath: string): Promise<GameInfo[]> => {
   try {
-    const response = await fetch(`${tournamentPath}/index.html`);
-    if (!response.ok) {
-      throw new Error(`Failed to load tournament index: ${response.status} ${response.statusText}`);
-    }
+    // First try to fetch the index.html
+    let indexHtmlGames: GameInfo[] = [];
+    let hasLoadedIndex = false;
     
-    const html = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    
-    // Extract game information from the HTML table
-    const games: GameInfo[] = [];
-    const tournamentName = doc.querySelector('h1')?.textContent || '';
-    const tournamentId = tournamentPath.split('/').pop() || '';
-    
-    // Process all tables in the document
-    const tables = doc.querySelectorAll('table');
-    
-    for (let tableIndex = 0; tableIndex < tables.length; tableIndex++) {
-      const table = tables[tableIndex];
-      const rows = table.querySelectorAll('tr');
-      
-      if (rows.length <= 1) continue; // Skip tables with just header or empty
-      
-      // Get table headers to determine column meanings
-      const headerRow = rows[0];
-      const headers = Array.from(headerRow.querySelectorAll('th')).map(th => 
-        th.textContent?.trim().toLowerCase() || ''
-      );
-      
-      // Determine column indices for key data
-      const dateColIndex = headers.findIndex(h => h.includes('date') || h.includes('year'));
-      const blackColIndex = headers.findIndex(h => h.includes('black'));
-      const whiteColIndex = headers.findIndex(h => h.includes('white'));
-      const resultColIndex = headers.findIndex(h => h.includes('result'));
-      const sgfColIndex = headers.findIndex(h => h.includes('sgf'));
-      
-      // If no specific column found for players, look for winner/opponent pattern
-      const winnerColIndex = blackColIndex === -1 ? headers.findIndex(h => h.includes('winner')) : -1;
-      const opponentColIndex = whiteColIndex === -1 ? headers.findIndex(h => h.includes('opponent')) : -1;
-      
-      // Process each data row
-      for (let i = 1; i < rows.length; i++) {
-        const row = rows[i];
-        const cells = row.querySelectorAll('td');
+    try {
+      const response = await fetch(`${tournamentPath}/index.html`);
+      if (response.ok) {
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
         
-        if (cells.length < 2) continue; // Skip rows with insufficient cells
+        // Extract game information from the HTML table
+        const tournamentName = doc.querySelector('h1')?.textContent || '';
+        const tournamentId = tournamentPath.split('/').pop() || '';
         
-        // Extract data based on detected column positions
-        let date = '';
-        let players: string[] = [];
-        let result = '';
-        let gameLinks: HTMLAnchorElement[] = [];
+        // Process all tables in the document
+        const tables = doc.querySelectorAll('table');
         
-        // Extract date
-        if (dateColIndex >= 0 && dateColIndex < cells.length) {
-          date = cells[dateColIndex].textContent?.trim() || '';
-        }
-        
-        // Extract players
-        if (blackColIndex >= 0 && whiteColIndex >= 0 && 
-            blackColIndex < cells.length && whiteColIndex < cells.length) {
-          // Black and white player format
-          const black = cells[blackColIndex].textContent?.trim() || '';
-          const white = cells[whiteColIndex].textContent?.trim() || '';
-          players = [black, white];
-        } else if (winnerColIndex >= 0 && opponentColIndex >= 0 && 
-                  winnerColIndex < cells.length && opponentColIndex < cells.length) {
-          // Winner and opponent format
-          const winner = cells[winnerColIndex].textContent?.trim() || '';
-          const opponent = cells[opponentColIndex].textContent?.trim() || '';
-          players = [winner, opponent];
-        }
-        
-        // Extract result
-        if (resultColIndex >= 0 && resultColIndex < cells.length) {
-          result = cells[resultColIndex].textContent?.trim() || '';
-        }
-        
-        // Extract SGF links
-        if (sgfColIndex >= 0 && sgfColIndex < cells.length) {
-          // Links in the SGF column
-          gameLinks = Array.from(cells[sgfColIndex].querySelectorAll('a'));
-        } else {
-          // Look for links in any cell
-          for (let j = 0; j < cells.length; j++) {
-            const cellLinks = cells[j].querySelectorAll('a');
-            if (cellLinks.length > 0) {
-              gameLinks = Array.from(cellLinks).filter(link => {
-                const href = link.getAttribute('href') || '';
-                return href.endsWith('.sgf');
-              });
-              if (gameLinks.length > 0) break;
-            }
-          }
-        }
-        
-        // Process each game link
-        for (let j = 0; j < gameLinks.length; j++) {
-          const link = gameLinks[j];
-          const gameNumber = link.textContent?.trim() || `Game ${j+1}`;
-          const sgfPath = link.getAttribute('href') || '';
+        for (let tableIndex = 0; tableIndex < tables.length; tableIndex++) {
+          const table = tables[tableIndex];
+          const rows = table.querySelectorAll('tr');
           
-          if (sgfPath && sgfPath.endsWith('.sgf')) {
-            // Determine the title based on table content
-            let title = '';
+          if (rows.length <= 1) continue; // Skip tables with just header or empty
+          
+          // Get table headers to determine column meanings
+          const headerRow = rows[0];
+          const headers = Array.from(headerRow.querySelectorAll('th')).map(th => 
+            th.textContent?.trim().toLowerCase() || ''
+          );
+          
+          // Determine column indices for key data
+          const dateColIndex = headers.findIndex(h => h.includes('date') || h.includes('year'));
+          const blackColIndex = headers.findIndex(h => h.includes('black'));
+          const whiteColIndex = headers.findIndex(h => h.includes('white'));
+          const resultColIndex = headers.findIndex(h => h.includes('result'));
+          const sgfColIndex = headers.findIndex(h => h.includes('sgf'));
+          
+          // If no specific column found for players, look for winner/opponent pattern
+          const winnerColIndex = blackColIndex === -1 ? headers.findIndex(h => h.includes('winner')) : -1;
+          const opponentColIndex = whiteColIndex === -1 ? headers.findIndex(h => h.includes('opponent')) : -1;
+          
+          // Process each data row
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.querySelectorAll('td');
             
-            // Try to extract a sensible title from the first few cells
-            for (let k = 0; k < Math.min(cells.length, 3); k++) {
-              const cellText = cells[k].textContent?.trim() || '';
-              if (cellText && !cellText.includes('sgf') && cellText !== gameNumber) {
-                if (title) title += ' - ';
-                title += cellText;
+            if (cells.length < 2) continue; // Skip rows with insufficient cells
+            
+            // Extract data based on detected column positions
+            let date = '';
+            let players: string[] = [];
+            let result = '';
+            let gameLinks: HTMLAnchorElement[] = [];
+            
+            // Extract date
+            if (dateColIndex >= 0 && dateColIndex < cells.length) {
+              date = cells[dateColIndex].textContent?.trim() || '';
+            }
+            
+            // Extract players
+            if (blackColIndex >= 0 && whiteColIndex >= 0 && 
+                blackColIndex < cells.length && whiteColIndex < cells.length) {
+              // Black and white player format
+              const black = cells[blackColIndex].textContent?.trim() || '';
+              const white = cells[whiteColIndex].textContent?.trim() || '';
+              players = [black, white];
+            } else if (winnerColIndex >= 0 && opponentColIndex >= 0 && 
+                      winnerColIndex < cells.length && opponentColIndex < cells.length) {
+              // Winner and opponent format
+              const winner = cells[winnerColIndex].textContent?.trim() || '';
+              const opponent = cells[opponentColIndex].textContent?.trim() || '';
+              players = [winner, opponent];
+            }
+            
+            // Extract result
+            if (resultColIndex >= 0 && resultColIndex < cells.length) {
+              result = cells[resultColIndex].textContent?.trim() || '';
+            }
+            
+            // Extract SGF links
+            if (sgfColIndex >= 0 && sgfColIndex < cells.length) {
+              // Links in the SGF column
+              gameLinks = Array.from(cells[sgfColIndex].querySelectorAll('a'));
+            } else {
+              // Look for links in any cell
+              for (let j = 0; j < cells.length; j++) {
+                const cellLinks = cells[j].querySelectorAll('a');
+                if (cellLinks.length > 0) {
+                  gameLinks = Array.from(cellLinks).filter(link => {
+                    const href = link.getAttribute('href') || '';
+                    return href.endsWith('.sgf');
+                  });
+                  if (gameLinks.length > 0) break;
+                }
               }
             }
             
-            // Fallback title if we couldn't extract one
-            if (!title) {
-              title = `${tournamentName} (${date || 'Unknown date'}) - ${gameNumber}`;
+            // Process each game link
+            for (let j = 0; j < gameLinks.length; j++) {
+              const link = gameLinks[j];
+              const gameNumber = link.textContent?.trim() || `Game ${j+1}`;
+              const sgfPath = link.getAttribute('href') || '';
+              
+              if (sgfPath && sgfPath.endsWith('.sgf')) {
+                // Determine the title based on table content
+                let title = '';
+                
+                // Try to extract a sensible title from the first few cells
+                for (let k = 0; k < Math.min(cells.length, 3); k++) {
+                  const cellText = cells[k].textContent?.trim() || '';
+                  if (cellText && !cellText.includes('sgf') && cellText !== gameNumber) {
+                    if (title) title += ' - ';
+                    title += cellText;
+                  }
+                }
+                
+                // Fallback title if we couldn't extract one
+                if (!title) {
+                  title = `${tournamentName} (${date || 'Unknown date'}) - ${gameNumber}`;
+                }
+                
+                indexHtmlGames.push({
+                  id: `${tournamentId}-${date}-${j}`,
+                  tournament: tournamentName,
+                  title: title,
+                  players: players,
+                  date: date,
+                  result: result,
+                  path: `${tournamentPath}/${sgfPath}`
+                });
+              }
             }
-            
-            games.push({
-              id: `${tournamentId}-${date}-${j}`,
-              tournament: tournamentName,
-              title: title,
-              players: players,
-              date: date,
-              result: result,
-              path: `${tournamentPath}/${sgfPath}`
-            });
           }
         }
+        
+        hasLoadedIndex = indexHtmlGames.length > 0;
       }
+    } catch (error) {
+      console.warn(`No index.html found at ${tournamentPath} or error parsing it:`, error);
     }
     
-    return games;
+    // If we found games in the index.html, return them. Otherwise, scan the directory for SGF files
+    if (hasLoadedIndex) {
+      return indexHtmlGames;
+    }
+    
+    // No index.html or no games found, scan directory for SGF files directly
+    const allGames: GameInfo[] = [];
+    await scanDirectoryForSgfFiles(tournamentPath, allGames);
+    
+    return allGames;
   } catch (error) {
     console.error('Error parsing game index:', error);
     return [];
+  }
+};
+
+// Helper function to scan a directory for SGF files
+const scanDirectoryForSgfFiles = async (dirPath: string, games: GameInfo[]): Promise<void> => {
+  try {
+    // Try to get directory listing
+    const dirListingResponse = await fetch(`${dirPath}/`);
+    if (!dirListingResponse.ok) {
+      // Can't get directory listing, try as a last resort to scan for common SGF filenames
+      await scanForCommonSgfFiles(dirPath, games);
+      return;
+    }
+    
+    const html = await dirListingResponse.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // Get directory name for display in titles
+    const tournamentId = dirPath.split('/').pop() || '';
+    const tournamentName = formatTournamentName(tournamentId);
+    
+    // Process direct SGF links
+    const links = doc.querySelectorAll('a');
+    const sgfLinks = Array.from(links).filter(link => {
+      const href = link.getAttribute('href') || '';
+      return href.endsWith('.sgf');
+    });
+    
+    for (let i = 0; i < sgfLinks.length; i++) {
+      const link = sgfLinks[i];
+      const sgfPath = link.getAttribute('href') || '';
+      const fileName = sgfPath.split('/').pop() || `game-${i+1}.sgf`;
+      
+      games.push({
+        id: `${tournamentId}-${fileName}-${i}`,
+        tournament: tournamentName,
+        title: `${fileName.replace('.sgf', '')}`,
+        players: [],
+        date: '',
+        result: '',
+        path: `${dirPath}/${sgfPath}`
+      });
+    }
+    
+    // Find subdirectories to scan recursively
+    const dirLinks = Array.from(links).filter(link => {
+      const href = link.getAttribute('href') || '';
+      return href.endsWith('/') && !href.includes('..') && !href.includes('?') && !href.includes('://');
+    });
+    
+    // Process each subdirectory recursively
+    for (const dirLink of dirLinks) {
+      const subDirPath = dirLink.getAttribute('href') || '';
+      // If this is a directory index page, skip it to avoid infinite recursion
+      if (subDirPath === 'index.html' || subDirPath === './') continue;
+      
+      await scanDirectoryForSgfFiles(`${dirPath}/${subDirPath}`, games);
+    }
+    
+    // If we didn't find any SGF files and this is a known problematic directory,
+    // try additional scanners
+    if (games.length === 0) {
+      const dirName = dirPath.split('/').pop() || '';
+      
+      // Special handling for player collections and certain tournament series
+      const specialDirs = ['Cho_Chikun', 'Go_Seigen', 'Agon'];
+      if (specialDirs.includes(dirName)) {
+        await scanForCommonSgfFiles(dirPath, games);
+        
+        // For Agon, also check numbered subfolders
+        if (dirName === 'Agon') {
+          await scanNumberedSubfolders(dirPath, games);
+        }
+      }
+    }
+  } catch (error) {
+    console.warn(`Error scanning directory ${dirPath}:`, error);
+    
+    // Try one more approach - check for common SGF files
+    await scanForCommonSgfFiles(dirPath, games);
+    
+    // For specific known problematic directories like Agon with numbered subfolders,
+    // try to scan each numbered subfolder
+    const dirName = dirPath.split('/').pop() || '';
+    if (dirName === 'Agon') {
+      console.log('Special handling for Agon directory with numbered subfolders');
+      await scanNumberedSubfolders(dirPath, games);
+    } else if (dirName === 'Cho_Chikun' || dirName === 'Go_Seigen') {
+      // Special handling for player collections
+      console.log(`Special handling for player collection: ${dirName}`);
+      await scanPlayerCollection(dirPath, games, dirName);
+    }
+  }
+};
+
+// Helper for player collections like Cho_Chikun and Go_Seigen
+const scanPlayerCollection = async (dirPath: string, games: GameInfo[], playerName: string): Promise<void> => {
+  // Common prefixes used in player collections
+  const prefixes = ['Jud', 'Hon', 'Kis', 'Mei', 'Ten', 'Gos', 'Oza', 'ProB', 'NHK', 'NEC'];
+  
+  for (const prefix of prefixes) {
+    for (let i = 1; i <= 30; i++) {
+      const num = i.toString().padStart(2, '0');
+      const filePath = `${dirPath}/${prefix}${num}.sgf`;
+      
+      try {
+        const response = await fetch(filePath, { method: 'HEAD' });
+        if (response.ok) {
+          games.push({
+            id: `${playerName}-${prefix}${num}`,
+            tournament: formatTournamentName(playerName),
+            title: `${playerName} - ${prefix}${num}`,
+            players: [playerName],
+            date: '',
+            result: '',
+            path: filePath
+          });
+        }
+      } catch (error) {
+        // Skip - file doesn't exist
+      }
+    }
+  }
+};
+
+// Helper function to scan numbered subfolders (like in Agon directory)
+const scanNumberedSubfolders = async (parentPath: string, games: GameInfo[]): Promise<void> => {
+  // Common patterns for numbered folders (01, 02, 03... and 1, 2, 3...)
+  // Try two-digit numbered folders (01-50)
+  for (let i = 1; i <= 50; i++) {
+    const folderNum = i.toString().padStart(2, '0');
+    const subfolderPath = `${parentPath}/${folderNum}`;
+    
+    try {
+      // Try to access the folder
+      const response = await fetch(`${subfolderPath}/`);
+      if (response.ok) {
+        await scanDirectoryForSgfFiles(subfolderPath, games);
+      }
+    } catch (error) {
+      // If folder doesn't exist or can't be accessed, try the next one
+    }
+  }
+  
+  // Also try single-digit folders (1-9)
+  for (let i = 1; i <= 9; i++) {
+    const subfolderPath = `${parentPath}/${i}`;
+    
+    try {
+      const response = await fetch(`${subfolderPath}/`);
+      if (response.ok) {
+        await scanDirectoryForSgfFiles(subfolderPath, games);
+      }
+    } catch (error) {
+      // If folder doesn't exist or can't be accessed, try the next one
+    }
+  }
+};
+
+// Helper to check for common SGF files when directory listing fails
+const scanForCommonSgfFiles = async (dirPath: string, games: GameInfo[]): Promise<void> => {
+  const tournamentId = dirPath.split('/').pop() || '';
+  const tournamentName = formatTournamentName(tournamentId);
+  
+  // Check for common numeric SGF file patterns (1.sgf, 2.sgf, etc.)
+  for (let i = 1; i <= 50; i++) {
+    try {
+      const filePath = `${dirPath}/${i}.sgf`;
+      const response = await fetch(filePath, { method: 'HEAD' });
+      
+      if (response.ok) {
+        games.push({
+          id: `${tournamentId}-game-${i}`,
+          tournament: tournamentName,
+          title: `Game ${i}`,
+          players: [],
+          date: '',
+          result: '',
+          path: filePath
+        });
+      }
+    } catch (error) {
+      // Skip - file doesn't exist
+    }
+  }
+  
+  // Also check common letter patterns (A01.sgf, etc.)
+  const patterns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
+                   'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+  
+  for (const letter of patterns) {
+    for (let i = 1; i <= 20; i++) {
+      try {
+        const num = i.toString().padStart(2, '0');
+        const filePath = `${dirPath}/${letter}${num}.sgf`;
+        const response = await fetch(filePath, { method: 'HEAD' });
+        
+        if (response.ok) {
+          games.push({
+            id: `${tournamentId}-${letter}${num}`,
+            tournament: tournamentName,
+            title: `${letter}${num}`,
+            players: [],
+            date: '',
+            result: '',
+            path: filePath
+          });
+        }
+      } catch (error) {
+        // Skip - file doesn't exist
+      }
+    }
   }
 };
 
