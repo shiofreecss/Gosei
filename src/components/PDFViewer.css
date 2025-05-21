@@ -273,6 +273,31 @@
   .pdf-controls {
     padding: 10px;
     background-color: rgba(248, 249, 250, 0.95);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .pdf-page-info {
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .go-to-page-form {
+    width: 100%;
+    justify-content: center;
+    margin: 0;
+  }
+
+  .page-input {
+    width: 100px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .go-button {
+    height: 36px;
+    min-width: 50px;
   }
 
   .pdf-nav-buttons {
@@ -283,28 +308,11 @@
 
   .pdf-nav-button {
     flex: 1;
-    min-height: 44px; /* Better touch target */
+    min-height: 44px;
     font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .go-to-page-form {
-    width: 100%;
-    justify-content: center;
-    margin: 8px 0;
-  }
-
-  .page-input {
-    width: 80px;
-    height: 36px;
-    font-size: 16px;
-  }
-
-  .go-button {
-    height: 36px;
-    min-width: 50px;
   }
 
   /* Enhance touch targets */
