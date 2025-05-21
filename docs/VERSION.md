@@ -15,6 +15,14 @@
   - Enhanced mobile layout with better button placement
   - Added swipe gestures for page navigation
   - Optimized controls layout for different screen sizes
+  - Updated keyboard navigation:
+    - Left Arrow: Previous page
+    - Right Arrow: Next page
+    - Space: Disabled (no action)
+- Game Viewer keyboard controls:
+  - Left Arrow: Previous move
+  - Right Arrow: Next move
+  - Space: Toggle autoplay
 
 ## v1.0.7 - 2025-05-18
 

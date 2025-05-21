@@ -3,7 +3,6 @@ import GoBoard, { BoardTheme } from './GoBoard';
 import KifuSettings from './KifuSettings';
 import LibertyAnalysis from './LibertyAnalysis';
 import WinRateChart from './WinRateChart';
-import UserInfo from './UserInfo';
 import { ParsedGame, parseSGF, movesToStones } from '../utils/sgfParser';
 import { applyMove, createBoardFromStones, getHandicapPositions, findCapturedStones, Position, Stone, isValidMove, isKoSituation } from '../utils/goRules';
 import { Move } from '../utils/sgfParser';
@@ -1036,20 +1035,6 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
       )}
       <div className="kifu-content">
         <div className="board-container">
-          {/* Add UserInfo component */}
-          <UserInfo
-            blackPlayer={{
-              name: game?.info.playerBlack || 'Black Player',
-              handicap: game?.info.handicap,
-              imageUrl: undefined // Add player image URL when available
-            }}
-            whitePlayer={{
-              name: game?.info.playerWhite || 'White Player',
-              imageUrl: undefined // Add player image URL when available
-            }}
-            countdownTime={300} // Example: 5 minutes (300 seconds)
-          />
-          
           {/* Fullscreen toggle button for mobile */}
           {isMobile && (
             <div className="fullscreen-controls">

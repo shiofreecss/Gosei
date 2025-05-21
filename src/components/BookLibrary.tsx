@@ -84,7 +84,7 @@ const BookLibrary: React.FC = () => {
         
         // Get base path - empty for relative paths, add PUBLIC_URL for Netlify
         const basePath = process.env.PUBLIC_URL || '';
-
+        
         // Function to get file stats
         const getFileStats = async (path: string): Promise<{ dateAdded: Date; lastModified: Date }> => {
           try {

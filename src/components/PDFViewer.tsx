@@ -321,13 +321,15 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
             >
               {displayMode === 'single' ? "⫸⫷" : "⫸"}
             </button>
-            <button 
-              className="header-button" 
-              onClick={toggleFullscreen} 
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-            >
-              {isFullscreen ? "⤾" : "⤢"}
-            </button>
+            {!isMobile && (
+              <button 
+                className="header-button" 
+                onClick={toggleFullscreen} 
+                title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+              >
+                {isFullscreen ? "⤾" : "⤢"}
+              </button>
+            )}
             <button className="close-button" onClick={onClose}>×</button>
           </div>
         </div>
@@ -363,78 +365,41 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
         <div className="pdf-controls">
           <span className="pdf-page-info">{getPageInfo()}</span>
           
-          {/* Mobile view - reordered controls */}
-          {isMobile ? (
-            <>
-              <form onSubmit={handlePageInputSubmit} className="go-to-page-form">
-                <input
-                  type="number"
-                  placeholder="Page..."
-                  value={pageInput}
-                  onChange={handlePageInputChange}
-                  min={1}
-                  max={numPages || undefined}
-                  className="page-input"
-                />
-                <button type="submit" className="go-button">Go</button>
-              </form>
-              
-              <div className="pdf-nav-buttons">
-                <button 
-                  onClick={goToPreviousPage} 
-                  disabled={currentPage <= 1}
-                  className="pdf-nav-button"
-                  aria-label="Previous page"
-                >
-                  ← Previous
-                </button>
-                
-                <button 
-                  onClick={goToNextPage} 
-                  disabled={!numPages || currentPage >= numPages}
-                  className="pdf-nav-button"
-                  aria-label="Next page"
-                >
-                  Next →
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <form onSubmit={handlePageInputSubmit} className="go-to-page-form">
-                <input
-                  type="number"
-                  placeholder="Page..."
-                  value={pageInput}
-                  onChange={handlePageInputChange}
-                  min={1}
-                  max={numPages || undefined}
-                  className="page-input"
-                />
-                <button type="submit" className="go-button">Go</button>
-              </form>
-              
-              <div className="pdf-nav-buttons">
-                <button 
-                  onClick={goToPreviousPage} 
-                  disabled={currentPage <= 1}
-                  className="pdf-nav-button"
-                  aria-label="Previous page"
-                >
-                  ← Previous
-                </button>
-                
-                <button 
-                  onClick={goToNextPage} 
-                  disabled={!numPages || currentPage >= numPages}
-                  className="pdf-nav-button"
-                  aria-label="Next page"
-                >
-                  Next →
-                </button>
-              </div>
-            </>
-          )}
+          {/* Mobile layout: Form above buttons */}
+          <div className="pdf-mobile-controls">
+            <form onSubmit={handlePageInputSubmit} className="go-to-page-form">
+              <input
+                type="number"
+                placeholder="Page..."
+                value={pageInput}
+                onChange={handlePageInputChange}
+                min={1}
+                max={numPages || undefined}
+                className="page-input"
+              />
+              <button type="submit" className="go-button">Go</button>
+            </form>
+            
+            <div className="pdf-nav-buttons">
+              <button 
+                onClick={goToPreviousPage} 
+                disabled={currentPage <= 1}
+                className="pdf-nav-button"
+                aria-label="Previous page"
+              >
+                ← Previous
+              </button>
+            
+              <button 
+                onClick={goToNextPage} 
+                disabled={!numPages || currentPage >= numPages}
+                className="pdf-nav-button"
+                aria-label="Next page"
+              >
+                Next →
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
