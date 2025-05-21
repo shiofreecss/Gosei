@@ -60,7 +60,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === ' ') {
+      if (e.key === 'ArrowRight') {
         goToNextPage();
       } else if (e.key === 'ArrowLeft') {
         goToPreviousPage();

@@ -999,6 +999,32 @@ const KifuReader: React.FC<KifuReaderProps> = ({ sgfContent }) => {
     }
   }, [testMode, originalGame, originalCurrentMove, game, userPlacementMode, currentMove]);
 
+  // Add keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle keyboard events if not in an input field
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          handlePrevMove();
+          break;
+        case 'ArrowRight':
+          handleNextMove();
+          break;
+        case ' ': // Space bar
+          e.preventDefault(); // Prevent page scrolling
+          toggleAutoplay();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handlePrevMove, handleNextMove, toggleAutoplay]); // Add required dependencies
+
   return (
     <div className={`kifu-reader ${isMobile ? 'kifu-reader-mobile' : ''} ${isZenMode ? 'kifu-fullscreen' : ''}`}>
       {error && (
