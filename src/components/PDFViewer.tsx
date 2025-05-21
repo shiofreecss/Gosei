@@ -27,15 +27,35 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   
-  // Handle responsive layout
+  // Handle responsive layout and auto fullscreen for mobile
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const isMobileView = window.innerWidth <= 768;
+      setIsMobile(isMobileView);
+      
+      // If switching to mobile view, enter fullscreen
+      if (isMobileView && !isFullscreen && viewerRef.current) {
+        viewerRef.current.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      }
     };
+
+    // Initial check and setup
+    handleResize();
+    
+    // Auto-enter fullscreen on mobile when component mounts
+    if (isMobile && viewerRef.current) {
+      setTimeout(() => {
+        viewerRef.current?.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      }, 100);
+    }
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [isMobile]);
 
   // Handle keyboard navigation
   useEffect(() => {

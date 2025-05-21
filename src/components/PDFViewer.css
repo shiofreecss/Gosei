@@ -10,10 +10,12 @@
   align-items: center;
   z-index: 1000;
   padding: 20px;
+  transition: all 0.3s ease;
 }
 
 .pdf-viewer-overlay.fullscreen {
   padding: 0;
+  background-color: rgb(0, 0, 0);
 }
 
 .pdf-viewer-container {
@@ -249,57 +251,79 @@
 
 /* Media queries for mobile */
 @media (max-width: 768px) {
+  .pdf-viewer-overlay {
+    padding: 0;
+  }
+
   .pdf-viewer-container {
-    width: 95%;
-    height: 95vh;
-  }
-  
-  .pdf-controls {
-    flex-direction: column;
-    gap: 15px;
-    padding: 15px;
-  }
-  
-  .pdf-page-info {
-    order: -1;
-    text-align: center;
-    margin-bottom: 10px;
-  }
-  
-  .go-to-page-form {
     width: 100%;
-    margin: 5px 0;
-    justify-content: center;
+    height: 100vh;
+    border-radius: 0;
+    max-width: none;
   }
 
-  .page-input {
-    width: 100px;
+  .pdf-viewer-header {
+    padding: 10px 15px;
   }
 
-  /* Mobile navigation buttons */
+  .pdf-viewer-header h2 {
+    font-size: 16px;
+  }
+
+  .pdf-controls {
+    padding: 10px;
+    background-color: rgba(248, 249, 250, 0.95);
+  }
+
   .pdf-nav-buttons {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
   }
 
   .pdf-nav-button {
     flex: 1;
+    min-height: 44px; /* Better touch target */
+    font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12px;
+  }
+
+  .go-to-page-form {
+    width: 100%;
+    justify-content: center;
+    margin: 8px 0;
+  }
+
+  .page-input {
+    width: 80px;
+    height: 36px;
     font-size: 16px;
-    border-radius: 6px;
   }
 
-  .pdf-nav-button:active {
-    transform: translateY(1px);
+  .go-button {
+    height: 36px;
+    min-width: 50px;
   }
 
-  /* Remove mobile-hidden class effects */
-  .mobile-hidden {
-    display: flex !important;
+  /* Enhance touch targets */
+  .header-button,
+  .close-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Optimize zoom controls for touch */
+  .zoom-controls {
+    bottom: 70px;
+    right: 10px;
+  }
+
+  .zoom-button {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
   }
 }
 
