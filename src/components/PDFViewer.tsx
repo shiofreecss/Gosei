@@ -341,14 +341,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
         </div>
         
         <div className="pdf-controls">
-          <button 
-            onClick={goToPreviousPage} 
-            disabled={currentPage <= 1}
-            className={`pdf-nav-button ${isMobile ? 'mobile-hidden' : ''}`}
-          >
-            ← Previous
-          </button>
-          
           <span className="pdf-page-info">{getPageInfo()}</span>
           
           <form onSubmit={handlePageInputSubmit} className="go-to-page-form">
@@ -364,13 +356,25 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfPath, onClose }) => {
             <button type="submit" className="go-button">Go</button>
           </form>
           
-          <button 
-            onClick={goToNextPage} 
-            disabled={!numPages || currentPage >= numPages}
-            className={`pdf-nav-button ${isMobile ? 'mobile-hidden' : ''}`}
-          >
-            Next →
-          </button>
+          <div className="pdf-nav-buttons">
+            <button 
+              onClick={goToPreviousPage} 
+              disabled={currentPage <= 1}
+              className="pdf-nav-button"
+              aria-label="Previous page"
+            >
+              ← Previous
+            </button>
+            
+            <button 
+              onClick={goToNextPage} 
+              disabled={!numPages || currentPage >= numPages}
+              className="pdf-nav-button"
+              aria-label="Next page"
+            >
+              Next →
+            </button>
+          </div>
         </div>
       </div>
     </div>

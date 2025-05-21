@@ -1,5 +1,21 @@
 # GoSei AI-Kifu Version History
 
+## v1.0.8 - 2025-05-25
+
+### Book Library and PDF Viewer Improvements
+- Enhanced Book Library functionality:
+  - Added sorting capabilities (Name A-Z/Z-A, Size, Date Added, Last Modified)
+  - Implemented real-time search functionality
+  - Added date-based filtering using file metadata
+  - Default sorting set to alphabetical (A-Z)
+  - Improved mobile responsiveness
+- PDF Viewer enhancements:
+  - Added mobile-friendly navigation controls
+  - Improved touch interaction for page navigation
+  - Enhanced mobile layout with better button placement
+  - Added swipe gestures for page navigation
+  - Optimized controls layout for different screen sizes
+
 ## v1.0.7 - 2025-05-18
 
 ### Player Information Improvements

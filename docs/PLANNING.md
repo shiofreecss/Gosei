@@ -13,10 +13,14 @@
   - [x] Zen Mode for distraction-free viewing
   - [x] Test Mode for interactive variation exploration
   - [x] Fullscreen Mode for optimal analysis
+  - [x] Mobile-friendly PDF navigation
+  - [x] Enhanced book library sorting and filtering
   - [ ] Interactive annotation system
   - [ ] Multi-game comparison view
 
 - Performance Optimization
+  - [x] Real-time search in book library
+  - [x] Efficient file metadata handling
   - [ ] Implement progressive loading for large game collections
   - [ ] Optimize SGF parsing algorithm
   - [ ] Add service worker for offline functionality
